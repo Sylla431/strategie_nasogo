@@ -163,7 +163,12 @@ export default function Home() {
             <div className="min-w-0">
               {/* <p className="text-sm font-semibold text-brand">Boutique officielle</p> */}
               <p className="text-lg font-semibold tracking-tight">{store.name}</p>
-              <p className="text-sm text-neutral-300">{store.description}</p>
+              <p className="text-xs text-neutral-300 sm:hidden">
+                Formations et coaching depuis 2020.
+              </p>
+              <p className="hidden sm:block text-sm text-neutral-300">
+                {store.description}
+              </p>
             </div>
           </div>
           <div className="hidden items-center gap-3 md:flex">
@@ -617,7 +622,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
       <div className="fixed bottom-4 left-0 right-0 z-40 px-4 md:hidden">
         <div className="card flex items-center justify-between gap-3 p-4 shadow-lg">
           <div>
-            <p className="text-sm font-semibold text-brand">Offre VPS</p>
+            <p className="text-sm font-semibold text-brand">Offre VB Sniper</p>
             <p className="text-lg font-semibold">{formatPrice(product.price)}</p>
           </div>
           <Link href="#checkout" className="button-primary">
