@@ -44,8 +44,8 @@ const product = {
   description: productDescription,
   price: 27500,
   originalPrice: 39700,
-  salePercent: 60,
-  saleEndsAt: "2025-12-15T00:00:00Z",
+  salePercent: 70,
+  saleEndsAt: "2025-12-31T00:00:00Z",
   category: "Business & Finance",
   type: "Programme de formation",
   customCtaText: "Profiter de l'offre",
@@ -396,10 +396,10 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
               )}
             </form>
 
-            <div className="space-y-3 rounded-2xl bg-[#161720] p-4">
+            <div className="space-y-3 rounded-2xl bg-[rgba(212,175,55,0.08)] p-4">
               <div className="flex items-center gap-3">
-                <span className="badge-soft">💳 Paiement</span>
-                <span className="text-sm text-neutral-300">
+                <span className="badge-soft text-brand">💳 Paiement</span>
+                <span className="text-sm text-neutral-500">
                   Choisissez votre moyen de paiement
                 </span>
               </div>
@@ -455,7 +455,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
               <iframe
                 className="h-full w-full rounded-2xl"
                 src=""
-                title="Stratégie Nasogo"
+                title="Stratégie Nasongon"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 allowFullScreen
               />
