@@ -199,7 +199,7 @@ export default function Home() {
               />
               <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
               <div className="absolute right-4 top-4 z-10 rounded-xl border border-[#d4af37] bg-black/70 px-3 py-2 backdrop-blur max-sm:hidden">
-                <p className="text-xs text-neutral-200 leading-tight">Stratégie nasogo</p>
+                <p className="text-xs text-neutral-200 leading-tight">Stratégie nasongon</p>
                 <p className="text-sm font-semibold text-brand leading-tight">
                   100$ / jour avec 20$
                 </p>
@@ -217,7 +217,7 @@ export default function Home() {
                 <div className="flex-1 min-w-0">
                   <div className="block sm:hidden">
                     <p className="text-xs text-neutral-200 truncate">100$ / jour avec 20$</p>
-                    <p className="text-sm font-semibold text-brand truncate">Stratégie nasogo</p>
+                    <p className="text-sm font-semibold text-brand truncate">Stratégie nasongon</p>
                   </div>
                   <div className="hidden sm:block">
                     <p className="text-xs text-neutral-200 truncate">Programme exclusif</p>
@@ -248,7 +248,7 @@ export default function Home() {
                   {product.name}
                 </h1>
                 <p className="text-lg text-neutral-200 max-w-3xl">
-                  ma nouvelle stratégie nasogo au quotidien sur les
+                  ma nouvelle stratégie nasongon au quotidien sur les
                   indices synthétiques, distillées sur 5 video, avec coaching,
                   communauté privée et garantie satisfaite ou remboursé 48h.
                 </p>
