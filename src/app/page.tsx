@@ -14,7 +14,7 @@ type Countdown = {
 };
 
 const store = {
-  name: "VB Sniper Academy",
+  name: "VB Sniper Academie",
   description:
     "À travers mes divers programmes de formation et de coaching, j'accompagne des traders particuliers depuis 2022.",
   url: "#",
@@ -351,7 +351,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
                   Paiement simulé pour cette démo • accès immédiat
                 </p> */}
               </div>
-              <div className="badge-soft">💎 Garantie 48h</div>
+              <div className="badge-soft">Garantie 48h</div>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
@@ -382,7 +382,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
               </div> */}
 
               <button type="submit" className="button-primary w-full cta-pulse">
-                🚀 {product.customCtaText}
+              {product.customCtaText}
               </button>
               {/* <p className="text-xs text-neutral-300">
                 Cette interface reproduit la page réelle : aucune transaction
@@ -406,9 +406,9 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
               <div className="flex flex-wrap gap-2">
                 {[
                   "Carte bancaire (Visa / MasterCard)",
-                  "Mobile Money (Orange / Moov)",
-                  "Wave",
-                  "PayPal",
+                  "Mobile Money (Orange money)",
+                  // "Wave",
+                  // "PayPal",
                 ].map((method) => (
                   <button
                     key={method}
@@ -423,7 +423,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
 
             <div className="rounded-2xl border border-neutral-200 p-4 space-y-3">
-              <p className="text-sm font-semibold text-neutral-200">
+              <p className="text-sm font-semibold text-neutral-500">
                 Besoin de plus d&apos;information ?
               </p>
               <div className="flex flex-wrap gap-2">
@@ -443,8 +443,8 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-brand">Ce que tu vas maîtriser</p>
-              <h2 className="text-2xl font-semibold">Découvre la stratégie Nasogo</h2>
-              <p className="text-neutral-300">
+              <h2 className="text-2xl font-semibold">Découvre la stratégie Nasongon</h2>
+              <p className="text-neutral-500">
                 Vidéo de présentation et d&apos;exemples concrets de la méthode.
               </p>
             </div>
@@ -488,7 +488,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             <div>
               <p className="text-sm font-semibold text-brand">Résultats en direct</p>
               <h2 className="text-2xl font-semibold p-3">Trades pris sur MT5 mobile</h2>
-              <p className="text-neutral-300">
+              <p className="text-neutral-500">
                 Témoignages visuels issus de MT5 mobile partagé par les élèves.
               </p>
             </div>
