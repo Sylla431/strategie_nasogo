@@ -16,7 +16,7 @@ type Countdown = {
 const store = {
   name: "VB Sniper Academy",
   description:
-    "À travers mes divers programmes de formation et de coaching, j'accompagne des traders particuliers depuis 2020.",
+    "À travers mes divers programmes de formation et de coaching, j'accompagne des traders particuliers depuis 2022.",
   url: "#",
   logoUrl: "/logo/logo.png",
   socialLinks: {
@@ -37,13 +37,13 @@ const productDescription = `<h3 class="ql-align-center"><strong style="color: rg
 
 const product = {
   id: "prd_6dq35w",
-  name: "VB Sniper : 5 videos pour Apprendre ma nouvelle stratégie nasogo",
+  name: "VB Sniper : 5 videos pour Apprendre ma nouvelle stratégie nasongon",
   slug: "vps-v1",
   cover: "/images/3.jpg",
   thumbnail: "/images/Instructeur.jpg",
   description: productDescription,
-  price: 19700,
-  originalPrice: 49700,
+  price: 27500,
+  originalPrice: 39700,
   salePercent: 60,
   saleEndsAt: "2025-12-15T00:00:00Z",
   category: "Business & Finance",
@@ -124,9 +124,9 @@ function useCountdown(targetDate: string): Countdown {
 }
 
 const Stat = ({ value, label }: { value: string; label: string }) => (
-  <div className="flex flex-col gap-1 rounded-xl bg-[#1b1b25] p-3 text-center shadow-sm backdrop-blur">
+  <div className="flex flex-col gap-1 rounded-xl bg-white p-3 text-center shadow-sm border border-[#e1e3eb]">
     <span className="text-xl font-semibold text-brand">{value}</span>
-    <span className="text-sm text-neutral-300">{label}</span>
+    <span className="text-sm text-neutral-700">{label}</span>
   </div>
 );
 
@@ -147,8 +147,8 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-transparent text-neutral-100">
-      <header className="sticky top-0 z-30  bg-[#0b0b10e6] backdrop-blur-lg p-4">
+    <div className="bg-transparent text-neutral-900">
+      <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-lg p-4 border-b border-[#e1e3eb]">
         <div className="layout-shell flex flex-wrap items-center justify-between gap-3 sm:gap-4 py-4">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-[#d4af37]/60 bg-black shadow-md">
@@ -163,10 +163,10 @@ export default function Home() {
             <div className="min-w-0">
               {/* <p className="text-sm font-semibold text-brand">Boutique officielle</p> */}
               <p className="text-lg font-semibold tracking-tight">{store.name}</p>
-              <p className="text-xs text-neutral-300 sm:hidden">
-                Formations et coaching depuis 2020.
+              <p className="text-xs text-neutral-700 sm:hidden">
+                Formations et coaching depuis 2022.
               </p>
-              <p className="hidden sm:block text-sm text-neutral-300">
+              <p className="hidden sm:block text-sm text-neutral-800">
                 {store.description}
               </p>
             </div>
@@ -197,14 +197,14 @@ export default function Home() {
                 className="object-cover"
                 priority
               />
-              <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-              <div className="absolute right-4 top-4 z-10 rounded-xl border border-[#d4af37] bg-black/70 px-3 py-2 backdrop-blur max-sm:hidden">
-                <p className="text-xs text-neutral-200 leading-tight">Stratégie nasongon</p>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-transparent" />
+              <div className="absolute right-4 top-4 z-10 rounded-xl border border-[#d4af37] bg-white/95 px-3 py-2 backdrop-blur max-sm:hidden">
+                <p className="text-xs text-neutral-800 leading-tight">Stratégie nasongon</p>
                 <p className="text-sm font-semibold text-brand leading-tight">
                   100$ / jour avec 20$
                 </p>
               </div>
-              <div className="absolute left-4 bottom-4 max-sm:left-4 max-sm:right-4 max-sm:bottom-3 flex items-center gap-3 rounded-full bg-black/70 px-3 py-2 backdrop-blur max-sm:w-[90%]">
+              <div className="absolute left-4 bottom-4 max-sm:left-4 max-sm:right-4 max-sm:bottom-3 flex items-center gap-3 rounded-full bg-white/90 px-3 py-2 backdrop-blur max-sm:w-[90%]">
                 <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-full border border-[#d4af37]/60 shadow-md">
                   <Image
                     src={store.logoUrl}
@@ -216,11 +216,11 @@ export default function Home() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="block sm:hidden">
-                    <p className="text-xs text-neutral-200 truncate">100$ / jour avec 20$</p>
+                    <p className="text-xs text-neutral-800 truncate">100$ / jour avec 20$</p>
                     <p className="text-sm font-semibold text-brand truncate">Stratégie nasongon</p>
                   </div>
                   <div className="hidden sm:block">
-                    <p className="text-xs text-neutral-200 truncate">Programme exclusif</p>
+                    <p className="text-xs text-neutral-800 truncate">Programme exclusif</p>
                     <p className="text-sm font-semibold text-brand truncate">VB Sniper</p>
                   </div>
                 </div>
@@ -239,7 +239,7 @@ export default function Home() {
               <div className="flex flex-wrap items-center gap-3">
                 <span className="pill-neutral">{product.type}</span>
                 <span className="pill-neutral">
-                  🔥 Offre limitée jusqu&apos;au 15 décembre 2025
+                  🔥 Offre limitée jusqu&apos;au 31 décembre 2025
                 </span>
               </div>
 
@@ -247,8 +247,8 @@ export default function Home() {
                 <h1 className="text-3xl md:text-4xl font-semibold leading-tight tracking-tight">
                   {product.name}
                 </h1>
-                <p className="text-lg text-neutral-200 max-w-3xl">
-                  ma nouvelle stratégie nasongon au quotidien sur les
+                <p className="text-lg text-neutral-500 max-w-3xl">
+                  Ma nouvelle stratégie nasongon au quotidien sur les
                   indices synthétiques, distillées sur 5 video, avec coaching,
                   communauté privée et garantie satisfaite ou remboursé 48h.
                 </p>
@@ -264,7 +264,7 @@ export default function Home() {
                   </span>
                 </div>
                 <span className="badge-soft">-{product.salePercent}%</span>
-              <span className="text-sm text-neutral-300">
+              <span className="text-sm text-neutral-700">
                   Économisez {formatPrice(savings)}
                 </span>
               </div>
@@ -295,7 +295,7 @@ export default function Home() {
               </div> */}
               <div className="space-y-3">
           
-                <p className="text-lg text-neutral-200 max-w-3xl">
+                <p className="text-lg text-neutral-500 max-w-3xl">
                 Formation Nansongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu’à 100$ par jour avec un petit capital. Elle repose sur l’analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
 
 Cette formation t’apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s’adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
