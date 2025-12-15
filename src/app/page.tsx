@@ -44,7 +44,7 @@ const product = {
   description: productDescription,
   price: 27500,
   originalPrice: 39700,
-  salePercent: 70,
+  salePercent: 30,
   saleEndsAt: "2025-12-31T00:00:00Z",
   category: "Business & Finance",
   type: "Programme de formation",
@@ -351,7 +351,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
                   Paiement simulé pour cette démo • accès immédiat
                 </p> */}
               </div>
-              <div className="badge-soft">Garantie 48h</div>
+              <div className="badge-soft text-brand">Garantie 48h</div>
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
