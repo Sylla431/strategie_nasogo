@@ -137,6 +137,7 @@ export default function Home() {
     null,
   );
   const [paymentInfo, setPaymentInfo] = useState<string | null>(null);
+  const [videoZoomOpen, setVideoZoomOpen] = useState(false);
   const countdown = useCountdown(product.saleEndsAt);
 
   const savings = product.originalPrice - product.price;
@@ -152,7 +153,7 @@ export default function Home() {
         <div className="layout-shell flex flex-wrap items-center justify-between gap-3 sm:gap-4 py-4">
           <div className="flex items-center gap-3 sm:gap-4 min-w-0">
             <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-[#d4af37]/60 bg-black shadow-md">
-              <Image
+        <Image
                 src={store.logoUrl}
                 alt={store.name}
                 fill
@@ -195,8 +196,8 @@ export default function Home() {
                 alt={product.name}
                 fill
                 className="object-cover"
-                priority
-              />
+          priority
+        />
               <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-transparent" />
               <div className="absolute right-4 top-4 z-10 rounded-xl border border-[#d4af37] bg-white/95 px-3 py-2 backdrop-blur max-sm:hidden">
                 <p className="text-xs text-neutral-800 leading-tight">Stratégie nasongon</p>
@@ -246,7 +247,7 @@ export default function Home() {
               <div className="space-y-3">
                 <h1 className="text-3xl md:text-4xl font-semibold leading-tight tracking-tight">
                   {product.name}
-                </h1>
+          </h1>
                 <p className="text-lg text-neutral-500 max-w-3xl">
                   Ma nouvelle stratégie nasongon au quotidien sur les
                   indices synthétiques, distillées sur 5 video, avec coaching,
@@ -275,7 +276,7 @@ export default function Home() {
                 </Link>
                 <Link
                   href={store.support.whatsapp}
-                  target="_blank"
+            target="_blank"
                   className="button-secondary"
                 >
                   💬 Parler à un conseiller
@@ -450,10 +451,17 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
           </div>
 
-            <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-[#0f1016] shadow-md">
-            <div className="aspect-video w-full">
+          <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-[#0f1016] shadow-md">
+            <button
+              type="button"
+              className="absolute right-3 top-3 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-brand"
+              onClick={() => setVideoZoomOpen(true)}
+            >
+              Agrandir
+            </button>
+            <div className="relative w-full aspect-[16/9] sm:aspect-video">
               <iframe
-                className="h-full w-full rounded-2xl"
+                className="absolute inset-0 h-full w-full rounded-2xl"
                   src="https://player.vimeo.com/video/1147397571?title=0&byline=0&portrait=0"
                   title="Stratégie Nasongon"
                   allow="autoplay; fullscreen; picture-in-picture"
@@ -462,6 +470,37 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
           </div>
         </section>
+
+        {videoZoomOpen && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 p-4"
+            role="dialog"
+            aria-modal="true"
+            onClick={() => setVideoZoomOpen(false)}
+          >
+            <div
+              className="relative w-full max-w-6xl max-h-[90vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                type="button"
+                className="absolute right-3 top-3 z-10 rounded-full bg-black/70 px-3 py-1 text-xs font-semibold text-white shadow hover:bg-black focus:outline-none focus:ring-2 focus:ring-brand"
+                onClick={() => setVideoZoomOpen(false)}
+              >
+                Fermer
+              </button>
+              <div className="relative w-full h-[80vh]">
+                <iframe
+                  className="absolute inset-0 h-full w-full rounded-2xl"
+                  src="https://player.vimeo.com/video/1147397571?title=0&byline=0&portrait=0"
+                  title="Stratégie Nasongon"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* <section className="card p-6 md:p-8 space-y-4">
           <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -490,8 +529,8 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
               <h2 className="text-2xl font-semibold p-3">Trades pris sur MT5 mobile</h2>
               <p className="text-neutral-500">
                 Témoignages visuels issus de MT5 mobile partagé par les élèves.
-              </p>
-            </div>
+          </p>
+        </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {testimonials.map((file) => (
@@ -533,7 +572,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
                 Fermer
               </button>
               <div className="relative h-[75vh] w-full bg-black">
-                <Image
+            <Image
                   src={`/testimonial/${selectedTestimonial}`}
                   alt={`Résultat MT5 - ${selectedTestimonial}`}
                   fill
@@ -615,7 +654,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
                 </div>
               </div>
             ))}
-          </div>
+        </div>
         </section>
       </main>
 
