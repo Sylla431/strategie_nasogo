@@ -20,16 +20,16 @@ const store = {
   url: "#",
   logoUrl: "/logo/logo.png",
   socialLinks: {
-    telegram: "https://t.me/+0NJDYbSz2BM0MTI0",
-    instagram: "https://www.instagram.com/geoffroyboko",
-    facebook: "https://facebook.com/geoffroy.bk08",
-    youtube: "https://youtube.com/@geoffroybk",
-    tiktok: "https://www.tiktok.com/@geoffroyboko_",
+    // telegram: "https://t.me/+0NJDYbSz2BM0MTI0",
+    // instagram: "https://www.instagram.com/geoffroyboko",
+    // facebook: "https://facebook.com/geoffroy.bk08",
+    // youtube: "https://youtube.com/@geoffroybk",
+    // tiktok: "https://www.tiktok.com/@geoffroyboko_",
   },
   support: {
-    whatsapp: "https://wa.me/33759644734",
-    email: "mailto:tibacademy.contact@gmail.com",
-    phone: "+223 83 85 62 03",
+    whatsapp: "https://wa.me/+22373695125",
+    email: "mailto:vbsnipergroupe@gmail.com",
+    phone: "+223 73 69 51 25",
   },
 };
 
@@ -450,16 +450,15 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
+            <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-[#0f1016] shadow-md">
             <div className="aspect-video w-full">
-              <video
-                className="h-full w-full rounded-2xl object-cover"
-                controls
-                poster={product.cover}
-              >
-                <source src="/video/Présentation .mp4" type="video/mp4" />
-                Votre navigateur ne supporte pas la lecture vidéo.
-              </video>
+              <iframe
+                className="h-full w-full rounded-2xl"
+                  src="https://player.vimeo.com/video/1147397571?title=0&byline=0&portrait=0"
+                  title="Stratégie Nasongon"
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  allowFullScreen
+                />
             </div>
           </div>
         </section>
