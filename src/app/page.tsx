@@ -422,7 +422,6 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
                 ))}
               </div>
             </div>
-
             <div className="rounded-2xl border border-neutral-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-neutral-500">
                 Besoin de plus d&apos;information ?
@@ -440,7 +439,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
           </aside>
         </section>
 
-        <section className="card p-6 md:p-8 space-y-6">
+        <section className="card p-4 md:p-8 space-y-6">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-sm font-semibold text-brand">Ce que tu vas maîtriser</p>
