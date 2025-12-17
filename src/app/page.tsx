@@ -450,15 +450,16 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
           </div>
 
-          <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-[#0f1016] shadow-md">
+          <div className="relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-md">
             <div className="aspect-video w-full">
-              <iframe
-                className="h-full w-full rounded-2xl"
-                src=""
-                title="Stratégie Nasongon"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              <video
+                className="h-full w-full rounded-2xl object-cover"
+                controls
+                poster={product.cover}
+              >
+                <source src="/video/Présentation .mp4" type="video/mp4" />
+                Votre navigateur ne supporte pas la lecture vidéo.
+              </video>
             </div>
           </div>
         </section>
