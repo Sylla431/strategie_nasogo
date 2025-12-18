@@ -12,16 +12,17 @@ const poppins = Poppins({
 export const metadata: Metadata = {
   title: "Stratégie Nasongon - VB Sniper",
   description:
-    "Apprenez 2 stratégies clés en 7 jours pour maîtriser le trading sur indices. Offre limitée à 19 700 FCFA avec garantie satisfait ou remboursé.",
+    "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
+  metadataBase: new URL("https://vbsniperacademie.com"),
   openGraph: {
     title:
       "Stratégie Nasongon - VB Sniper",
     description:
-      "Apprenez 2 stratégies clés en 7 jours pour maîtriser le trading sur indices synthétiques, avec accès immédiat et garantie 48h.",
+      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
     images: [
-      "#",
+      "/images/instr2.jpg",
     ],
-    url: "/",
+    url: "https://vbsniperacademie.com",
     locale: "fr_FR",
     type: "website",
   },
@@ -30,9 +31,9 @@ export const metadata: Metadata = {
     title:
       "Stratégie Nasongon - VB Sniper",
     description:
-      "Apprenez 2 stratégies clés en 7 jours pour maîtriser le trading sur indices synthétiques.",
+      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
     images: [
-      "https://images.chariow.com/cdn-cgi/image/format=auto,onerror=redirect,quality=medium-high,slow-connection-quality=50/https://assets.cdn.chariow.com/assets/store_2ogbw3q722u8/idayBXggm6IdU0nYoAVh0wV8xk3KoSD88BRRbfWz.png",
+      "/images/instr2.jpg",
     ],
   },
   icons: {
