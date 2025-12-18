@@ -142,6 +142,52 @@ export default function Home() {
 
   const savings = product.originalPrice - product.price;
 
+  const siteUrl = "https://vbsniperacademie.com";
+  const toAbs = (path: string) =>
+    path.startsWith("http")
+      ? path
+      : `${siteUrl}${path.startsWith("/") ? "" : "/"}${path}`;
+
+  const ldProduct = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: product.name,
+    description:
+      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital.",
+    image: [toAbs(product.cover), toAbs(product.thumbnail)],
+    brand: {
+      "@type": "Organization",
+      name: "VB Sniper Academie",
+      logo: toAbs(store.logoUrl),
+      url: siteUrl,
+    },
+    offers: {
+      "@type": "Offer",
+      url: siteUrl,
+      priceCurrency: "XOF",
+      price: product.price,
+      availability: "https://schema.org/InStock",
+      priceValidUntil: product.saleEndsAt,
+    },
+  };
+
+  const ldOrganization = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "VB Sniper Academie",
+    url: siteUrl,
+    logo: toAbs(store.logoUrl),
+    contactPoint: [
+      {
+        "@type": "ContactPoint",
+        telephone: store.support.phone,
+        contactType: "customer support",
+        areaServed: "FR",
+        availableLanguage: ["fr"],
+      },
+    ],
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitted(true);
@@ -188,6 +234,14 @@ export default function Home() {
       </header>
 
       <main className="layout-shell py-10 md:py-14 space-y-10 ">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ldOrganization) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(ldProduct) }}
+        />
         <section className="grid gap-8 lg:grid-cols-[1.4fr_1fr] items-start pt-5">
           <div className="card overflow-hidden">
             <div className="relative h-[360px] w-full bg-dotted">
