@@ -289,21 +289,21 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
             <Link
               href={store.support.whatsapp}
               target="_blank"
-              className="pill-neutral"
+              className="pill-neutral text-xs sm:text-sm whitespace-nowrap"
             >
               Besoin d&apos;aide ?
             </Link>
             {sessionToken ? (
               <>
-                <Link href="/client" className="pill-neutral">
+                <Link href="/client" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
                   Espace client
                 </Link>
                 {userRole === "admin" && (
-                  <Link href="/admin" className="pill-neutral">
+                  <Link href="/admin" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
                     Admin
                   </Link>
                 )}
@@ -384,7 +384,7 @@ export default function Home() {
                 </div>
               </>
             ) : (
-              <Link href="/auth" className="button-primary cta-pulse">
+              <Link href="/auth" className="button-primary cta-pulse text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
                 Connexion
               </Link>
             )}
