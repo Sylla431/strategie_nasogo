@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Mode = "login" | "register";
 
-export default function AuthPage() {
+function AuthForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [mode, setMode] = useState<Mode>("login");
@@ -189,6 +189,25 @@ export default function AuthPage() {
         {message && <p className="text-sm text-green-600">{message}</p>}
       </div>
     </div>
+  );
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md space-y-6 bg-white border border-neutral-200 rounded-2xl p-6 shadow-md">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-semibold">Chargement...</h1>
+            <Link href="/" className="text-sm text-brand">
+              Retour à l&apos;accueil
+            </Link>
+          </div>
+        </div>
+      </div>
+    }>
+      <AuthForm />
+    </Suspense>
   );
 }
 
