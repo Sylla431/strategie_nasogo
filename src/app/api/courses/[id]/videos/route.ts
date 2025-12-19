@@ -9,18 +9,20 @@ async function getRole(supabase: ReturnType<typeof createSupabaseFromRequest>["s
   return typeof data?.role === "string" ? data.role.trim().toLowerCase() : null;
 }
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { supabase } = createSupabaseFromRequest(req);
   const { data, error } = await supabase
     .from("course_videos")
     .select("*")
-    .eq("course_id", params.id)
+    .eq("course_id", id)
     .order("position", { ascending: true });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
   return NextResponse.json(data);
 }
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const { supabase } = createSupabaseFromRequest(req);
   const role = await getRole(supabase);
   if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -30,7 +32,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
 
   const { data, error } = await supabase
     .from("course_videos")
-    .insert([{ course_id: params.id, title, video_url, position: Number(position ?? 0) }])
+    .insert([{ course_id: id, title, video_url, position: Number(position ?? 0) }])
     .select("*")
     .single();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });

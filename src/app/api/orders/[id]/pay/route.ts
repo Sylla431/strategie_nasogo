@@ -9,14 +9,13 @@ async function getUserRole(supabase: ReturnType<typeof createSupabaseFromRequest
   return data?.role ?? null;
 }
 
-export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> | { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { supabase } = createSupabaseFromRequest(req);
   const role = await getUserRole(supabase);
   if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-  // Résoudre params si c'est une Promise (Next.js 15+)
-  const resolvedParams = await Promise.resolve(params);
-  const orderId = resolvedParams.id;
+  // Résoudre params (Next.js 16+)
+  const { id: orderId } = await params;
 
   if (!orderId) {
     return NextResponse.json({ error: "ID de commande manquant" }, { status: 400 });
