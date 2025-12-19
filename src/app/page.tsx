@@ -2,8 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
+import { supabase } from "@/lib/supabaseClient";
 
 type Countdown = {
   days: number;
@@ -131,6 +133,7 @@ const Stat = ({ value, label }: { value: string; label: string }) => (
 );
 
 export default function Home() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [selectedTestimonial, setSelectedTestimonial] = useState<string | null>(
@@ -138,6 +141,12 @@ export default function Home() {
   );
   const [paymentInfo, setPaymentInfo] = useState<string | null>(null);
   const [videoZoomOpen, setVideoZoomOpen] = useState(false);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  const [roleLoadError, setRoleLoadError] = useState<string | null>(null);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const countdown = useCountdown(product.saleEndsAt);
 
   const savings = product.originalPrice - product.price;
@@ -188,9 +197,71 @@ export default function Home() {
     ],
   };
 
+  useEffect(() => {
+    const loadSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token ?? null;
+      const uid = data.session?.user?.id ?? null;
+      const emailVal = data.session?.user?.email ?? null;
+      setSessionToken(token);
+      setUserEmail(emailVal);
+      setUserId(uid);
+      setRoleLoadError(null);
+      if (token && uid) {
+        const readRole = async () => {
+          const { data: profile, error } = await supabase
+            .from("users_profile")
+            .select("role")
+            .eq("id", uid)
+            .maybeSingle();
+          if (error) {
+            setRoleLoadError(error.message);
+            return null;
+          }
+          const roleVal =
+            (profile?.role && typeof profile.role === "string"
+              ? profile.role.trim().toLowerCase()
+              : null) ?? null;
+          return roleVal;
+        };
+
+        let roleVal = await readRole();
+        if (!roleVal) {
+          const { error: upErr } = await supabase
+            .from("users_profile")
+            .upsert({ id: uid });
+          if (upErr) {
+            setRoleLoadError(upErr.message);
+          } else {
+            roleVal = await readRole();
+          }
+        }
+        setUserRole(roleVal === "admin" ? "admin" : roleVal);
+      } else {
+        setUserRole(null);
+        setUserId(null);
+        setRoleLoadError(null);
+        setUserMenuOpen(false);
+      }
+    };
+    loadSession();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setSessionToken(null);
+    setUserRole(null);
+    setUserEmail(null);
+    setUserId(null);
+    setRoleLoadError(null);
+    setUserMenuOpen(false);
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setSubmitted(true);
+    // Rediriger vers la page de création de compte avec l'email en paramètre
+    const emailParam = email ? `?email=${encodeURIComponent(email)}` : "";
+    router.push(`/auth${emailParam}`);
   };
 
   return (
@@ -226,9 +297,97 @@ export default function Home() {
             >
               Besoin d&apos;aide ?
             </Link>
-            <Link href="#checkout" className="button-primary cta-pulse">
-              Mes achats
-            </Link>
+            {sessionToken ? (
+              <>
+                <Link href="/client" className="pill-neutral">
+                  Espace client
+                </Link>
+                {userRole === "admin" && (
+                  <Link href="/admin" className="pill-neutral">
+                    Admin
+                  </Link>
+                )}
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="h-10 w-10 rounded-full border border-[#d4af37]/40 bg-white shadow-sm grid place-items-center hover:bg-[rgba(212,175,55,0.08)]"
+                    onClick={() => setUserMenuOpen((v) => !v)}
+                    aria-label="Profil"
+                    aria-haspopup="dialog"
+                    aria-expanded={userMenuOpen}
+                  >
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M12 12c2.761 0 5-2.239 5-5S14.761 2 12 2 7 4.239 7 7s2.239 5 5 5Z"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                      />
+                      <path
+                        d="M20 22a8 8 0 1 0-16 0"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                  </button>
+
+                  {userMenuOpen && (
+                    <div
+                      role="dialog"
+                      aria-label="Profil utilisateur"
+                      className="absolute right-0 mt-2 w-64 rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg"
+                    >
+                      <p className="text-sm text-neutral-600">Connecté en tant que</p>
+                      <p className="font-semibold break-all">
+                        {userEmail ?? "Utilisateur"}
+                      </p>
+                      <div className="mt-2 flex items-center gap-2">
+                        <span className="badge-soft text-brand">
+                          Rôle : {userRole ?? "client"}
+                        </span>
+                      </div>
+                      {userId && (
+                        <p className="mt-2 text-xs text-neutral-500 break-all">
+                          ID: {userId}
+                        </p>
+                      )}
+                      {roleLoadError && (
+                        <p className="mt-2 text-xs text-red-600 break-all">
+                          Erreur rôle: {roleLoadError}
+                        </p>
+                      )}
+                      <div className="mt-3 flex gap-2">
+                        <Link href="/client" className="pill-neutral">
+                          Espace client
+                        </Link>
+                        {userRole === "admin" && (
+                          <Link href="/admin" className="pill-neutral">
+                            Admin
+                          </Link>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        className="mt-4 button-primary w-full cta-pulse"
+                        onClick={handleLogout}
+                      >
+                        Déconnexion
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              <Link href="/auth" className="button-primary cta-pulse">
+                Connexion
+              </Link>
+            )}
           </div>
         </div>
       </header>
@@ -410,31 +569,18 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             </div>
 
             <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="space-y-2">
+              {/* <div className="space-y-2">
                 <label className="text-sm font-semibold">Adresse email</label>
                 <input
-                  required
+                  
                   type="email"
                   className="form-control"
                   placeholder="ton.email@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
-              </div>
-              {/* <div className="space-y-2">
-                <label className="text-sm font-semibold">
-                  {product.field.label}
-                </label>
-                <input
-                  required
-                  type="text"
-                  className="form-control"
-                  placeholder={product.field.placeholder}
-                  value={niveau}
-                  onChange={(e) => setNiveau(e.target.value)}
-                />
-                <p className="text-sm text-neutral-300">{product.field.help}</p>
               </div> */}
+            
 
               <button type="submit" className="button-primary w-full cta-pulse">
               {product.customCtaText}
