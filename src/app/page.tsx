@@ -58,7 +58,7 @@ const product = {
   },
   badges: [
     "Livraison immédiate",
-    "Garantie satisfait ou remboursé 48h",
+    "Resultat Garantie",
     "Accès communauté privée (30 jours)",
     "Appel bilan personnalisé",
   ],
@@ -162,7 +162,7 @@ export default function Home() {
     "@type": "Product",
     name: product.name,
     description:
-      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital.",
+      "Stratégie Nasongon : 5 vidéos + coaching, resultat garantie, objectif 100$ par jour avec 20$ de capital.",
     image: [toAbs(product.cover), toAbs(product.thumbnail)],
     brand: {
       "@type": "Organization",
@@ -464,7 +464,7 @@ export default function Home() {
                 <p className="text-lg text-neutral-500 max-w-3xl">
                   Ma nouvelle stratégie nasongon au quotidien sur les
                   indices synthétiques, distillées sur 5 video, avec coaching,
-                  communauté privée et garantie satisfaite ou remboursé 48h.
+                  communauté privée et résultat garantie.
                 </p>
               </div>
 
@@ -510,11 +510,11 @@ export default function Home() {
               <div className="space-y-3">
           
                 <p className="text-lg text-neutral-500 max-w-3xl">
-                Formation Nansongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu’à 100$ par jour avec un petit capital. Elle repose sur l’analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
+                Formation Nasongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu’à 100$ par jour avec un petit capital. Elle repose sur l’analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
 
 Cette formation t’apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s’adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
 
-Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
+Nasongon n’est pas une promesse, c’est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
 
                 </p>
               </div>
@@ -863,7 +863,7 @@ Nansongon n’est pas une promesse, c’est une méthode. Une approche réaliste
             <p className="text-sm font-semibold text-brand">Offre VB Sniper</p>
             <p className="text-lg font-semibold">{formatPrice(product.price)}</p>
           </div>
-          <Link href="#checkout" className="button-primary">
+          <Link href="/auth" className="button-primary text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
             {product.customCtaText}
           </Link>
         </div>

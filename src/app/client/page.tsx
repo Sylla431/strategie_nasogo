@@ -199,7 +199,7 @@ export default function ClientSpace() {
         <h2 className="text-xl font-semibold">Mes cours</h2>
         <div className="grid gap-4">
           {allAccessibleCourses.length === 0 && (
-            <p className="text-neutral-600">Aucun cours accessible. Crée une commande ou attends qu&apos;un admin t&apos;accorde l&apos;accès.</p>
+            <p className="text-neutral-600">Aucun cours accessible. Si vous avez payez veuillez patientez qu&apos;un admin t&apos;accorde l&apos;accès.</p>
           )}
           {allAccessibleCourses.map((course) => {
             // Utiliser video_url (JSONB) en priorité, sinon course_videos (table séparée)
