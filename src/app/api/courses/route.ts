@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
       // Masquer video_url (JSONB)
       if (sanitized.video_url) {
         if (Array.isArray(sanitized.video_url)) {
-          sanitized.video_url = sanitized.video_url.map((v) => ({
+          sanitized.video_url = sanitized.video_url.map((v: { title: string; video_url: string; position: number }) => ({
             title: v.title,
             position: v.position,
             video_url: "", // URL masquée
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       
       // Masquer video_url dans course_videos
       if (sanitized.course_videos && Array.isArray(sanitized.course_videos)) {
-        sanitized.course_videos = sanitized.course_videos.map((v) => ({
+        sanitized.course_videos = sanitized.course_videos.map((v: { id: string; course_id: string; title: string; video_url: string; position: number; created_at: string }) => ({
           ...v,
           video_url: "", // URL masquée
         }));
