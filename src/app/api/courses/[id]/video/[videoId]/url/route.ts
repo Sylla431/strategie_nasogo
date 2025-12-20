@@ -74,7 +74,7 @@ export async function GET(
   
   // Chercher dans course_videos (table)
   if (course.course_videos && Array.isArray(course.course_videos)) {
-    const video = course.course_videos.find((v) => v.id === videoId || v.id === videoId.split("-")[0]);
+    const video = course.course_videos.find((v: { id: string; video_url: string }) => v.id === videoId || v.id === videoId.split("-")[0]);
     if (video) {
       videoUrl = video.video_url;
     }
