@@ -19,11 +19,46 @@ async function getProfileRole(
 
 export async function GET(req: NextRequest) {
   const { supabase } = createSupabaseFromRequest(req);
+  const role = await getProfileRole(supabase);
+  const isAdmin = role === "admin";
+  
+  // Pour les admins, renvoyer toutes les données
+  // Pour les clients, masquer les URLs des vidéos
   const { data, error } = await supabase
     .from("courses")
     .select("*, course_videos(*)")
     .order("created_at", { ascending: false });
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  
+  // Si ce n'est pas un admin, masquer les URLs des vidéos
+  if (!isAdmin && data) {
+    const sanitizedData = data.map((course) => {
+      const sanitized: typeof course = { ...course };
+      
+      // Masquer video_url (JSONB)
+      if (sanitized.video_url) {
+        if (Array.isArray(sanitized.video_url)) {
+          sanitized.video_url = sanitized.video_url.map((v) => ({
+            title: v.title,
+            position: v.position,
+            video_url: "", // URL masquée
+          }));
+        }
+      }
+      
+      // Masquer video_url dans course_videos
+      if (sanitized.course_videos && Array.isArray(sanitized.course_videos)) {
+        sanitized.course_videos = sanitized.course_videos.map((v) => ({
+          ...v,
+          video_url: "", // URL masquée
+        }));
+      }
+      
+      return sanitized;
+    });
+    return NextResponse.json(sanitizedData);
+  }
+  
   return NextResponse.json(data);
 }
 

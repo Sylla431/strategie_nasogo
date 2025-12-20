@@ -29,6 +29,7 @@ export default function VideoPage() {
   const [course, setCourse] = useState<Course | null>(null);
   const [currentVideo, setCurrentVideo] = useState<CourseVideo | null>(null);
   const [allVideos, setAllVideos] = useState<CourseVideo[]>([]);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -103,26 +104,27 @@ export default function VideoPage() {
       const videosFromTable = foundCourse.course_videos || [];
 
       // Combiner les deux sources et créer un format unifié avec les mêmes IDs que l'espace client
+      // Ne pas inclure les URLs pour les clients (elles seront chargées via l'API sécurisée)
       const allVideosData = [
         ...videosFromJson.map((v, index) => ({
           id: `json-${courseId}-vid-${index}`,
           course_id: courseId,
           title: v.title,
-          video_url: v.video_url,
+          video_url: "", // URL masquée, sera chargée via API sécurisée
           position: v.position ?? index,
         })),
         ...videosFromTable.map((v, index) => ({
           id: `table-${courseId}-${v.id}-${index}`,
           course_id: v.course_id,
           title: v.title,
-          video_url: v.video_url,
+          video_url: "", // URL masquée, sera chargée via API sécurisée
           position: v.position,
         })),
       ];
 
-      // Supprimer les doublons basés sur video_url
+      // Supprimer les doublons basés sur l'ID (puisqu'on n'a plus les URLs)
       const uniqueVideos = allVideosData.filter((video, index, self) => 
-        index === self.findIndex((v) => v.video_url === video.video_url)
+        index === self.findIndex((v) => v.id === video.id)
       );
 
       // S'assurer que les IDs sont vraiment uniques
@@ -143,6 +145,17 @@ export default function VideoPage() {
       }
 
       setCurrentVideo(video);
+
+      // Charger l'URL de la vidéo via l'API sécurisée
+      const urlRes = await fetch(`/api/courses/${courseId}/video/${videoId}/url`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (urlRes.ok) {
+        const urlData = await urlRes.json();
+        setVideoUrl(urlData.video_url);
+      } else {
+        setError("Impossible de charger l'URL de la vidéo");
+      }
 
       setLoading(false);
     };
@@ -201,22 +214,28 @@ export default function VideoPage() {
 
       <div className="card p-4 md:p-6">
         <div className="relative w-full aspect-[16/9] overflow-hidden rounded-2xl border border-neutral-200 bg-[#0f1016] shadow-md">
-          {currentVideo.video_url.includes("vimeo.com") || currentVideo.video_url.includes("player.vimeo.com") ? (
-            <iframe
-              className="absolute inset-0 h-full w-full"
-              src={getVimeoEmbedUrl(currentVideo.video_url)}
-              title={currentVideo.title}
-              allow="autoplay; fullscreen; picture-in-picture"
-              allowFullScreen
-            />
+          {videoUrl ? (
+            videoUrl.includes("vimeo.com") || videoUrl.includes("player.vimeo.com") ? (
+              <iframe
+                className="absolute inset-0 h-full w-full"
+                src={getVimeoEmbedUrl(videoUrl)}
+                title={currentVideo.title}
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                className="absolute inset-0 h-full w-full"
+                controls
+                src={videoUrl}
+              >
+                Ton navigateur ne supporte pas la lecture vidéo.
+              </video>
+            )
           ) : (
-            <video
-              className="absolute inset-0 h-full w-full"
-              controls
-              src={currentVideo.video_url}
-            >
-              Ton navigateur ne supporte pas la lecture vidéo.
-            </video>
+            <div className="absolute inset-0 flex items-center justify-center text-neutral-400">
+              Chargement de la vidéo...
+            </div>
           )}
         </div>
       </div>

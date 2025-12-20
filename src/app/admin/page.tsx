@@ -47,6 +47,10 @@ export default function AdminDashboard() {
   const [tempVideo, setTempVideo] = useState({ title: "", video_url: "", position: 0 });
   const [grantAccessEmail, setGrantAccessEmail] = useState("");
   const [grantAccessCourseId, setGrantAccessCourseId] = useState<string>("");
+  const [expandedCourses, setExpandedCourses] = useState<Set<string>>(new Set());
+  const [selectedVideo, setSelectedVideo] = useState<{ title: string; video_url: string } | null>(null);
+  const [selectedCourseForVideos, setSelectedCourseForVideos] = useState<string>("");
+  const [newVideo, setNewVideo] = useState({ title: "", video_url: "", position: 0 });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -208,6 +212,78 @@ export default function AdminDashboard() {
     setGrantAccessCourseId("");
   };
 
+  const addVideoToCourse = async () => {
+    if (!token || !selectedCourseForVideos || !newVideo.title || !newVideo.video_url) {
+      setError("Cours, titre et URL vidéo requis");
+      return;
+    }
+    setError(null);
+    setMessage(null);
+    const res = await fetch(`/api/courses/${selectedCourseForVideos}/videos`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: newVideo.title,
+        video_url: newVideo.video_url,
+        position: newVideo.position || 0,
+      }),
+    });
+    if (!res.ok) {
+      const b = await res.json().catch(() => ({}));
+      setError(b.error || "Erreur ajout vidéo");
+      return;
+    }
+    setMessage("Vidéo ajoutée au cours avec succès");
+    setNewVideo({ title: "", video_url: "", position: 0 });
+    await loadCourses(token);
+  };
+
+  const toggleCourse = (courseId: string) => {
+    setExpandedCourses((prev) => {
+      const next = new Set(prev);
+      if (next.has(courseId)) {
+        next.delete(courseId);
+      } else {
+        next.add(courseId);
+      }
+      return next;
+    });
+  };
+
+  const getAllVideosForCourse = (course: Course): Array<{ title: string; video_url: string; position: number; source: string }> => {
+    const videos: Array<{ title: string; video_url: string; position: number; source: string }> = [];
+    
+    // Vidéos depuis course_videos (table)
+    if (course.course_videos && course.course_videos.length > 0) {
+      course.course_videos.forEach((v) => {
+        videos.push({
+          title: v.title,
+          video_url: v.video_url,
+          position: v.position,
+          source: "table",
+        });
+      });
+    }
+    
+    // Vidéos depuis video_url (JSONB)
+    if (course.video_url && Array.isArray(course.video_url)) {
+      course.video_url.forEach((v) => {
+        videos.push({
+          title: v.title || "Sans titre",
+          video_url: v.video_url,
+          position: v.position ?? 999,
+          source: "jsonb",
+        });
+      });
+    }
+    
+    // Trier par position
+    return videos.sort((a, b) => a.position - b.position);
+  };
+
   return (
     <div className="layout-shell py-10 space-y-8">
       <h1 className="text-3xl font-semibold">Dashboard admin</h1>
@@ -216,7 +292,8 @@ export default function AdminDashboard() {
       {message && <p className="text-sm text-green-600">{message}</p>}
 
       {role === "admin" && (
-        <>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
           <section className="card p-4 md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Créer un cours</h2>
             <div className="grid gap-3">
@@ -305,15 +382,18 @@ export default function AdminDashboard() {
             </div>
           </section>
 
-          {/* <section className="card p-4 md:p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Gérer les vidéos d&apos;un cours</h2>
+          <section className="card p-4 md:p-6 space-y-4">
+            <h2 className="text-xl font-semibold">Ajouter des vidéos à un cours existant</h2>
             <div className="grid gap-3">
               <div>
                 <label className="text-sm font-semibold mb-2 block">Sélectionner un cours</label>
                 <select
                   className="form-control"
-                  value={selectedCourseForVideos || ""}
-                  onChange={(e) => setSelectedCourseForVideos(e.target.value || null)}
+                  value={selectedCourseForVideos}
+                  onChange={(e) => {
+                    setSelectedCourseForVideos(e.target.value);
+                    setNewVideo({ title: "", video_url: "", position: 0 });
+                  }}
                 >
                   <option value="">-- Choisir un cours --</option>
                   {courses.map((c) => (
@@ -327,50 +407,71 @@ export default function AdminDashboard() {
                 <>
                   <div className="border-t pt-4 mt-4">
                     <h3 className="font-semibold mb-3">Vidéos existantes</h3>
-                    {courses
-                      .find((c) => c.id === selectedCourseForVideos)
-                      ?.course_videos?.map((v) => (
-                        <div key={v.id} className="flex items-center justify-between p-2 border rounded mb-2">
-                          <div>
-                            <p className="font-medium">{v.title}</p>
-                            <p className="text-xs text-neutral-600">{v.video_url}</p>
-                          </div>
-                          <span className="text-xs text-neutral-500">Position: {v.position}</span>
+                    {(() => {
+                      const course = courses.find((c) => c.id === selectedCourseForVideos);
+                      const allVideos = course ? getAllVideosForCourse(course) : [];
+                      return allVideos.length > 0 ? (
+                        <div className="space-y-2">
+                          {allVideos.map((video, index) => (
+                            <div
+                              key={`${course?.id}-${index}-${video.source}`}
+                              className="flex items-center justify-between p-2 border rounded bg-neutral-50"
+                            >
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-medium">{video.title}</p>
+                                <p className="text-xs text-neutral-600 truncate">{video.video_url}</p>
+                              </div>
+                              <div className="flex items-center gap-2 ml-2">
+                                <span className="text-xs text-neutral-500">Pos: {video.position}</span>
+                                <span className="text-xs px-2 py-0.5 bg-neutral-100 rounded text-neutral-600">
+                                  {video.source === "table" ? "Table" : "JSONB"}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    {!courses.find((c) => c.id === selectedCourseForVideos)?.course_videos?.length && (
-                      <p className="text-sm text-neutral-600">Aucune vidéo pour ce cours.</p>
-                    )}
+                      ) : (
+                        <p className="text-sm text-neutral-600">Aucune vidéo pour ce cours.</p>
+                      );
+                    })()}
                   </div>
                   <div className="border-t pt-4 mt-4">
-                    <h3 className="font-semibold mb-3">Ajouter une vidéo</h3>
-                    <input
-                      className="form-control mb-2"
-                      placeholder="Titre de la vidéo"
-                      value={newVideo.title}
-                      onChange={(e) => setNewVideo((v) => ({ ...v, title: e.target.value }))}
-                    />
-                    <input
-                      className="form-control mb-2"
-                      placeholder="URL vidéo (Vimeo/MP4)"
-                      value={newVideo.video_url}
-                      onChange={(e) => setNewVideo((v) => ({ ...v, video_url: e.target.value }))}
-                    />
-                    <input
-                      className="form-control mb-2"
-                      type="number"
-                      placeholder="Position (ordre)"
-                      value={newVideo.position}
-                      onChange={(e) => setNewVideo((v) => ({ ...v, position: Number(e.target.value) }))}
-                    />
-                    <button className="button-secondary w-full sm:w-auto" onClick={addVideoToCourse}>
-                      Ajouter la vidéo
-                    </button>
+                    <h3 className="font-semibold mb-3">Ajouter une nouvelle vidéo</h3>
+                    <div className="grid gap-3">
+                      <input
+                        className="form-control"
+                        placeholder="Titre de la vidéo"
+                        value={newVideo.title}
+                        onChange={(e) => setNewVideo((v) => ({ ...v, title: e.target.value }))}
+                      />
+                      <input
+                        className="form-control"
+                        placeholder="URL vidéo (Vimeo/MP4)"
+                        value={newVideo.video_url}
+                        onChange={(e) => setNewVideo((v) => ({ ...v, video_url: e.target.value }))}
+                      />
+                      <div className="flex gap-2">
+                        <input
+                          className="form-control"
+                          type="number"
+                          placeholder="Position (ordre)"
+                          value={newVideo.position}
+                          onChange={(e) => setNewVideo((v) => ({ ...v, position: Number(e.target.value) }))}
+                        />
+                        <button
+                          className="button-primary whitespace-nowrap"
+                          onClick={addVideoToCourse}
+                          disabled={!newVideo.title || !newVideo.video_url}
+                        >
+                          Ajouter la vidéo
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 </>
               )}
             </div>
-          </section> */}
+          </section>
 
           <section className="card p-4 md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Donner accès à un cours (Orange Money)</h2>
@@ -399,102 +500,182 @@ export default function AdminDashboard() {
               </button>
             </div>
           </section>
+          </div>
 
+          <div className="space-y-6">
           <section className="card p-4 md:p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Cours existants</h2>
-            <div className="grid gap-3">
+            <h2 className="text-xl font-semibold">Liste des cours et vidéos</h2>
+            <div className="space-y-3">
               {courses.length === 0 && <p className="text-neutral-600">Aucun cours.</p>}
-              {courses.map((c) => (
-                <div key={c.id} className="rounded-2xl border border-neutral-200 p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <p className="font-semibold">{c.title}</p>
-                      <p className="text-sm text-neutral-600">{c.price.toLocaleString("fr-FR")} F CFA</p>
-                    </div>
-                    {c.cover_url && (
-                      <div className="relative h-12 w-20 overflow-hidden rounded border border-neutral-200">
-                        <Image
-                          src={c.cover_url}
-                          alt={c.title}
-                          fill
-                          sizes="80px"
-                          className="object-cover"
-                        />
+              {courses.map((course) => {
+                const allVideos = getAllVideosForCourse(course);
+                const isExpanded = expandedCourses.has(course.id);
+                
+                return (
+                  <div key={course.id} className="border border-neutral-200 rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => toggleCourse(course.id)}
+                      className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 transition-colors"
+                    >
+                      <div className="flex items-center gap-3 flex-1 min-w-0">
+                        {course.cover_url && (
+                          <div className="relative h-12 w-16 flex-shrink-0 overflow-hidden rounded border border-neutral-200">
+                            <Image
+                              src={course.cover_url}
+                              alt={course.title}
+                              fill
+                              sizes="64px"
+                              className="object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0 text-left">
+                          <p className="font-semibold truncate">{course.title}</p>
+                          <p className="text-sm text-neutral-600">
+                            {course.price.toLocaleString("fr-FR")} F CFA • {allVideos.length} vidéo{allVideos.length > 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <svg
+                        className={`w-5 h-5 text-neutral-400 transition-transform flex-shrink-0 ${isExpanded ? "rotate-180" : ""}`}
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="border-t border-neutral-200 bg-neutral-50 p-4">
+                        {allVideos.length === 0 ? (
+                          <p className="text-sm text-neutral-600">Aucune vidéo pour ce cours.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {allVideos.map((video, index) => (
+                              <div
+                                key={`${course.id}-${index}-${video.source}`}
+                                className="flex items-start gap-3 p-3 bg-white rounded border border-neutral-200 hover:border-brand transition-colors cursor-pointer"
+                                onClick={() => setSelectedVideo({ title: video.title, video_url: video.video_url })}
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2">
+                                    <p className="text-sm font-medium text-neutral-900">{video.title}</p>
+                                    <svg
+                                      className="w-4 h-4 text-brand flex-shrink-0"
+                                      fill="none"
+                                      stroke="currentColor"
+                                      viewBox="0 0 24 24"
+                                    >
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                  </div>
+                                  <p className="text-xs text-neutral-600 truncate mt-1">{video.video_url}</p>
+                                  <div className="flex items-center gap-2 mt-2">
+                                    <span className="text-xs text-neutral-500">Position: {video.position}</span>
+                                    <span className="text-xs px-2 py-0.5 bg-neutral-100 rounded text-neutral-600">
+                                      {video.source === "table" ? "Table" : "JSONB"}
+                                    </span>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
-                  {c.course_videos && c.course_videos.length > 0 && (
-                    <div className="mt-2 pt-2 border-t">
-                      <p className="text-xs text-neutral-600 mb-1">
-                        {c.course_videos.length} vidéo{c.course_videos.length > 1 ? "s" : ""}
-                      </p>
-                      <div className="flex flex-wrap gap-1">
-                        {c.course_videos.map((v) => (
-                          <span key={v.id} className="text-xs bg-neutral-100 px-2 py-1 rounded">
-                            {v.title}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </section>
+          </div>
+        </div>
+      )}
 
-         {/*  <section className="card p-4 md:p-6 space-y-4">
-            <h2 className="text-xl font-semibold">Commandes</h2>
-            <div className="grid gap-3">
-              {orders.length === 0 && <p className="text-neutral-600">Aucune commande.</p>}
-              {orders.map((order) => (
-                <div
-                  key={order.id}
-                  className="rounded-2xl border border-neutral-200 p-4 flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between">
-                    <p className="font-semibold">{order.courses?.title ?? "Cours"}</p>
-                    <span className="badge-soft">
-                      {order.status} • {order.payment_method}
-                    </span>
-                  </div>
-                  <div className="text-sm text-neutral-600 space-y-1">
-                    {order.users_profile ? (
-                      <>
-                        <p>
-                          <span className="font-semibold">Email:</span> {order.users_profile.email || order.user_id}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Nom complet:</span> {order.users_profile.full_name || "Non renseigné"}
-                        </p>
-                        <p>
-                          <span className="font-semibold">Téléphone:</span> {order.users_profile.phone || "Non renseigné"}
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p>
-                          <span className="font-semibold">User ID:</span> {order.user_id}
-                        </p>
-                        <p className="text-xs text-red-600">Profil utilisateur non trouvé</p>
-                      </>
-                    )}
-                    <p>
-                      <span className="font-semibold">Date:</span> {new Date(order.created_at).toLocaleString("fr-FR")}
-                    </p>
-                  </div>
-                  {order.status !== "paid" && (
-                    <button
-                      className="button-secondary w-fit"
-                      onClick={() => markPaid(order.id)}
-                    >
-                      Confirmer paiement
-                    </button>
-                  )}
-                </div>
-              ))}
+      {/* Modal pour lire la vidéo */}
+      {selectedVideo && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          onClick={() => setSelectedVideo(null)}
+        >
+          <div
+            className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-semibold">{selectedVideo.title}</h3>
+              <button
+                type="button"
+                onClick={() => setSelectedVideo(null)}
+                className="text-neutral-400 hover:text-neutral-600 transition-colors"
+                aria-label="Fermer"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
-          </section> */}
-        </>
+            <div className="aspect-video w-full bg-black rounded-lg overflow-hidden">
+              {(() => {
+                const url = selectedVideo.video_url;
+                // Vimeo
+                if (url.includes("vimeo.com")) {
+                  const vimeoIdMatch = url.match(/(?:vimeo\.com\/|player\.vimeo\.com\/video\/)(\d+)/);
+                  if (vimeoIdMatch) {
+                    return (
+                      <iframe
+                        src={`https://player.vimeo.com/video/${vimeoIdMatch[1]}`}
+                        className="w-full h-full"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title={selectedVideo.title}
+                      />
+                    );
+                  }
+                }
+                // YouTube
+                if (url.includes("youtube.com") || url.includes("youtu.be")) {
+                  let videoId = "";
+                  if (url.includes("youtube.com/watch?v=")) {
+                    videoId = url.split("v=")[1]?.split("&")[0] || "";
+                  } else if (url.includes("youtu.be/")) {
+                    videoId = url.split("youtu.be/")[1]?.split("?")[0] || "";
+                  } else if (url.includes("youtube.com/embed/")) {
+                    videoId = url.split("embed/")[1]?.split("?")[0] || "";
+                  }
+                  if (videoId) {
+                    return (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${videoId}`}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={selectedVideo.title}
+                      />
+                    );
+                  }
+                }
+                // Vidéo directe (MP4, etc.)
+                return (
+                  <video
+                    src={url}
+                    controls
+                    className="w-full h-full"
+                    controlsList="nodownload"
+                  >
+                    Votre navigateur ne supporte pas la lecture de vidéos.
+                  </video>
+                );
+              })()}
+            </div>
+            <div className="mt-4">
+              <p className="text-sm text-neutral-600 break-all">{selectedVideo.video_url}</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
