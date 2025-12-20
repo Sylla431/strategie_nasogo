@@ -413,7 +413,7 @@ export default function Home() {
         />
               <div className="absolute inset-0 bg-gradient-to-r from-black/55 via-black/30 to-transparent" />
               <div className="absolute right-4 top-4 z-10 rounded-xl border border-[#d4af37] bg-white/95 px-3 py-2 backdrop-blur max-sm:hidden">
-                <p className="text-xs text-neutral-800 leading-tight">Stratégie nasongon</p>
+                <p className="text-xs text-neutral-800 leading-tight">Stratégie Nasongon</p>
                 <p className="text-sm font-semibold text-brand leading-tight">
                   100$ / jour avec 20$
                 </p>

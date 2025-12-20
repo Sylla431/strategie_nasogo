@@ -73,8 +73,29 @@ export async function GET(
   let videoUrl: string | null = null;
   
   // Chercher dans course_videos (table)
+  // Les IDs sont transformés dans le frontend comme: table-${courseId}-${originalId}-${index}-idx${finalIndex}
+  // Il faut extraire l'ID original (UUID) depuis l'ID transformé
   if (course.course_videos && Array.isArray(course.course_videos)) {
-    const video = course.course_videos.find((v: { id: string; video_url: string }) => v.id === videoId || v.id === videoId.split("-")[0]);
+    // Pattern UUID: 8-4-4-4-12 caractères hexadécimaux
+    const uuidPattern = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    const uuidMatches = videoId.match(uuidPattern);
+    
+    // Chercher la vidéo par ID original extrait ou par correspondance
+    const video = course.course_videos.find((v: { id: string; video_url: string }) => {
+      // Si on a extrait des UUIDs, le deuxième devrait être l'ID de la vidéo (après le courseId)
+      if (uuidMatches && uuidMatches.length >= 2) {
+        // Le deuxième UUID est l'ID de la vidéo
+        if (v.id === uuidMatches[1]) return true;
+      }
+      // Si on a un seul UUID et qu'il correspond à l'ID de la vidéo
+      if (uuidMatches && uuidMatches.length === 1 && v.id === uuidMatches[0]) return true;
+      // Si l'ID transformé contient l'ID original de la vidéo (fallback)
+      if (videoId.includes(v.id)) return true;
+      // Si l'ID de la vidéo correspond exactement (cas non transformé)
+      if (v.id === videoId) return true;
+      return false;
+    });
+    
     if (video) {
       videoUrl = video.video_url;
     }
