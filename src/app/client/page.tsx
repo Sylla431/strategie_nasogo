@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
 
@@ -47,52 +47,137 @@ export default function ClientSpace() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchOrders = async (token: string) => {
-    const res = await fetch("/api/orders", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) {
-      setError("Impossible de charger les commandes");
-      return;
+  const fetchOrders = useCallback(async (token: string) => {
+      try {
+        const res = await fetch("/api/orders", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => ({ error: "Erreur inconnue" }));
+          console.error("Erreur chargement commandes:", errorData);
+          
+          // Si la session a expiré, rediriger vers la page d'accueil
+          if (res.status === 401) {
+            setError("Session expirée. Veuillez vous reconnecter.");
+            setTimeout(() => {
+              window.location.href = "/";
+            }, 2000);
+            return;
+          }
+          
+          setError(`Impossible de charger les commandes: ${errorData.error || "Erreur serveur"}`);
+          return;
+        }
+        
+        const data = await res.json();
+        setOrders(data || []);
+      } catch (err) {
+      console.error("Erreur réseau lors du chargement des commandes:", err);
+      setError("Erreur de connexion. Vérifiez votre connexion internet.");
     }
-    const data = await res.json();
-    setOrders(data);
-  };
+  }, []);
 
-  const fetchAccessGrants = async (token: string) => {
-    const res = await fetch("/api/access", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    setAccessGrants(data);
-  };
+  const fetchAccessGrants = useCallback(async (token: string) => {
+      try {
+        const res = await fetch("/api/access", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          console.error("Erreur chargement accès:", res.status);
+          return;
+        }
+        const data = await res.json();
+        setAccessGrants(data || []);
+      } catch (err) {
+        console.error("Erreur réseau lors du chargement des accès:", err);
+      }
+  }, []);
 
-  const fetchCourses = async (token: string) => {
-    const res = await fetch("/api/courses", {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    setCourses(data);
-    if (data.length > 0) setSelectedCourse(data[0].id);
-  };
+  const fetchCourses = useCallback(async (token: string) => {
+      try {
+        const res = await fetch("/api/courses", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (!res.ok) {
+          console.error("Erreur chargement cours:", res.status);
+          return;
+        }
+        const data = await res.json();
+        setCourses(data || []);
+        if (data && data.length > 0) setSelectedCourse(data[0].id);
+      } catch (err) {
+        console.error("Erreur réseau lors du chargement des cours:", err);
+      }
+  }, []);
 
   useEffect(() => {
     const load = async () => {
-      const { data } = await supabase.auth.getSession();
-      const token = data.session?.access_token ?? null;
-      setSessionToken(token);
-      if (!token) {
+      try {
+        const { data, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Erreur session:", sessionError);
+          setError("Erreur de session. Veuillez vous reconnecter.");
+          setLoading(false);
+          return;
+        }
+        
+        const token = data.session?.access_token ?? null;
+        setSessionToken(token);
+        
+        if (!token) {
+          setLoading(false);
+          setError("Connecte-toi pour voir tes cours.");
+          return;
+        }
+        
+        // Vérifier que le token n'est pas expiré
+        const expiresAt = data.session?.expires_at;
+        if (expiresAt && expiresAt * 1000 < Date.now()) {
+          setError("Session expirée. Veuillez vous reconnecter.");
+          setLoading(false);
+          await supabase.auth.signOut();
+          setTimeout(() => {
+            window.location.href = "/";
+          }, 2000);
+          return;
+        }
+        
+        await Promise.all([fetchOrders(token), fetchCourses(token), fetchAccessGrants(token)]);
         setLoading(false);
-        setError("Connecte-toi pour voir tes cours.");
-        return;
+      } catch (err) {
+        console.error("Erreur lors du chargement:", err);
+        setError("Erreur lors du chargement des données.");
+        setLoading(false);
       }
-      await Promise.all([fetchOrders(token), fetchCourses(token), fetchAccessGrants(token)]);
-      setLoading(false);
     };
+    
     load();
-  }, []);
+    
+    // Écouter les changements de session
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        setSessionToken(null);
+        setOrders([]);
+        setAccessGrants([]);
+        setCourses([]);
+        setError("Vous avez été déconnecté.");
+        setTimeout(() => {
+          window.location.href = "/";
+        }, 2000);
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        // Recharger les données si la session change
+        load();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [fetchOrders, fetchCourses, fetchAccessGrants]);
 
   const createOrder = async () => {
     if (!sessionToken) return;
@@ -120,8 +205,26 @@ export default function ClientSpace() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    try {
+      // Nettoyer l'état local d'abord
+      setSessionToken(null);
+      setOrders([]);
+      setAccessGrants([]);
+      setCourses([]);
+      
+      // Déconnexion Supabase avec nettoyage complet
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        console.error("Erreur lors de la déconnexion:", error);
+      }
+      
+      // Forcer le rechargement pour nettoyer complètement la session
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion:", err);
+      // Forcer le rechargement même en cas d'erreur
+      window.location.href = "/";
+    }
   };
 
   // Combiner les cours payés (orders avec status=paid) et les accès accordés

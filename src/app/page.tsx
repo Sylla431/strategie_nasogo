@@ -240,21 +240,58 @@ export default function Home() {
       } else {
         setUserRole(null);
         setUserId(null);
+        setUserEmail(null);
         setRoleLoadError(null);
         setUserMenuOpen(false);
       }
     };
+    
     loadSession();
+    
+    // Écouter les changements de session (déconnexion, expiration, etc.)
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        setSessionToken(null);
+        setUserRole(null);
+        setUserId(null);
+        setUserEmail(null);
+        setRoleLoadError(null);
+        setUserMenuOpen(false);
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        loadSession();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setSessionToken(null);
-    setUserRole(null);
-    setUserEmail(null);
-    setUserId(null);
-    setRoleLoadError(null);
-    setUserMenuOpen(false);
+    try {
+      // Nettoyer l'état local d'abord
+      setSessionToken(null);
+      setUserRole(null);
+      setUserEmail(null);
+      setUserId(null);
+      setRoleLoadError(null);
+      setUserMenuOpen(false);
+      
+      // Déconnexion Supabase avec nettoyage complet
+      const { error } = await supabase.auth.signOut({ scope: "local" });
+      if (error) {
+        console.error("Erreur lors de la déconnexion:", error);
+      }
+      
+      // Forcer le rechargement pour nettoyer complètement la session
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Erreur lors de la déconnexion:", err);
+      // Forcer le rechargement même en cas d'erreur
+      window.location.href = "/";
+    }
   };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
