@@ -150,24 +150,24 @@ export default function ClientSpace() {
 
   return (
     <div className="layout-shell py-10 space-y-8">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-3xl font-semibold">Espace client</h1>
-        <div className="flex items-center gap-2">
-          <Link href="/" className="pill-neutral">
+      <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+        <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900">Espace client</h1>
+        <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <Link href="/" className="pill-neutral text-sm sm:text-base">
             Accueil
           </Link>
           <button
             type="button"
-            className="button-primary cta-pulse"
+            className="button-primary cta-pulse text-sm sm:text-base"
             onClick={handleLogout}
           >
             Déconnexion
           </button>
         </div>
       </div>
-      {loading && <p>Chargement...</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {message && <p className="text-sm text-green-600">{message}</p>}
+      {loading && <p className="text-sm sm:text-base text-neutral-600">Chargement...</p>}
+      {error && <p className="text-sm sm:text-base text-red-600 font-medium px-4 py-3 bg-red-50 border border-red-200 rounded-lg">{error}</p>}
+      {message && <p className="text-sm sm:text-base text-green-700 font-medium px-4 py-3 bg-green-50 border border-green-200 rounded-lg">{message}</p>}
 
       {/* <section className="card p-4 md:p-6 space-y-4">
         <h2 className="text-xl font-semibold">Nouvelle commande (paiement en espèces)</h2>
@@ -195,11 +195,11 @@ export default function ClientSpace() {
         </p>
       </section> */}
 
-      <section className="card p-4 md:p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Mes cours</h2>
+      <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
+        <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Mes cours</h2>
         <div className="grid gap-4">
           {allAccessibleCourses.length === 0 && (
-            <p className="text-neutral-600">Aucun cours accessible. Si vous avez payez veuillez patientez qu&apos;un admin t&apos;accorde l&apos;accès.</p>
+            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">Aucun cours accessible. Si vous avez payez veuillez patientez qu&apos;un admin t&apos;accorde l&apos;accès.</p>
           )}
           {allAccessibleCourses.map((course) => {
             // Utiliser video_url (JSONB) en priorité, sinon course_videos (table séparée)
@@ -239,9 +239,15 @@ export default function ClientSpace() {
               })),
             ];
             
-            // Supprimer les doublons basés sur video_url pour éviter les clés dupliquées
+            // Supprimer les doublons basés sur l'ID ou le titre (pas sur video_url car elle peut être vide)
             const uniqueVideos = allVideos.filter((video, index, self) => 
-              index === self.findIndex((v) => v.video_url === video.video_url)
+              index === self.findIndex((v) => {
+                // Si les IDs correspondent, c'est un doublon
+                if (v.id === video.id) return true;
+                // Si les titres correspondent et les positions aussi, c'est probablement un doublon
+                if (v.title === video.title && v.position === video.position) return true;
+                return false;
+              })
             );
             
             // S'assurer que les IDs sont vraiment uniques en ajoutant un index final
@@ -255,30 +261,30 @@ export default function ClientSpace() {
             return (
               <div
                 key={course.id}
-                className="rounded-2xl border border-neutral-200 p-4 flex flex-col gap-3"
+                className="rounded-2xl border border-neutral-200 p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4"
               >
                 <div className="flex items-center justify-between">
-                  <p className="font-semibold">{course.title}</p>
+                  <h3 className="font-semibold text-base sm:text-lg text-neutral-900 leading-tight">{course.title}</h3>
                 </div>
                 {sortedVideos.length > 0 ? (
-                  <div className="space-y-2">
-                    <p className="text-sm font-medium text-neutral-700">
+                  <div className="space-y-3">
+                    <p className="text-sm sm:text-base font-semibold text-neutral-800">
                       {sortedVideos.length} vidéo{sortedVideos.length > 1 ? "s" : ""} disponible{sortedVideos.length > 1 ? "s" : ""}:
                     </p>
-                    <div className="grid gap-2">
+                    <div className="grid gap-2.5 sm:gap-3">
                       {sortedVideos.map((video) => (
                         <Link
                           key={video.id}
                           href={`/course/${course.id}/video/${video.id}`}
-                          className="button-secondary w-full text-left"
+                          className="button-secondary w-full text-left px-4 py-3 sm:px-5 sm:py-3.5"
                         >
-                          <span className="font-medium text-brand">{video.title}</span>
+                          <span className="font-semibold text-base sm:text-sm text-brand block leading-snug">{video.title}</span>
                         </Link>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <p className="text-sm text-neutral-600">Aucune vidéo disponible pour ce cours.</p>
+                  <p className="text-sm sm:text-base text-neutral-600">Aucune vidéo disponible pour ce cours.</p>
                 )}
               </div>
             );

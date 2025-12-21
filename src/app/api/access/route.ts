@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const { data, error } = await supabase
     .from("course_access")
-    .select("*, courses(*)")
+    .select("*, courses(*, course_videos(*))")
     .eq("user_id", authData.user.id)
     .order("granted_at", { ascending: false });
 

@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     .from("orders")
     .select(`
       *,
-      courses(*),
+      courses(*, course_videos(*)),
       users_profile(*)
     `)
     .order("created_at", { ascending: false });

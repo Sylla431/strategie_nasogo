@@ -126,9 +126,9 @@ function useCountdown(targetDate: string): Countdown {
 }
 
 const Stat = ({ value, label }: { value: string; label: string }) => (
-  <div className="flex flex-col gap-1 rounded-xl bg-white p-3 text-center shadow-sm border border-[#e1e3eb]">
-    <span className="text-xl font-semibold text-brand">{value}</span>
-    <span className="text-sm text-neutral-700">{label}</span>
+  <div className="flex flex-col gap-1 sm:gap-1.5 rounded-xl bg-white p-2.5 sm:p-3 text-center shadow-sm border border-[#e1e3eb]">
+    <span className="text-lg sm:text-xl md:text-2xl font-bold text-brand leading-none">{value}</span>
+    <span className="text-xs sm:text-sm text-neutral-700 font-medium">{label}</span>
   </div>
 );
 
@@ -299,9 +299,11 @@ export default function Home() {
             </Link>
             {sessionToken ? (
               <>
-                <Link href="/client" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
-                  Espace client
-                </Link>
+                {userRole !== "admin" && (
+                  <Link href="/client" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
+                    Espace client
+                  </Link>
+                )}
                 {userRole === "admin" && (
                   <Link href="/admin" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
                     Admin
@@ -338,48 +340,63 @@ export default function Home() {
                   </button>
 
                   {userMenuOpen && (
-                    <div
-                      role="dialog"
-                      aria-label="Profil utilisateur"
-                      className="absolute right-0 mt-2 w-64 rounded-2xl border border-neutral-200 bg-white p-4 shadow-lg"
-                    >
-                      <p className="text-sm text-neutral-600">Connecté en tant que</p>
-                      <p className="font-semibold break-all">
-                        {userEmail ?? "Utilisateur"}
-                      </p>
-                      <div className="mt-2 flex items-center gap-2">
-                        <span className="badge-soft text-brand">
-                          Rôle : {userRole ?? "client"}
-                        </span>
-                      </div>
-                      {userId && (
-                        <p className="mt-2 text-xs text-neutral-500 break-all">
-                          ID: {userId}
-                        </p>
-                      )}
-                      {roleLoadError && (
-                        <p className="mt-2 text-xs text-red-600 break-all">
-                          Erreur rôle: {roleLoadError}
-                        </p>
-                      )}
-                      <div className="mt-3 flex gap-2">
-                        <Link href="/client" className="pill-neutral">
-                          Espace client
-                        </Link>
-                        {userRole === "admin" && (
-                          <Link href="/admin" className="pill-neutral">
-                            Admin
-                          </Link>
-                        )}
-                      </div>
-                      <button
-                        type="button"
-                        className="mt-4 button-primary w-full cta-pulse"
-                        onClick={handleLogout}
+                    <>
+                      {/* Overlay pour fermer la popup en cliquant à l'extérieur */}
+                      <div
+                        className="fixed inset-0 z-40 bg-black/20 sm:bg-transparent"
+                        onClick={() => setUserMenuOpen(false)}
+                      />
+                      <div
+                        role="dialog"
+                        aria-label="Profil utilisateur"
+                        className="fixed sm:absolute right-2 sm:right-0 top-16 sm:top-auto sm:mt-2 w-[calc(100vw-1rem)] sm:w-64 max-w-sm rounded-2xl border border-neutral-200 bg-white p-4 sm:p-4 shadow-xl z-50"
                       >
-                        Déconnexion
-                      </button>
-                    </div>
+                        <p className="text-sm sm:text-sm text-neutral-600 font-medium">Connecté en tant que</p>
+                        <p className="font-semibold text-base sm:text-base break-all mt-1 text-neutral-900">
+                          {userEmail ?? "Utilisateur"}
+                        </p>
+                        <div className="mt-3 flex items-center gap-2 flex-wrap">
+                          <span className="badge-soft text-brand text-xs sm:text-sm">
+                            Rôle : {userRole ?? "client"}
+                          </span>
+                        </div>
+                        {userId && (
+                          <p className="mt-2 text-xs text-neutral-500 break-all">
+                            ID: {userId}
+                          </p>
+                        )}
+                        {roleLoadError && (
+                          <p className="mt-2 text-xs text-red-600 break-all">
+                            Erreur rôle: {roleLoadError}
+                          </p>
+                        )}
+                        <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                          <Link 
+                            href="/client" 
+                            className="pill-neutral text-center text-sm sm:text-base"
+                            onClick={() => setUserMenuOpen(false)}
+                          >
+                            Espace client
+                          </Link>
+                          {userRole === "admin" && (
+                            <Link 
+                              href="/admin" 
+                              className="pill-neutral text-center text-sm sm:text-base"
+                              onClick={() => setUserMenuOpen(false)}
+                            >
+                              Admin
+                            </Link>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          className="mt-4 button-primary w-full cta-pulse text-sm sm:text-base"
+                          onClick={handleLogout}
+                        >
+                          Déconnexion
+                        </button>
+                      </div>
+                    </>
                   )}
                 </div>
               </>
@@ -449,36 +466,36 @@ export default function Home() {
               </div> */}
             </div>
 
-            <div className="p-6 md:p-8 space-y-6">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="pill-neutral">{product.type}</span>
-                <span className="pill-neutral">
+            <div className="p-4 sm:p-6 md:p-8 space-y-4 sm:space-y-6">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                <span className="pill-neutral text-xs sm:text-sm">{product.type}</span>
+                <span className="pill-neutral text-xs sm:text-sm">
                   🔥 Offre limitée jusqu&apos;au 31 décembre 2025
                 </span>
               </div>
 
-              <div className="space-y-3">
-                <h1 className="text-3xl md:text-4xl font-semibold leading-tight tracking-tight">
+              <div className="space-y-2 sm:space-y-3">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold leading-tight tracking-tight text-neutral-900">
                   {product.name}
           </h1>
-                <p className="text-lg text-neutral-500 max-w-3xl">
+                <p className="text-base sm:text-lg text-neutral-600 max-w-3xl leading-relaxed">
                   Ma nouvelle stratégie nasongon au quotidien sur les
                   indices synthétiques, distillées sur 5 video, avec coaching,
                   communauté privée et résultat garantie.
                 </p>
               </div>
 
-              <div className="flex flex-wrap items-end gap-3">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-semibold text-brand">
+              <div className="flex flex-wrap items-end gap-2 sm:gap-3">
+                <div className="flex items-baseline gap-2 sm:gap-3">
+                  <span className="text-3xl sm:text-4xl font-semibold text-brand">
                     {formatPrice(product.price)}
                   </span>
-                <span className="text-lg text-neutral-400 line-through">
+                <span className="text-base sm:text-lg text-neutral-400 line-through">
                     {formatPrice(product.originalPrice)}
                   </span>
                 </div>
-                <span className="badge-soft">-{product.salePercent}%</span>
-              <span className="text-sm text-neutral-700">
+                <span className="badge-soft text-xs sm:text-sm">-{product.salePercent}%</span>
+              <span className="text-xs sm:text-sm text-neutral-700 font-medium">
                   Économisez {formatPrice(savings)}
                 </span>
               </div>
@@ -509,23 +526,23 @@ export default function Home() {
               </div> */}
               <div className="space-y-3">
           
-                <p className="text-lg text-neutral-500 max-w-3xl">
-                Formation Nasongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu’à 100$ par jour avec un petit capital. Elle repose sur l’analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
+                <p className="text-sm sm:text-base md:text-lg text-neutral-600 max-w-3xl leading-relaxed">
+                Formation Nasongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu'à 100$ par jour avec un petit capital. Elle repose sur l'analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
 
-Cette formation t’apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s’adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
+Cette formation t'apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s'adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
 
-Nasongon n’est pas une promesse, c’est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
+Nasongon n'est pas une promesse, c'est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
 
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-dashed border-brand bg-[rgba(212,175,55,0.08)] p-4 md:p-5">
-                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:gap-6">
+              <div className="rounded-2xl border border-dashed border-brand bg-[rgba(212,175,55,0.08)] p-4 sm:p-5">
+                <div className="flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:gap-6">
                   <div className="flex-1 space-y-1">
-                    <p className="text-sm font-semibold text-brand">
+                    <p className="text-xs sm:text-sm font-semibold text-brand">
                       Offre à durée limitée
                     </p>
-                    <p className="text-lg font-semibold">
+                    <p className="text-base sm:text-lg font-semibold text-neutral-900">
                       L&apos;offre se termine dans :
                     </p>
                   </div>
@@ -553,22 +570,22 @@ Nasongon n’est pas une promesse, c’est une méthode. Une approche réaliste 
 
           <aside
             id="checkout"
-            className="card sticky top-24 space-y-5 p-6 md:p-7"
+            className="card sticky top-20 sm:top-24 space-y-4 sm:space-y-5 p-4 sm:p-6 md:p-7"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-sm font-semibold text-brand">
+            <div className="flex items-start justify-between gap-2 sm:gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs sm:text-sm font-semibold text-brand">
                   Offre spéciale VB SNIPER
                 </p>
-                <p className="text-2xl font-semibold">{formatPrice(product.price)}</p>
+                <p className="text-xl sm:text-2xl font-semibold text-neutral-900">{formatPrice(product.price)}</p>
                 {/* <p className="text-sm text-neutral-300">
                   Paiement simulé pour cette démo • accès immédiat
                 </p> */}
               </div>
-              <div className="badge-soft text-brand">Garantie 48h</div>
+              <div className="badge-soft text-brand text-xs sm:text-sm flex-shrink-0">Garantie 48h</div>
             </div>
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
+            <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
               {/* <div className="space-y-2">
                 <label className="text-sm font-semibold">Adresse email</label>
                 <input
@@ -582,7 +599,7 @@ Nasongon n’est pas une promesse, c’est une méthode. Une approche réaliste 
               </div> */}
             
 
-              <button type="submit" className="button-primary w-full cta-pulse">
+              <button type="submit" className="button-primary w-full cta-pulse text-base sm:text-lg font-semibold">
               {product.customCtaText}
               </button>
               {/* <p className="text-xs text-neutral-300">
