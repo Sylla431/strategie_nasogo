@@ -289,7 +289,7 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <div className="flex items-center gap-2 sm:gap-3 flex-nowwrap">
             <Link
               href={store.support.whatsapp}
               target="_blank"
