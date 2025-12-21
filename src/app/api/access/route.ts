@@ -34,8 +34,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   const { supabase } = createSupabaseFromRequest(req);
+  
+  // Vérifier l'authentification
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  // Vérifier le rôle
   const role = await getProfileRole(supabase);
-  if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (role !== "admin") {
+    return NextResponse.json({ error: "Forbidden - Accès admin requis" }, { status: 403 });
+  }
 
   const { email, course_id } = await req.json();
   if (!email || !course_id) {
@@ -59,31 +69,52 @@ export async function POST(req: NextRequest) {
   // Vérifier que le profil existe, sinon le créer
   const { error: profileCheckError } = await supabase
     .from("users_profile")
-    .upsert({ id: userId, email: email.toLowerCase().trim() }, { onConflict: "id" });
+    .upsert({ id: userId, email: email.toLowerCase().trim(), role: "client" }, { onConflict: "id" });
 
   if (profileCheckError && profileCheckError.code !== "23505") {
     console.error("Error ensuring profile exists:", profileCheckError);
+    // Ne pas bloquer si le profil existe déjà, mais continuer
   }
 
   // Obtenir l'ID de l'admin qui accorde l'accès
-  const { data: authData } = await supabase.auth.getUser();
-  const grantedBy = authData?.user?.id ?? null;
+  const grantedBy = authData.user.id;
 
-  // Créer l'accès
-  const { data, error } = await supabase
-    .from("course_access")
-    .insert([{ user_id: userId, course_id, granted_by: grantedBy }])
-    .select("*, courses(*)")
-    .single();
+  // Utiliser la fonction SQL qui contourne RLS
+  const { data: accessData, error: accessError } = await supabase.rpc("grant_course_access", {
+    p_user_id: userId,
+    p_course_id: course_id,
+    p_granted_by: grantedBy,
+  });
 
-  if (error) {
-    // Si l'erreur est une violation de contrainte unique, l'accès existe déjà
-    if (error.code === "23505") {
-      return NextResponse.json({ error: "L'utilisateur a déjà accès à ce cours" }, { status: 409 });
+  if (accessError) {
+    console.error("Error granting course access:", accessError);
+    // Si l'erreur indique que l'utilisateur n'est pas admin
+    if (accessError.message?.includes("admin")) {
+      return NextResponse.json({ error: "Seuls les admins peuvent accorder l'accès" }, { status: 403 });
     }
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json({ 
+      error: accessError.message || "Erreur lors de l'attribution de l'accès",
+      code: accessError.code,
+    }, { status: 400 });
   }
 
-  return NextResponse.json(data, { status: 201 });
+  if (!accessData) {
+    return NextResponse.json({ error: "L'utilisateur a déjà accès à ce cours" }, { status: 409 });
+  }
+
+  // Récupérer les données complètes avec le cours
+  const { data: fullData, error: fetchError } = await supabase
+    .from("course_access")
+    .select("*, courses(*)")
+    .eq("user_id", userId)
+    .eq("course_id", course_id)
+    .single();
+
+  if (fetchError) {
+    // Si on ne peut pas récupérer les données complètes, retourner au moins les données de base
+    return NextResponse.json(accessData, { status: 201 });
+  }
+
+  return NextResponse.json(fullData, { status: 201 });
 }
 

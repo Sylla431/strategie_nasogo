@@ -27,7 +27,7 @@ $$;
 create or replace function public.handle_new_user()
 returns trigger
 language plpgsql
-security definer set search_path = public
+security definer set search_path = public, auth
 as $$
 begin
   -- Vérifier si le profil existe déjà
@@ -40,12 +40,14 @@ begin
     where id = new.id;
   else
     -- Créer un nouveau profil
-    insert into public.users_profile (id, email, full_name, phone)
+    -- Utiliser INSERT directement car security definer contourne RLS
+    insert into public.users_profile (id, email, full_name, phone, role)
     values (
       new.id,
       new.email,
       coalesce(new.raw_user_meta_data->>'full_name', null),
-      coalesce(new.raw_user_meta_data->>'phone', null)
+      coalesce(new.raw_user_meta_data->>'phone', null),
+      'client' -- Valeur par défaut
     )
     on conflict (id) do update
       set email = coalesce(excluded.email, users_profile.email),
@@ -106,6 +108,45 @@ declare
 begin
   select id into user_id from auth.users where email = lower(trim(user_email));
   return user_id;
+end;
+$$;
+
+-- Function to grant course access (bypasses RLS)
+create or replace function public.grant_course_access(
+  p_user_id uuid,
+  p_course_id uuid,
+  p_granted_by uuid
+)
+returns jsonb
+language plpgsql
+security definer set search_path = public
+as $$
+declare
+  result jsonb;
+  inserted_id uuid;
+begin
+  -- Vérifier que l'utilisateur qui accorde l'accès est admin
+  if not exists (
+    select 1 from public.users_profile 
+    where id = p_granted_by and role = 'admin'
+  ) then
+    raise exception 'Seuls les admins peuvent accorder l''accès';
+  end if;
+  
+  -- Insérer l'accès (contourne RLS grâce à security definer)
+  insert into public.course_access (user_id, course_id, granted_by)
+  values (p_user_id, p_course_id, p_granted_by)
+  on conflict (user_id, course_id) do update
+    set granted_by = excluded.granted_by,
+        granted_at = excluded.granted_at
+  returning id into inserted_id;
+  
+  -- Récupérer les données complètes
+  select to_jsonb(ca.*) into result
+  from public.course_access ca
+  where ca.user_id = p_user_id and ca.course_id = p_course_id;
+  
+  return result;
 end;
 $$;
 
