@@ -26,6 +26,7 @@ type UserProfile = {
   email: string | null;
   full_name: string | null;
   phone: string | null;
+  role?: string | null;
 };
 
 type Order = {
@@ -38,11 +39,23 @@ type Order = {
   users_profile?: UserProfile;
 };
 
+type CourseAccess = {
+  id: string;
+  user_id: string;
+  course_id: string;
+  granted_by: string | null;
+  granted_at: string;
+  courses?: Course;
+  users_profile?: UserProfile;
+};
+
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
+  const [courseAccesses, setCourseAccesses] = useState<CourseAccess[]>([]);
+  const [searchUserQuery, setSearchUserQuery] = useState("");
   const [newCourse, setNewCourse] = useState({ title: "", price: 0, cover_url: "", video_url: [] as Array<{ title: string; video_url: string; position: number }> });
   const [tempVideo, setTempVideo] = useState({ title: "", video_url: "", position: 0 });
   const [grantAccessEmail, setGrantAccessEmail] = useState("");
@@ -67,6 +80,24 @@ export default function AdminDashboard() {
     if (!res.ok) return;
     const data = await res.json();
     setCourses(data);
+  };
+
+  const loadCourseAccesses = async (tok: string) => {
+    try {
+      const res = await fetch("/api/access", { headers: { Authorization: `Bearer ${tok}` } });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Erreur inconnue" }));
+        console.error("Erreur chargement accès:", res.status, errorData);
+        setError(`Erreur chargement accès: ${errorData.error || res.status}`);
+        return;
+      }
+      const data = await res.json();
+      console.log("Accès chargés:", data);
+      setCourseAccesses(data || []);
+    } catch (err) {
+      console.error("Erreur réseau lors du chargement des accès:", err);
+      setError("Erreur de connexion lors du chargement des accès.");
+    }
   };
 
   useEffect(() => {
@@ -118,7 +149,7 @@ export default function AdminDashboard() {
         setLoading(false);
         return;
       }
-      await Promise.all([loadOrders(tok), loadCourses(tok)]);
+      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok)]);
       setLoading(false);
     };
     load();
@@ -210,6 +241,8 @@ export default function AdminDashboard() {
     setMessage(`Accès accordé à ${grantAccessEmail}`);
     setGrantAccessEmail("");
     setGrantAccessCourseId("");
+    // Recharger les accès après attribution
+    if (token) await loadCourseAccesses(token);
   };
 
   const addVideoToCourse = async () => {
@@ -590,6 +623,187 @@ export default function AdminDashboard() {
                 );
               })}
             </div>
+          </section>
+
+          <section className="card p-4 sm:p-5 md:p-6 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h2 className="text-xl sm:text-xl font-semibold text-neutral-900">Utilisateurs avec accès aux cours</h2>
+              {courseAccesses.length > 0 && (() => {
+                // Exclure les admins du calcul (ils n'ont pas payé)
+                const nonAdminAccesses = courseAccesses.filter(
+                  (access) => access.users_profile?.role !== 'admin'
+                );
+                
+                // Trier les accès par date d'accès accordé (les plus anciens en premier)
+                const sortedAccesses = [...nonAdminAccesses].sort((a, b) => 
+                  new Date(a.granted_at).getTime() - new Date(b.granted_at).getTime()
+                );
+                
+                // Calculer le total : 10 premiers = 25000, les autres = 27500
+                const total = sortedAccesses.reduce((sum, access, index) => {
+                  const price = index < 10 ? 25000 : 27500;
+                  return sum + price;
+                }, 0);
+                
+                return (
+                  <div className="bg-brand/10 border border-brand/20 rounded-lg px-4 py-2 sm:px-6 sm:py-3">
+                    <p className="text-xs sm:text-sm text-neutral-600 mb-1">Total</p>
+                    <p className="text-base sm:text-xl font-bold text-brand">
+                      {total.toLocaleString("fr-FR")} FCFA
+                    </p>
+                  </div>
+                );
+              })()}
+            </div>
+            
+            {/* Barre de recherche */}
+            {courseAccesses.length > 0 && (
+              <div className="relative">
+                <input
+                  type="text"
+                  placeholder="Rechercher par nom, email, téléphone ou cours..."
+                  value={searchUserQuery}
+                  onChange={(e) => setSearchUserQuery(e.target.value)}
+                  className="form-control w-full pl-10 pr-4"
+                />
+                {/* <svg
+                  className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg> */}
+              </div>
+            )}
+
+            {/* Filtrer les résultats */}
+            {(() => {
+              // Exclure les admins du calcul (ils n'ont pas payé)
+              const nonAdminAccesses = courseAccesses.filter(
+                (access) => access.users_profile?.role !== 'admin'
+              );
+              
+              // Trier les accès par date d'accès accordé (les plus anciens en premier)
+              const sortedAccesses = [...nonAdminAccesses].sort((a, b) => 
+                new Date(a.granted_at).getTime() - new Date(b.granted_at).getTime()
+              );
+              
+              // Créer un map pour obtenir le prix de chaque accès
+              const accessPriceMap = new Map<string, number>();
+              sortedAccesses.forEach((access, index) => {
+                accessPriceMap.set(access.id, index < 10 ? 25000 : 27500);
+              });
+              
+              const filteredAccesses = sortedAccesses.filter((access) => {
+                if (!searchUserQuery.trim()) return true;
+                
+                const query = searchUserQuery.toLowerCase();
+                const user = access.users_profile;
+                const course = access.courses;
+                
+                const fullName = user?.full_name?.toLowerCase() || "";
+                const email = user?.email?.toLowerCase() || "";
+                const phone = user?.phone?.toLowerCase() || "";
+                const courseTitle = course?.title?.toLowerCase() || "";
+                
+                return (
+                  fullName.includes(query) ||
+                  email.includes(query) ||
+                  phone.includes(query) ||
+                  courseTitle.includes(query)
+                );
+              });
+
+              return filteredAccesses.length === 0 ? (
+                <p className="text-sm sm:text-base text-neutral-600">
+                  {courseAccesses.length === 0
+                    ? "Aucun utilisateur n'a encore accès à un cours."
+                    : "Aucun résultat trouvé pour votre recherche."}
+                </p>
+              ) : (
+                <>
+                  {/* Afficher le total si on filtre */}
+                  {searchUserQuery.trim() && (
+                    <div className="bg-neutral-50 border border-neutral-200 rounded-lg px-4 py-2 sm:px-6 sm:py-3">
+                      <p className="text-xs sm:text-sm text-neutral-600 mb-1">
+                        Total des revenus ({filteredAccesses.length} accès)
+                      </p>
+                      <p className="text-lg sm:text-xl font-bold text-brand">
+                        {filteredAccesses.reduce((sum, access) => {
+                          const price = accessPriceMap.get(access.id) || 27500;
+                          return sum + price;
+                        }, 0).toLocaleString("fr-FR")} FCFA
+                      </p>
+                    </div>
+                  )}
+                  <div className="max-h-[600px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                    {filteredAccesses.map((access) => {
+                      const user = access.users_profile;
+                      const course = access.courses;
+                      const price = accessPriceMap.get(access.id) || 27500;
+                      const isEarlyBird = price === 25000;
+                    return (
+                      <div
+                        key={access.id}
+                        className="border border-neutral-200 rounded-lg p-3 sm:p-4 bg-white hover:border-brand/50 transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start gap-2 sm:gap-3">
+                              <div className="flex-1 min-w-0">
+                                <p className="font-semibold text-sm sm:text-base text-neutral-900 truncate">
+                                  {user?.full_name || user?.email || "Utilisateur"}
+                                </p>
+                                <p className="text-xs sm:text-sm text-neutral-600 break-all mt-1">
+                                  {user?.email || "Email non disponible"}
+                                </p>
+                                {user?.phone && (
+                                  <p className="text-xs text-neutral-500 mt-1">{user.phone}</p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-neutral-100">
+                              <p className="text-xs sm:text-sm font-medium text-neutral-700">
+                                Accès au cours :
+                              </p>
+                              <p className="text-sm sm:text-base font-semibold text-brand mt-1">
+                                {course?.title || "Cours supprimé"}
+                              </p>
+                              <div className="flex items-center gap-2 mt-2">
+                                <p className="text-sm sm:text-base font-semibold text-neutral-900">
+                                  {price.toLocaleString("fr-FR")} FCFA
+                                </p>
+                                {isEarlyBird && (
+                                  <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">
+                                    Early Bird
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-neutral-500 mt-1">
+                                Accès accordé le {new Date(access.granted_at).toLocaleDateString("fr-FR", {
+                                  day: "numeric",
+                                  month: "long",
+                                  year: "numeric",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  </div>
+                </>
+              );
+            })()}
           </section>
           </div>
         </div>

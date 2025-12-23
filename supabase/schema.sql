@@ -150,6 +150,66 @@ begin
 end;
 $$;
 
+-- Function to get all course accesses for admin (bypasses RLS)
+create or replace function public.get_all_course_accesses(p_admin_id uuid)
+returns jsonb
+language plpgsql
+security definer set search_path = public, auth
+as $$
+declare
+  result jsonb;
+begin
+  -- Vérifier que l'utilisateur est admin
+  if not exists (
+    select 1 from public.users_profile 
+    where id = p_admin_id and role = 'admin'
+  ) then
+    raise exception 'Seuls les admins peuvent voir tous les accès';
+  end if;
+  
+  -- Récupérer tous les accès avec les infos utilisateur et cours
+  -- Récupérer email, full_name et phone depuis auth.users.raw_user_meta_data
+  select coalesce(
+    jsonb_agg(
+      jsonb_build_object(
+        'id', ca.id,
+        'user_id', ca.user_id,
+        'course_id', ca.course_id,
+        'granted_by', ca.granted_by,
+        'granted_at', ca.granted_at,
+        'courses', case 
+          when c.id is not null then jsonb_build_object(
+            'id', c.id,
+            'title', c.title,
+            'price', c.price,
+            'cover_url', c.cover_url
+          )
+          else null
+        end,
+        'users_profile', case
+          when au.id is not null then jsonb_build_object(
+            'id', au.id,
+            'email', au.email,
+            'full_name', au.raw_user_meta_data->>'full_name',
+            'phone', au.raw_user_meta_data->>'phone',
+            'role', up.role
+          )
+          else null
+        end
+      )
+      order by ca.granted_at desc
+    ),
+    '[]'::jsonb
+  ) into result
+  from public.course_access ca
+  left join public.courses c on c.id = ca.course_id
+  left join auth.users au on au.id = ca.user_id
+  left join public.users_profile up on up.id = ca.user_id;
+  
+  return result;
+end;
+$$;
+
 -- Courses
 create table if not exists public.courses (
   id uuid primary key default gen_random_uuid(),

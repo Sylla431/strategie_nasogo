@@ -22,14 +22,53 @@ export async function GET(req: NextRequest) {
   const { data: authData, error: authError } = await supabase.auth.getUser();
   if (authError || !authData.user) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const { data, error } = await supabase
-    .from("course_access")
-    .select("*, courses(*, course_videos(*))")
-    .eq("user_id", authData.user.id)
-    .order("granted_at", { ascending: false });
+  // Vérifier si c'est un admin
+  const role = await getProfileRole(supabase);
+  const isAdmin = role === "admin";
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json(data);
+  if (isAdmin) {
+    // Pour les admins, utiliser la fonction SQL qui contourne RLS
+    const { data: accessData, error: accessError } = await supabase.rpc("get_all_course_accesses", {
+      p_admin_id: authData.user.id,
+    });
+
+    if (accessError) {
+      console.error("Error fetching all accesses:", accessError);
+      return NextResponse.json({ error: accessError.message }, { status: 400 });
+    }
+
+    // La fonction retourne un JSONB qui peut être un tableau ou null
+    let accesses = [];
+    if (accessData) {
+      // Si c'est déjà un tableau, l'utiliser tel quel
+      if (Array.isArray(accessData)) {
+        accesses = accessData;
+      } else if (typeof accessData === 'string') {
+        // Si c'est une string JSON, la parser
+        try {
+          accesses = JSON.parse(accessData);
+        } catch (e) {
+          console.error("Error parsing access data:", e);
+          accesses = [];
+        }
+      } else if (typeof accessData === 'object') {
+        // Si c'est un objet JSONB, le convertir en tableau
+        accesses = [accessData];
+      }
+    }
+    
+    return NextResponse.json(accesses);
+  } else {
+    // Pour les non-admins, retourner uniquement leurs propres accès
+    const { data, error } = await supabase
+      .from("course_access")
+      .select("*, courses(*, course_videos(*)), users_profile(*)")
+      .eq("user_id", authData.user.id)
+      .order("granted_at", { ascending: false });
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(data || []);
+  }
 }
 
 export async function POST(req: NextRequest) {
