@@ -648,7 +648,7 @@ export default function AdminDashboard() {
                 return (
                   <div className="bg-brand/10 border border-brand/20 rounded-lg px-4 py-2 sm:px-6 sm:py-3">
                     <p className="text-xs sm:text-sm text-neutral-600 mb-1">Total</p>
-                    <p className="text-base sm:text-xl font-bold text-brand">
+                    <p className="text-lg sm:text-base font-bold text-brand">
                       {total.toLocaleString("fr-FR")} FCFA
                     </p>
                   </div>
@@ -781,7 +781,7 @@ export default function AdminDashboard() {
                                 </p>
                                 {isEarlyBird && (
                                   <span className="text-xs px-2 py-0.5 bg-green-100 text-green-700 rounded-full font-medium">
-                                    Early Bird
+                                    Précommande 
                                   </span>
                                 )}
                               </div>
