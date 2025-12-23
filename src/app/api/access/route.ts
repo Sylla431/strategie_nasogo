@@ -60,13 +60,38 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(accesses);
   } else {
     // Pour les non-admins, retourner uniquement leurs propres accès
+    // Inclure les course_videos avec toutes les colonnes nécessaires
+    // Spécifier explicitement les relations users_profile pour éviter l'ambiguïté
     const { data, error } = await supabase
       .from("course_access")
-      .select("*, courses(*, course_videos(*)), users_profile(*)")
+      .select(`
+        *,
+        courses(
+          *,
+          course_videos(
+            id,
+            course_id,
+            title,
+            video_url,
+            position,
+            created_at
+          )
+        ),
+        users_profile!course_access_user_id_fkey(*)
+      `)
       .eq("user_id", authData.user.id)
       .order("granted_at", { ascending: false });
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      console.error("Error fetching course access:", error);
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
+    
+    // Log pour déboguer
+    if (data && data.length > 0) {
+      console.log("Course access data sample:", JSON.stringify(data[0], null, 2));
+    }
+    
     return NextResponse.json(data || []);
   }
 }
@@ -105,20 +130,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Utilisateur non trouvé avec cet email" }, { status: 404 });
   }
 
-  // Vérifier que le profil existe, sinon le créer
-  const { error: profileCheckError } = await supabase
-    .from("users_profile")
-    .upsert({ id: userId, email: email.toLowerCase().trim(), role: "client" }, { onConflict: "id" });
-
-  if (profileCheckError && profileCheckError.code !== "23505") {
-    console.error("Error ensuring profile exists:", profileCheckError);
-    // Ne pas bloquer si le profil existe déjà, mais continuer
-  }
-
   // Obtenir l'ID de l'admin qui accorde l'accès
   const grantedBy = authData.user.id;
 
-  // Utiliser la fonction SQL qui contourne RLS
+  // Utiliser la fonction SQL qui contourne RLS et crée automatiquement le profil si nécessaire
   const { data: accessData, error: accessError } = await supabase.rpc("grant_course_access", {
     p_user_id: userId,
     p_course_id: course_id,
@@ -130,6 +145,17 @@ export async function POST(req: NextRequest) {
     // Si l'erreur indique que l'utilisateur n'est pas admin
     if (accessError.message?.includes("admin")) {
       return NextResponse.json({ error: "Seuls les admins peuvent accorder l'accès" }, { status: 403 });
+    }
+    // Si l'erreur indique que l'utilisateur n'existe pas
+    if (accessError.message?.includes("non trouvé") || accessError.message?.includes("not found")) {
+      return NextResponse.json({ error: "Utilisateur non trouvé. Veuillez vérifier que l'utilisateur a bien créé un compte." }, { status: 404 });
+    }
+    // Si l'erreur indique une violation de contrainte de clé étrangère
+    if (accessError.code === "23503" || accessError.message?.includes("foreign key")) {
+      return NextResponse.json({ 
+        error: "Erreur: Le profil utilisateur n'existe pas. Veuillez réessayer ou contacter le support.",
+        code: accessError.code,
+      }, { status: 400 });
     }
     return NextResponse.json({ 
       error: accessError.message || "Erreur lors de l'attribution de l'accès",

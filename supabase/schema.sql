@@ -58,7 +58,15 @@ begin
 exception
   when others then
     -- Log l'erreur mais ne bloque pas la création de l'utilisateur
-    raise warning 'Error creating user profile for user %: %', new.id, sqlerrm;
+    -- Essayer de créer le profil avec les valeurs minimales si la première tentative échoue
+    begin
+      insert into public.users_profile (id, email, role)
+      values (new.id, new.email, 'client')
+      on conflict (id) do nothing;
+    exception
+      when others then
+        raise warning 'Error creating user profile for user %: %', new.id, sqlerrm;
+    end;
     return new;
 end;
 $$;
@@ -67,6 +75,36 @@ drop trigger if exists on_auth_user_created on auth.users;
 create trigger on_auth_user_created
 after insert on auth.users
 for each row execute procedure public.handle_new_user();
+
+-- Function to ensure all auth.users have a profile in users_profile
+create or replace function public.ensure_all_profiles_exist()
+returns integer
+language plpgsql
+security definer set search_path = public, auth
+as $$
+declare
+  created_count integer := 0;
+begin
+  -- Créer les profils manquants pour tous les utilisateurs dans auth.users
+  insert into public.users_profile (id, email, role)
+  select 
+    au.id,
+    au.email,
+    'client' as role
+  from auth.users au
+  where not exists (
+    select 1 from public.users_profile up where up.id = au.id
+  )
+  on conflict (id) do nothing;
+  
+  get diagnostics created_count = row_count;
+  return created_count;
+exception
+  when others then
+    raise warning 'Error ensuring profiles exist: %', sqlerrm;
+    return 0;
+end;
+$$;
 
 -- Function to sync email from auth.users to users_profile (for existing users)
 create or replace function public.sync_user_email()
@@ -119,7 +157,7 @@ create or replace function public.grant_course_access(
 )
 returns jsonb
 language plpgsql
-security definer set search_path = public
+security definer set search_path = public, auth
 as $$
 declare
   result jsonb;
@@ -131,6 +169,20 @@ begin
     where id = p_granted_by and role = 'admin'
   ) then
     raise exception 'Seuls les admins peuvent accorder l''accès';
+  end if;
+  
+  -- Vérifier que l'utilisateur existe dans auth.users
+  if not exists (select 1 from auth.users where id = p_user_id) then
+    raise exception 'Utilisateur non trouvé dans auth.users';
+  end if;
+  
+  -- S'assurer que le profil existe dans users_profile, sinon le créer
+  -- Créer le profil avec seulement id et role (colonnes minimales requises)
+  -- Note: On n'utilise pas email car cette colonne peut ne pas exister dans la table
+  if not exists (select 1 from public.users_profile where id = p_user_id) then
+    insert into public.users_profile (id, role)
+    values (p_user_id, 'client')
+    on conflict (id) do nothing;
   end if;
   
   -- Insérer l'accès (contourne RLS grâce à security definer)
@@ -147,6 +199,9 @@ begin
   where ca.user_id = p_user_id and ca.course_id = p_course_id;
   
   return result;
+exception
+  when others then
+    raise exception 'Erreur lors de l''attribution de l''accès: %', sqlerrm;
 end;
 $$;
 

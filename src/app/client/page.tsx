@@ -238,16 +238,21 @@ export default function ClientSpace() {
   ]) as Set<string>;
   
   // Enrichir les cours avec les données complètes depuis la liste des cours
+  // Prioriser les cours depuis accessGrants/orders car ils ont les course_videos avec les vraies URLs
   const allAccessibleCourses = Array.from(allAccessibleCoursesIds)
     .map((courseId) => {
-      // Chercher dans les cours complets chargés (qui ont video_url)
-      const fullCourse = courses.find((c) => c.id === courseId);
-      if (fullCourse) return fullCourse;
-      
-      // Sinon, utiliser le cours depuis orders/accessGrants
-      const fromPaid = paidCourses.find((c) => c?.id === courseId);
+      // Prioriser les cours depuis accessGrants/orders car ils ont les course_videos complets
       const fromGranted = grantedCourses.find((c) => c?.id === courseId);
-      return fromPaid || fromGranted;
+      const fromPaid = paidCourses.find((c) => c?.id === courseId);
+      
+      // Si on a un cours depuis accessGrants ou orders, l'utiliser (il a les course_videos)
+      if (fromGranted || fromPaid) {
+        return fromGranted || fromPaid;
+      }
+      
+      // Sinon, utiliser le cours depuis la liste générale (mais il n'aura pas les URLs des vidéos)
+      const fullCourse = courses.find((c) => c.id === courseId);
+      return fullCourse;
     })
     .filter(Boolean) as Course[];
 
