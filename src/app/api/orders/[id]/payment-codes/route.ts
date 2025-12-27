@@ -20,7 +20,7 @@ async function getUserIdAndRole(supabase: ReturnType<typeof createSupabaseFromRe
  */
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { supabase } = createSupabaseFromRequest(req);
   const { userId, role } = await getUserIdAndRole(supabase);
@@ -29,7 +29,7 @@ export async function GET(
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const orderId = params.id;
+  const { id: orderId } = await params;
 
   if (!orderId) {
     return NextResponse.json({ error: "ID de commande requis" }, { status: 400 });
