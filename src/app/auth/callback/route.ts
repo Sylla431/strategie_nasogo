@@ -10,18 +10,22 @@ export async function GET(request: NextRequest) {
   const error = requestUrl.searchParams.get("error");
   const errorDescription = requestUrl.searchParams.get("error_description");
 
+  // Construire l'URL de base de manière fiable (pour Vercel)
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
+  const authUrl = `${baseUrl}/auth`;
+
   // Si erreur, rediriger vers la page d'authentification avec le message d'erreur
   if (error) {
     const errorMessage = errorDescription || error;
     return NextResponse.redirect(
-      new URL(`/auth?error=${encodeURIComponent(errorMessage)}`, requestUrl.origin)
+      new URL(`/auth?error=${encodeURIComponent(errorMessage)}`, baseUrl)
     );
   }
 
   // Si pas de code, rediriger vers la page d'authentification sans message
   if (!code) {
     return NextResponse.redirect(
-      new URL("/auth", requestUrl.origin)
+      new URL("/auth", baseUrl)
     );
   }
 
@@ -39,7 +43,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(
       new URL(
         `/auth?error=${encodeURIComponent(exchangeError.message)}`,
-        requestUrl.origin
+        baseUrl
       )
     );
   }
@@ -62,7 +66,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(
         new URL(
           "/auth?message=Votre email a été confirmé avec succès. Vous pouvez maintenant vous connecter.",
-          requestUrl.origin
+          baseUrl
         )
       );
     } else {
@@ -71,7 +75,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(
         new URL(
           "/auth?error=L'email n'a pas pu être confirmé. Veuillez réessayer ou contacter le support.",
-          requestUrl.origin
+          baseUrl
         )
       );
     }
@@ -82,7 +86,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.redirect(
     new URL(
       "/auth?error=Erreur lors de la confirmation de l'email. Veuillez réessayer.",
-      requestUrl.origin
+      baseUrl
     )
   );
 }
