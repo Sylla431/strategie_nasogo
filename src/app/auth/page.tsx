@@ -88,8 +88,14 @@ function AuthForm() {
         router.push("/client");
       } else if (mode === "forgot-password") {
         console.log("Requesting password reset for email:", email);
+        // Utiliser NEXT_PUBLIC_APP_URL si disponible, sinon window.location.origin
+        // Note: NEXT_PUBLIC_APP_URL est injectée au build time et accessible côté client
+        const appUrl = typeof window !== "undefined" 
+          ? (process.env.NEXT_PUBLIC_APP_URL || window.location.origin)
+          : (process.env.NEXT_PUBLIC_APP_URL || "https://vbsniperacademie.com");
+        const redirectUrl = `${appUrl}/auth/reset-password`;
         const { data, error: err } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/auth/reset-password`,
+          redirectTo: redirectUrl,
         });
         
         console.log("Reset password response:", { data, error: err });
