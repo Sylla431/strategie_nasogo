@@ -111,7 +111,7 @@ export async function GET(
       try {
         const parsed = JSON.parse(course.video_url);
         videosFromJson = Array.isArray(parsed) ? parsed : [];
-      } catch (e) {
+      } catch {
         // Ignore
       }
     }

@@ -186,7 +186,7 @@ a {
 @media (min-width: 640px) {
   .pill-neutral {
     padding: 0.4rem 0.75rem;
-    font-size: 0.9rem;
+  font-size: 0.9rem;
     min-height: auto;
   }
 }

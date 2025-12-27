@@ -52,7 +52,7 @@ type CourseAccess = {
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [, setOrders] = useState<Order[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [courseAccesses, setCourseAccesses] = useState<CourseAccess[]>([]);
   const [searchUserQuery, setSearchUserQuery] = useState("");
@@ -155,7 +155,9 @@ export default function AdminDashboard() {
     load();
   }, []);
 
-  const markPaid = async (id: string) => {
+  // Fonction pour marquer une commande comme payée (non utilisée actuellement)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _markPaid = async (id: string) => {
     if (!token) return;
     setError(null);
     setMessage(null);

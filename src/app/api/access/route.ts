@@ -62,8 +62,8 @@ export async function GET(req: NextRequest) {
     // Pour les non-admins, retourner uniquement leurs propres accès
     // Inclure les course_videos avec toutes les colonnes nécessaires
     // Spécifier explicitement les relations users_profile pour éviter l'ambiguïté
-    const { data, error } = await supabase
-      .from("course_access")
+  const { data, error } = await supabase
+    .from("course_access")
       .select(`
         *,
         courses(
@@ -79,8 +79,8 @@ export async function GET(req: NextRequest) {
         ),
         users_profile!course_access_user_id_fkey(*)
       `)
-      .eq("user_id", authData.user.id)
-      .order("granted_at", { ascending: false });
+    .eq("user_id", authData.user.id)
+    .order("granted_at", { ascending: false });
 
     if (error) {
       console.error("Error fetching course access:", error);

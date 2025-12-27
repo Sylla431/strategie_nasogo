@@ -49,11 +49,11 @@ export default function ClientSpace() {
 
   const fetchOrders = useCallback(async (token: string) => {
       try {
-        const res = await fetch("/api/orders", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    const res = await fetch("/api/orders", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
         
-        if (!res.ok) {
+    if (!res.ok) {
           const errorData = await res.json().catch(() => ({ error: "Erreur inconnue" }));
           console.error("Erreur chargement commandes:", errorData);
           
@@ -67,10 +67,10 @@ export default function ClientSpace() {
           }
           
           setError(`Impossible de charger les commandes: ${errorData.error || "Erreur serveur"}`);
-          return;
-        }
+      return;
+    }
         
-        const data = await res.json();
+    const data = await res.json();
         setOrders(data || []);
       } catch (err) {
       console.error("Erreur réseau lors du chargement des commandes:", err);
@@ -80,14 +80,14 @@ export default function ClientSpace() {
 
   const fetchAccessGrants = useCallback(async (token: string) => {
       try {
-        const res = await fetch("/api/access", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    const res = await fetch("/api/access", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
         if (!res.ok) {
           console.error("Erreur chargement accès:", res.status);
           return;
         }
-        const data = await res.json();
+    const data = await res.json();
         setAccessGrants(data || []);
       } catch (err) {
         console.error("Erreur réseau lors du chargement des accès:", err);
@@ -96,14 +96,14 @@ export default function ClientSpace() {
 
   const fetchCourses = useCallback(async (token: string) => {
       try {
-        const res = await fetch("/api/courses", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+    const res = await fetch("/api/courses", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
         if (!res.ok) {
           console.error("Erreur chargement cours:", res.status);
           return;
         }
-        const data = await res.json();
+    const data = await res.json();
         setCourses(data || []);
         if (data && data.length > 0) setSelectedCourse(data[0].id);
       } catch (err) {
@@ -123,14 +123,14 @@ export default function ClientSpace() {
           return;
         }
         
-        const token = data.session?.access_token ?? null;
-        setSessionToken(token);
+      const token = data.session?.access_token ?? null;
+      setSessionToken(token);
         
-        if (!token) {
-          setLoading(false);
-          setError("Connecte-toi pour voir tes cours.");
-          return;
-        }
+      if (!token) {
+        setLoading(false);
+        setError("Connecte-toi pour voir tes cours.");
+        return;
+      }
         
         // Vérifier que le token n'est pas expiré
         const expiresAt = data.session?.expires_at;
@@ -144,8 +144,8 @@ export default function ClientSpace() {
           return;
         }
         
-        await Promise.all([fetchOrders(token), fetchCourses(token), fetchAccessGrants(token)]);
-        setLoading(false);
+      await Promise.all([fetchOrders(token), fetchCourses(token), fetchAccessGrants(token)]);
+      setLoading(false);
       } catch (err) {
         console.error("Erreur lors du chargement:", err);
         setError("Erreur lors du chargement des données.");
@@ -179,6 +179,8 @@ export default function ClientSpace() {
     };
   }, [fetchOrders, fetchCourses, fetchAccessGrants]);
 
+  // Fonction pour créer une commande (actuellement commentée dans le JSX)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const createOrder = async () => {
     if (!sessionToken) return;
     if (!selectedCourse) {
@@ -223,7 +225,7 @@ export default function ClientSpace() {
     } catch (err) {
       console.error("Erreur lors de la déconnexion:", err);
       // Forcer le rechargement même en cas d'erreur
-      window.location.href = "/";
+    window.location.href = "/";
     }
   };
 
@@ -303,6 +305,36 @@ export default function ClientSpace() {
         </p>
       </section> */}
 
+      {/* Section Communauté Telegram - visible uniquement pour les clients ayant payé */}
+      {allAccessibleCourses.length > 0 && (
+        <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z"/>
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté privée</h2>
+              <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                Rejoins notre groupe Telegram pour échanger avec les autres traders et bénéficier du coaching collectif
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://t.me/+Zi7RkQ3TAY5hY2Rk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z"/>
+            </svg>
+            Rejoindre le groupe Telegram
+          </a>
+        </section>
+      )}
+
       <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
         <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Mes cours</h2>
         <div className="grid gap-4">
@@ -322,7 +354,7 @@ export default function ClientSpace() {
                 try {
                   const parsed = JSON.parse(course.video_url);
                   videosFromJson = Array.isArray(parsed) ? parsed : [];
-                } catch (e) {
+                } catch {
                   // Ignore les erreurs de parsing
                 }
               }

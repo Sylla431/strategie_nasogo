@@ -134,8 +134,12 @@ const Stat = ({ value, label }: { value: string; label: string }) => (
 
 export default function Home() {
   const router = useRouter();
+  // Email pour préremplir le formulaire d'authentification (actuellement commenté dans le JSX)
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [selectedTestimonial, setSelectedTestimonial] = useState<string | null>(
     null,
   );
@@ -147,6 +151,8 @@ export default function Home() {
   const [userId, setUserId] = useState<string | null>(null);
   const [roleLoadError, setRoleLoadError] = useState<string | null>(null);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [hasPaidAccess, setHasPaidAccess] = useState(false);
+  const [isCheckingAccess, setIsCheckingAccess] = useState(false);
   const countdown = useCountdown(product.saleEndsAt);
 
   const savings = product.originalPrice - product.price;
@@ -243,6 +249,7 @@ export default function Home() {
         setUserEmail(null);
         setRoleLoadError(null);
         setUserMenuOpen(false);
+        setHasPaidAccess(false);
       }
     };
     
@@ -259,6 +266,7 @@ export default function Home() {
         setUserEmail(null);
         setRoleLoadError(null);
         setUserMenuOpen(false);
+        setHasPaidAccess(false);
       } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
         loadSession();
       }
@@ -268,6 +276,73 @@ export default function Home() {
       subscription.unsubscribe();
     };
   }, []);
+
+  // Vérifier si l'utilisateur a déjà payé pour le cours
+  useEffect(() => {
+    const checkPaidAccess = async () => {
+      if (!userId || !sessionToken) {
+        setHasPaidAccess(false);
+        setIsCheckingAccess(false);
+        return;
+      }
+
+      setIsCheckingAccess(true);
+      try {
+        // Récupérer les cours disponibles
+        const coursesRes = await fetch("/api/courses", {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+        
+        if (!coursesRes.ok) {
+          setHasPaidAccess(false);
+          setIsCheckingAccess(false);
+          return;
+        }
+
+        const courses = await coursesRes.json();
+        if (!courses || courses.length === 0) {
+          setHasPaidAccess(false);
+          setIsCheckingAccess(false);
+          return;
+        }
+
+        const courseId = courses[0].id;
+
+        // Vérifier les commandes payées
+        const ordersRes = await fetch("/api/orders", {
+          headers: { Authorization: `Bearer ${sessionToken}` },
+        });
+
+        if (ordersRes.ok) {
+          const orders = await ordersRes.json();
+          const hasPaidOrder = orders.some(
+            (o: { course_id: string; status: string }) => 
+              o.course_id === courseId && o.status === "paid"
+          );
+
+          // Vérifier aussi les accès accordés
+          const { data: accessData } = await supabase
+            .from("course_access")
+            .select("course_id")
+            .eq("user_id", userId)
+            .eq("course_id", courseId)
+            .maybeSingle();
+
+          const hasAccess = hasPaidOrder || !!accessData;
+          setHasPaidAccess(hasAccess);
+        } else {
+          setHasPaidAccess(false);
+        }
+      } catch (error) {
+        console.error("Erreur lors de la vérification de l'accès:", error);
+        setHasPaidAccess(false);
+      } finally {
+        setIsCheckingAccess(false);
+      }
+    };
+
+    checkPaidAccess();
+  }, [userId, sessionToken]);
 
   const handleLogout = async () => {
     try {
@@ -294,11 +369,103 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Rediriger vers la page de création de compte avec l'email en paramètre
-    const emailParam = email ? `?email=${encodeURIComponent(email)}` : "";
-    router.push(`/auth${emailParam}`);
+    
+    // Vérifier la session directement pour avoir la version la plus récente
+    const { data: sessionData } = await supabase.auth.getSession();
+    const currentSession = sessionData?.session;
+    const currentToken = currentSession?.access_token;
+    const currentUserId = currentSession?.user?.id;
+    
+    // Si l'utilisateur n'est pas connecté, rediriger vers l'authentification
+    if (!currentToken || !currentUserId) {
+      const emailParam = email ? `?email=${encodeURIComponent(email)}` : "";
+      router.push(`/auth${emailParam}`);
+      return;
+    }
+    
+    // Mettre à jour les états locaux avec la session actuelle
+    setSessionToken(currentToken);
+    setUserId(currentUserId);
+    setUserEmail(currentSession?.user?.email ?? null);
+
+    // Vérifier qu'un moyen de paiement est sélectionné
+    if (!paymentInfo) {
+      setError("Veuillez choisir un moyen de paiement.");
+      return;
+    }
+
+    // Si Orange Money est sélectionné, créer la commande et rediriger vers le paiement
+    if (paymentInfo === "Mobile Money (Orange money)") {
+      try {
+        setSubmitted(true);
+        setError(null);
+        
+        // Récupérer le premier cours disponible (ou le cours principal)
+        const coursesRes = await fetch("/api/courses", {
+          headers: { Authorization: `Bearer ${currentToken}` },
+        });
+        
+        if (!coursesRes.ok) {
+          throw new Error("Erreur lors de la récupération des cours");
+        }
+        
+        const courses = await coursesRes.json();
+        if (!courses || courses.length === 0) {
+          throw new Error("Aucun cours disponible");
+        }
+        
+        // Utiliser le premier cours disponible
+        const courseId = courses[0].id;
+        
+        // Créer la commande avec Orange Money
+        const orderRes = await fetch("/api/orders", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${currentToken}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            courseId,
+            payment_method: "orange_money",
+          }),
+        });
+        
+        if (!orderRes.ok) {
+          const errorData = await orderRes.json().catch(() => ({}));
+          throw new Error(errorData.error || "Erreur lors de la création de la commande");
+        }
+        
+        const orderData = await orderRes.json();
+        
+        // Si une URL de paiement est retournée, rediriger vers Orange Money
+        if (orderData.payment_url) {
+          window.location.href = orderData.payment_url;
+        } else if (orderData.payment_initiation_error) {
+          setError(`Erreur: ${orderData.payment_initiation_error}`);
+          setSubmitted(false);
+        } else {
+          // Fallback: rediriger vers la page client
+          router.push("/client");
+        }
+      } catch (error) {
+        console.error("Error processing Orange Money payment:", error);
+        setError(error instanceof Error ? error.message : "Erreur lors du traitement du paiement");
+        setSubmitted(false);
+      }
+      return;
+    }
+    
+    // Carte bancaire - Pas encore intégrée
+    // TODO: Implémenter l'intégration de la carte bancaire
+    // if (paymentInfo === "Carte bancaire (Visa / MasterCard)") {
+    //   // Code pour gérer le paiement par carte bancaire
+    //   return;
+    // }
+    
+    // Si aucun moyen de paiement reconnu, afficher une erreur
+    setError("Moyen de paiement non reconnu. Veuillez en choisir un autre.");
   };
 
   return (
@@ -564,11 +731,11 @@ export default function Home() {
               <div className="space-y-3">
           
                 <p className="text-sm sm:text-base md:text-lg text-neutral-600 max-w-3xl leading-relaxed">
-                Formation Nasongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu'à 100$ par jour avec un petit capital. Elle repose sur l'analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
+                Formation Nasongon est une formation basée sur une stratégie simple et testée sur les indices synthétiques, conçue pour générer jusqu&apos;à 100$ par jour avec un petit capital. Elle repose sur l&apos;analyse des zones, la répétition des mouvements du marché et une gestion du risque stricte.
 
-Cette formation t'apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s'adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
+Cette formation t&apos;apprend à entrer avec précision, à sécuriser rapidement tes profits et à construire une routine de trading claire et disciplinée. Elle s&apos;adresse aux débutants sérieux comme aux traders intermédiaires qui veulent arrêter de compliquer le trading et se concentrer sur ce qui fonctionne réellement.
 
-Nasongon n'est pas une promesse, c'est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
+Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réaliste pour ceux qui veulent de la constance et des résultats.
 
                 </p>
               </div>
@@ -622,6 +789,48 @@ Nasongon n'est pas une promesse, c'est une méthode. Une approche réaliste pour
               <div className="badge-soft text-brand text-xs sm:text-sm flex-shrink-0">Garantie 48h</div>
             </div>
 
+            {/* Section de sélection du moyen de paiement - AVANT le formulaire */}
+            <div className="space-y-3 sm:space-y-4 rounded-2xl bg-[rgba(212,175,55,0.08)] p-4 sm:p-5 border border-brand/20">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <span className="badge-soft text-brand text-xs sm:text-sm">Paiement</span>
+                <span className="text-xs sm:text-sm font-semibold text-neutral-700">
+                  Choisissez votre moyen de paiement
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-2 sm:gap-3">
+                {[
+                  "Mobile Money (Orange money)",
+                  // "Carte bancaire (Visa / MasterCard)", // Pas encore intégrée
+                  // "Wave",
+                  // "PayPal",
+                ].map((method) => (
+                  <button
+                    key={method}
+                    type="button"
+                    className={`pill-neutral text-xs sm:text-sm px-3 sm:px-4 py-2 transition-all ${
+                      paymentInfo === method 
+                        ? "bg-brand text-white shadow-md scale-105" 
+                        : "hover:bg-neutral-100"
+                    }`}
+                    onClick={() => {
+                      setPaymentInfo(method);
+                      setError(null);
+                      setMessage(null);
+                    }}
+                  >
+                    {method}
+                  </button>
+                ))}
+              </div>
+              {paymentInfo && (
+                <div className="mt-2 pt-3 border-t border-brand/20">
+                  <p className="text-xs sm:text-sm text-neutral-600">
+                    <span className="font-semibold text-brand">Moyen sélectionné :</span> {paymentInfo}
+                  </p>
+                </div>
+              )}
+            </div>
+
             <form className="space-y-3 sm:space-y-4" onSubmit={handleSubmit}>
               {/* <div className="space-y-2">
                 <label className="text-sm font-semibold">Adresse email</label>
@@ -636,46 +845,47 @@ Nasongon n'est pas une promesse, c'est une méthode. Une approche réaliste pour
               </div> */}
             
 
-              <button type="submit" className="button-primary w-full cta-pulse text-base sm:text-lg font-semibold">
-              {product.customCtaText}
+              <button 
+                type="submit" 
+                className="button-primary w-full cta-pulse text-base sm:text-lg font-semibold"
+                disabled={submitted || hasPaidAccess || isCheckingAccess}
+              >
+                {isCheckingAccess 
+                  ? "Vérification en cours..." 
+                  : hasPaidAccess 
+                    ? "✅ Accès déjà obtenu" 
+                    : submitted 
+                      ? "Traitement en cours..." 
+                      : product.customCtaText}
               </button>
-              {/* <p className="text-xs text-neutral-300">
-                Cette interface reproduit la page réelle : aucune transaction
-                n&apos;est effectuée.
-              </p> */}
-              {submitted && (
-                <div className="rounded-2xl bg-green-50 p-3 text-sm text-green-700 border border-green-200">
-                  Merci ! Dans la version live, tu serais redirigé vers le
-                  paiement sécurisé.
+              
+              {hasPaidAccess && (
+                <div className="rounded-2xl bg-green-50 p-3 sm:p-4 text-sm text-green-700 border border-green-200">
+                  🎉 Vous avez déjà accès à ce cours ! <Link href="/client" className="underline font-semibold">Accéder à mes cours</Link>
+                </div>
+              )}
+              
+              {/* Messages d'erreur */}
+              {error && (
+                <div className="rounded-2xl bg-red-50 p-3 sm:p-4 text-sm text-red-700 border border-red-200">
+                  {error}
+                </div>
+              )}
+              
+              {/* Messages de succès */}
+              {message && (
+                <div className="rounded-2xl bg-green-50 p-3 sm:p-4 text-sm text-green-700 border border-green-200">
+                  {message}
+                </div>
+              )}
+              
+              {/* Messages de chargement */}
+              {submitted && paymentInfo === "Mobile Money (Orange money)" && !error && (
+                <div className="rounded-2xl bg-blue-50 p-3 sm:p-4 text-sm text-blue-700 border border-blue-200">
+                  Redirection vers Orange Money en cours...
                 </div>
               )}
             </form>
-
-            <div className="space-y-3 rounded-2xl bg-[rgba(212,175,55,0.08)] p-4">
-              <div className="flex items-center gap-3">
-                <span className="badge-soft text-brand">💳 Paiement</span>
-                <span className="text-sm text-neutral-500">
-                  Choisissez votre moyen de paiement
-                </span>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  "Carte bancaire (Visa / MasterCard)",
-                  "Mobile Money (Orange money)",
-                  // "Wave",
-                  // "PayPal",
-                ].map((method) => (
-                  <button
-                    key={method}
-                    type="button"
-                    className="pill-neutral"
-                    onClick={() => setPaymentInfo(method)}
-                  >
-                    {method}
-                  </button>
-                ))}
-              </div>
-            </div>
             <div className="rounded-2xl border border-neutral-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-neutral-500">
                 Besoin de plus d&apos;information ?
@@ -837,34 +1047,6 @@ Nasongon n'est pas une promesse, c'est une méthode. Une approche réaliste pour
           </div>
         )}
 
-        {paymentInfo && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
-            role="dialog"
-            aria-modal="true"
-            onClick={() => setPaymentInfo(null)}
-          >
-            <div
-              className="relative w-full max-w-md rounded-2xl bg-[#0f1016] p-6 shadow-lg border border-[#d4af37]/40"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                type="button"
-                className="absolute right-3 top-3 rounded-full bg-black/60 px-3 py-1 text-sm font-semibold text-white hover:bg-black"
-                onClick={() => setPaymentInfo(null)}
-              >
-                Fermer
-              </button>
-              <div className="space-y-3">
-                <p className="text-sm font-semibold text-brand">Moyen : {paymentInfo}</p>
-                <p className="text-neutral-200">
-                  Cette option de paiement est en cours d&apos;implémentation. Merci de
-                  revenir bientôt ou de choisir un autre moyen disponible.
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
 
         <section className="card p-6 md:p-8 space-y-5">
           <div className="flex items-center justify-between gap-3 flex-wrap">

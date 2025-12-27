@@ -95,7 +95,7 @@ export default function VideoPage() {
           try {
             const parsed = JSON.parse(foundCourse.video_url);
             videosFromJson = Array.isArray(parsed) ? parsed : [];
-          } catch (e) {
+          } catch {
             // Ignore les erreurs de parsing
           }
         }

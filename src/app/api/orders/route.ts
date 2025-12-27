@@ -71,21 +71,99 @@ export async function GET(req: NextRequest) {
   return NextResponse.json(data);
 }
 
-// POST /api/orders { courseId } -> create pending cash order
+// POST /api/orders { courseId, payment_method? } -> create pending order
 export async function POST(req: NextRequest) {
   const { supabase } = createSupabaseFromRequest(req);
   const { userId } = await getUserIdAndRole(supabase);
   if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
-  const { courseId } = await req.json();
+  const { courseId, payment_method = "cash" } = await req.json();
   if (!courseId) return NextResponse.json({ error: "courseId requis" }, { status: 400 });
 
-  const { data, error } = await supabase
+  // Valider le payment_method
+  if (payment_method !== "cash" && payment_method !== "orange_money") {
+    return NextResponse.json({ error: "payment_method invalide" }, { status: 400 });
+  }
+
+  // Vérifier si l'utilisateur a déjà une commande payée pour ce cours
+  const { data: existingPaidOrder } = await supabase
     .from("orders")
-    .insert([{ user_id: userId, course_id: courseId, payment_method: "cash", status: "pending" }])
+    .select("id, status")
+    .eq("user_id", userId)
+    .eq("course_id", courseId)
+    .eq("status", "paid")
+    .single();
+
+  if (existingPaidOrder) {
+    return NextResponse.json({ 
+      error: "Vous avez déjà payé pour ce cours",
+      already_paid: true 
+    }, { status: 400 });
+  }
+
+  // Mettre en "failed" les anciennes commandes en "pending" pour ce cours et cet utilisateur
+  // Cela permet de marquer les tentatives précédentes qui ont échoué
+  const { error: updateOldOrdersError } = await supabase
+    .from("orders")
+    .update({ status: "failed" })
+    .eq("user_id", userId)
+    .eq("course_id", courseId)
+    .eq("status", "pending");
+
+  if (updateOldOrdersError) {
+    console.error("Erreur lors de la mise à jour des anciennes commandes:", updateOldOrdersError);
+    // On continue quand même, ce n'est pas bloquant
+  }
+
+  // Créer la nouvelle commande
+  const { data: order, error } = await supabase
+    .from("orders")
+    .insert([{ user_id: userId, course_id: courseId, payment_method, status: "pending" }])
     .select("*")
     .single();
+  
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
-  return NextResponse.json(data, { status: 201 });
+
+  // Si c'est Orange Money, initier le paiement et retourner l'URL de redirection
+  if (payment_method === "orange_money") {
+    try {
+      const initiateRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/payments/orange-money/initiate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": req.headers.get("Authorization") || "",
+        },
+        body: JSON.stringify({ orderId: order.id, courseId }),
+      });
+
+      if (!initiateRes.ok) {
+        const errorData = await initiateRes.json().catch(() => ({}));
+        // On retourne quand même la commande créée, mais avec une erreur
+        return NextResponse.json({
+          ...order,
+          payment_initiation_error: errorData.error || "Erreur lors de l'initiation du paiement",
+        }, { status: 201 });
+      }
+
+      const { payment_url, pay_token, notif_token } = await initiateRes.json();
+      return NextResponse.json({
+        ...order,
+        payment_url,
+        pay_token,
+        notif_token,
+        redirect_required: true,
+      }, { status: 201 });
+    } catch (error) {
+      console.error("Error initiating Orange Money payment:", error);
+      // On retourne quand même la commande créée
+      return NextResponse.json({
+        ...order,
+        payment_initiation_error: "Erreur lors de l'initiation du paiement",
+      }, { status: 201 });
+    }
+  }
+
+  // Pour cash, retourner simplement la commande
+  return NextResponse.json(order, { status: 201 });
 }
 
