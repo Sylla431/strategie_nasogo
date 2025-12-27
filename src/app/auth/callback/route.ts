@@ -44,22 +44,44 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  // Vérifier si l'email a été confirmé
+  // Vérifier si l'échange a réussi et si l'email est confirmé
   if (data.user && data.session) {
-    // L'email est confirmé, rediriger vers la page d'authentification avec un message de succès
-    // L'utilisateur devra se connecter avec ses identifiants
-    return NextResponse.redirect(
-      new URL(
-        "/auth?message=Votre email a été confirmé avec succès. Vous pouvez maintenant vous connecter.",
-        requestUrl.origin
-      )
-    );
+    // Vérifier explicitement si l'email est confirmé
+    const isEmailConfirmed = data.user.email_confirmed_at !== null && data.user.email_confirmed_at !== undefined;
+    
+    console.log("Email confirmation status:", {
+      userId: data.user.id,
+      email: data.user.email,
+      email_confirmed_at: data.user.email_confirmed_at,
+      isEmailConfirmed,
+    });
+
+    if (isEmailConfirmed) {
+      // L'email est confirmé, rediriger vers la page d'authentification avec un message de succès
+      // L'utilisateur devra se connecter avec ses identifiants
+      return NextResponse.redirect(
+        new URL(
+          "/auth?message=Votre email a été confirmé avec succès. Vous pouvez maintenant vous connecter.",
+          requestUrl.origin
+        )
+      );
+    } else {
+      // L'échange a réussi mais l'email n'est pas confirmé (cas rare)
+      console.warn("Échange réussi mais email non confirmé:", data.user);
+      return NextResponse.redirect(
+        new URL(
+          "/auth?error=L'email n'a pas pu être confirmé. Veuillez réessayer ou contacter le support.",
+          requestUrl.origin
+        )
+      );
+    }
   }
 
-  // Si pas de session, rediriger vers la page d'authentification
+  // Si pas de session ou pas d'utilisateur, rediriger vers la page d'authentification
+  console.error("Échange réussi mais pas de session ou utilisateur:", { hasUser: !!data.user, hasSession: !!data.session });
   return NextResponse.redirect(
     new URL(
-      "/auth?error=Erreur lors de la confirmation de l'email",
+      "/auth?error=Erreur lors de la confirmation de l'email. Veuillez réessayer.",
       requestUrl.origin
     )
   );

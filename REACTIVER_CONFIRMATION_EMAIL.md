@@ -201,6 +201,8 @@ if (mode === "register") {
 
 **Symptôme** : Après avoir cliqué sur le lien de confirmation dans l'email, l'utilisateur voit une erreur "requested path is invalid" ou reste sur une page blanche.
 
+**⚠️ IMPORTANT** : Consultez le guide détaillé `CORRIGER_ERREUR_CONFIRMATION_EMAIL.md` pour résoudre ce problème.
+
 **Solution** :
 1. **Vérifier les URLs de redirection dans Supabase** :
    - Aller dans **Authentication** → **URL Configuration** → **Redirect URLs**

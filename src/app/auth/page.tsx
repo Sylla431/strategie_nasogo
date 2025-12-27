@@ -71,7 +71,15 @@ function AuthForm() {
     try {
       if (mode === "login") {
         const { data, error: err } = await supabase.auth.signInWithPassword({ email, password });
-        if (err) throw err;
+        if (err) {
+          // Vérifier si l'erreur est due à un email non confirmé
+          if (err.message?.includes("email not confirmed") || err.message?.includes("Email not confirmed")) {
+            setError("Votre email n'a pas encore été confirmé. Vérifiez votre boîte de réception et cliquez sur le lien de confirmation.");
+          } else {
+            throw err;
+          }
+          return;
+        }
         const userId = data.user?.id ?? (await supabase.auth.getUser()).data.user?.id;
         if (userId) {
           await ensureProfile(userId);
