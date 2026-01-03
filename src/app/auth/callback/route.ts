@@ -12,6 +12,7 @@ export async function GET(request: NextRequest) {
 
   // Construire l'URL de base de manière fiable (pour Vercel)
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin;
+  const authUrl = `${baseUrl}/auth`;
 
   // Si erreur, rediriger vers la page d'authentification avec le message d'erreur
   if (error) {
