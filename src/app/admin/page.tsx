@@ -67,6 +67,21 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  
+  // États pour l'envoi d'emails promotionnels
+  const [emailPromoData, setEmailPromoData] = useState({
+    promoEndDate: "",
+    promoPrice: "27 500 F CFA",
+    originalPrice: "39 700 F CFA",
+    productName: "Stratégie Nasongon",
+    productUrl: "https://vbsniperacademie.com/services/strategie-nasongon",
+    testEmail: "",
+  });
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [exportedEmails, setExportedEmails] = useState<string>("");
+  const [exportingEmails, setExportingEmails] = useState(false);
+  const [emailTemplate, setEmailTemplate] = useState<string>("");
+  const [loadingTemplate, setLoadingTemplate] = useState(false);
 
   const loadOrders = async (tok: string) => {
     const res = await fetch("/api/orders", { headers: { Authorization: `Bearer ${tok}` } });
@@ -286,6 +301,137 @@ export default function AdminDashboard() {
       }
       return next;
     });
+  };
+
+  const loadEmailTemplate = async () => {
+    if (!emailPromoData.promoEndDate) {
+      setError("Date de fin de promotion requise pour générer le template");
+      return;
+    }
+
+    setLoadingTemplate(true);
+    setError(null);
+
+    try {
+      const params = new URLSearchParams({
+        promoEndDate: emailPromoData.promoEndDate,
+        promoPrice: emailPromoData.promoPrice,
+        originalPrice: emailPromoData.originalPrice,
+        productName: emailPromoData.productName,
+        productUrl: emailPromoData.productUrl,
+      });
+
+      const res = await fetch(`/api/email/get-template?${params.toString()}`);
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erreur lors de la génération du template");
+        return;
+      }
+
+      setEmailTemplate(data.html);
+      setMessage("✅ Template généré avec succès ! Copiez le HTML ci-dessous.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la génération du template");
+    } finally {
+      setLoadingTemplate(false);
+    }
+  };
+
+  const exportEmails = async () => {
+    if (!token) {
+      setError("Token manquant");
+      return;
+    }
+
+    setExportingEmails(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/users/export-emails", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erreur lors de l'export des emails");
+        return;
+      }
+
+      setExportedEmails(data.emails);
+      setMessage(`✅ ${data.total} emails exportés avec succès ! Copiez la liste ci-dessous.`);
+      
+      // Télécharger le CSV
+      const blob = new Blob([data.csv], { type: "text/csv;charset=utf-8;" });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", `emails_utilisateurs_${new Date().toISOString().split("T")[0]}.csv`);
+      link.style.visibility = "hidden";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'export");
+    } finally {
+      setExportingEmails(false);
+    }
+  };
+
+  const sendPromoEmails = async (testMode = false) => {
+    if (!token) {
+      setError("Token manquant");
+      return;
+    }
+
+    if (!emailPromoData.promoEndDate) {
+      setError("Date de fin de promotion requise");
+      return;
+    }
+
+    if (testMode && !emailPromoData.testEmail) {
+      setError("Email de test requis");
+      return;
+    }
+
+    setSendingEmails(true);
+    setError(null);
+    setMessage(null);
+
+    try {
+      const res = await fetch("/api/email/send-promo", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          ...emailPromoData,
+          testEmail: testMode ? emailPromoData.testEmail : undefined,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setError(data.error || "Erreur lors de l'envoi des emails");
+        return;
+      }
+
+      setMessage(
+        testMode
+          ? `Email de test envoyé avec succès à ${emailPromoData.testEmail}`
+          : `Emails envoyés : ${data.successCount} réussis, ${data.failureCount} échoués sur ${data.total}`
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur lors de l'envoi");
+    } finally {
+      setSendingEmails(false);
+    }
   };
 
   const getAllVideosForCourse = (course: Course): Array<{ title: string; video_url: string; position: number; source: string }> => {
@@ -806,6 +952,182 @@ export default function AdminDashboard() {
                 </>
               );
             })()}
+          </section>
+
+          {/* Section Envoi d'emails promotionnels */}
+          <section className="card p-4 md:p-6 space-y-4">
+            <h2 className="text-xl font-semibold">📧 Envoyer un email promotionnel</h2>
+            <p className="text-sm text-neutral-600">
+              Envoyer un email à tous les utilisateurs inscrits pour les informer que la promotion se termine bientôt.
+            </p>
+            
+            {/* Export des emails et template pour Resend */}
+            <div className="border-t pt-4 space-y-4">
+              <h3 className="text-sm font-semibold">Option : Utiliser l&apos;interface Resend</h3>
+              <p className="text-xs text-neutral-600">
+                Si vous préférez utiliser l&apos;interface web de Resend, vous pouvez exporter la liste des emails et le template HTML ici.
+              </p>
+              
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={exportEmails}
+                  disabled={exportingEmails}
+                  className="button-secondary"
+                >
+                  {exportingEmails ? "Export..." : "📥 Exporter les emails"}
+                </button>
+                <button
+                  type="button"
+                  onClick={loadEmailTemplate}
+                  disabled={loadingTemplate || !emailPromoData.promoEndDate}
+                  className="button-secondary"
+                >
+                  {loadingTemplate ? "Génération..." : "📄 Générer le template"}
+                </button>
+              </div>
+              
+              {exportedEmails && (
+                <div className="space-y-2">
+                  <label className="block text-xs font-medium">Emails (copiez dans Resend) :</label>
+                  <textarea
+                    readOnly
+                    value={exportedEmails}
+                    className="form-control h-24 text-xs font-mono"
+                    onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                  />
+                  <p className="text-xs text-neutral-500">
+                    💡 Dans Resend, créez un nouveau Broadcast, collez cette liste dans le champ &quot;To&quot; (séparés par des virgules).
+                  </p>
+                </div>
+              )}
+              
+              {emailTemplate && (
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <label className="block text-xs font-medium">Template HTML (copiez dans Resend) :</label>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        navigator.clipboard.writeText(emailTemplate);
+                        setMessage("✅ Template copié dans le presse-papiers !");
+                      }}
+                      className="text-xs button-secondary px-2 py-1"
+                    >
+                      📋 Copier
+                    </button>
+                  </div>
+                  <textarea
+                    readOnly
+                    value={emailTemplate}
+                    className="form-control h-64 text-xs font-mono"
+                    onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+                  />
+                  <p className="text-xs text-neutral-500">
+                    💡 Dans Resend, créez un nouveau Broadcast, allez dans &quot;HTML&quot; et collez ce template. Vous pouvez ensuite le personnaliser avec l&apos;éditeur visuel.
+                  </p>
+                </div>
+              )}
+            </div>
+            
+            <div className="border-t pt-4">
+              <h3 className="text-sm font-semibold mb-3">Option : Envoyer via l&apos;API (automatique)</h3>
+              
+              <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">Date de fin de promotion *</label>
+                <input
+                  type="date"
+                  className="form-control"
+                  value={emailPromoData.promoEndDate}
+                  onChange={(e) => setEmailPromoData((d) => ({ ...d, promoEndDate: e.target.value }))}
+                />
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Prix promotionnel</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={emailPromoData.promoPrice}
+                    onChange={(e) => setEmailPromoData((d) => ({ ...d, promoPrice: e.target.value }))}
+                    placeholder="27 500 F CFA"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Prix original</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={emailPromoData.originalPrice}
+                    onChange={(e) => setEmailPromoData((d) => ({ ...d, originalPrice: e.target.value }))}
+                    placeholder="39 700 F CFA"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">Nom du produit</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value={emailPromoData.productName}
+                  onChange={(e) => setEmailPromoData((d) => ({ ...d, productName: e.target.value }))}
+                  placeholder="Stratégie Nasongon"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-1">URL du produit</label>
+                <input
+                  type="url"
+                  className="form-control"
+                  value={emailPromoData.productUrl}
+                  onChange={(e) => setEmailPromoData((d) => ({ ...d, productUrl: e.target.value }))}
+                  placeholder="https://vbsniperacademie.com/services/strategie-nasongon"
+                />
+              </div>
+              
+              <div className="border-t pt-4 space-y-3">
+                <h3 className="text-sm font-semibold">Mode test (optionnel)</h3>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Email de test</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    value={emailPromoData.testEmail}
+                    onChange={(e) => setEmailPromoData((d) => ({ ...d, testEmail: e.target.value }))}
+                    placeholder="test@example.com"
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Si rempli, l&apos;email sera envoyé uniquement à cette adresse pour tester.
+                  </p>
+                </div>
+                
+                <div className="flex gap-3">
+                  {emailPromoData.testEmail && (
+                    <button
+                      type="button"
+                      onClick={() => sendPromoEmails(true)}
+                      disabled={sendingEmails}
+                      className="button-secondary flex-1"
+                    >
+                      {sendingEmails ? "Envoi..." : "Envoyer un email de test"}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => sendPromoEmails(false)}
+                    disabled={sendingEmails}
+                    className="button-primary flex-1"
+                  >
+                    {sendingEmails ? "Envoi en cours..." : "Envoyer à tous les utilisateurs"}
+                  </button>
+                </div>
+              </div>
+              </div>
+            </div>
           </section>
           </div>
         </div>

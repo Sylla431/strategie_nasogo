@@ -170,6 +170,24 @@ function AuthForm() {
           await new Promise((resolve) => setTimeout(resolve, 1000));
           // Mettre à jour les métadonnées (full_name, phone) si le trigger ne les a pas encore prises
           await ensureProfile(data.user.id, fullName, phone);
+          
+          // Ajouter le contact à Resend (en arrière-plan, ne pas bloquer l'inscription)
+          if (email) {
+            fetch("/api/resend/add-contact", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                email,
+                fullName: fullName || null,
+                phone: phone || null,
+              }),
+            }).catch((error) => {
+              // Ne pas bloquer l'inscription si l'ajout à Resend échoue
+              console.error("Erreur lors de l'ajout du contact à Resend:", error);
+            });
+          }
         }
         
         // Vérifier si l'email doit être confirmé
@@ -179,7 +197,7 @@ function AuthForm() {
         } else {
           // L'utilisateur a une session = email déjà confirmé ou confirmation désactivée
           setMessage("Compte créé avec succès !");
-          setMode("login");
+        setMode("login");
         }
       }
     } catch (err) {
@@ -298,14 +316,14 @@ function AuthForm() {
           <div className="space-y-2">
             <label className="text-sm font-semibold">Mot de passe</label>
             <div className="relative">
-              <input
+            <input
                 type={showPassword ? "text" : "password"}
-                required
-                minLength={6}
+              required
+              minLength={6}
                 className="form-control pr-10"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}

@@ -10,17 +10,17 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Stratégie Nasongon - VB Sniper",
+  title: "VB Sniper Académie - Formations et Coaching Trading",
   description:
-    "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
+    "VB Sniper Académie : Formations et coaching en trading depuis 2022. Accompagnement personnalisé pour traders particuliers avec stratégies éprouvées et résultats garantis.",
   metadataBase: new URL("https://vbsniperacademie.com"),
   openGraph: {
     title:
-      "Stratégie Nasongon - VB Sniper",
+      "VB Sniper Académie - Formations et Coaching Trading",
     description:
-      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
+      "VB Sniper Académie : Formations et coaching en trading depuis 2022. Accompagnement personnalisé pour traders particuliers avec stratégies éprouvées et résultats garantis.",
     images: [
-      "/images/instr2.jpg",
+      "/images/Instructeur.jpg",
     ],
     url: "https://vbsniperacademie.com",
     locale: "fr_FR",
@@ -29,11 +29,11 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title:
-      "Stratégie Nasongon - VB Sniper",
+      "VB Sniper Académie - Formations et Coaching Trading",
     description:
-      "Stratégie Nasongon : 5 vidéos + coaching, garantie 48h, objectif 100$ par jour avec 20$ de capital sur VB Sniper Académie.",
+      "VB Sniper Académie : Formations et coaching en trading depuis 2022. Accompagnement personnalisé pour traders particuliers avec stratégies éprouvées et résultats garantis.",
     images: [
-      "/images/instr2.jpg",
+      "/images/Instructeur.jpg",
     ],
   },
   icons: {
