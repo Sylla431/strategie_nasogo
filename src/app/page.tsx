@@ -50,7 +50,7 @@ const services = [
     slug: "strategie-nasongon",
     description: "5 vidéos pour apprendre ma nouvelle stratégie nasongon. Objectif : 100$ par jour avec 20$ de capital.",
     cover: "/images/SERVICES 01.jpg",
-    price: 27500,
+    price: 17500,
     featured: true,
     available: true,
   },
