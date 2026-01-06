@@ -403,9 +403,12 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                       <button
                         type="button"
                         className="button-primary cta-pulse"
-                        disabled
+                        onClick={() => {
+                          window.open("https://docs.google.com/forms/d/e/1FAIpQLScamqcelNW4CWLxk256vN6aC7mzyf1BaetoYA2saDncdSHcTQ/viewform?usp=header", "_blank");
+                        }}
+                        
                       >
-                        Bientôt disponible
+                        Precommande
                       </button>
                       <Link
                         href={store.support.whatsapp}
