@@ -50,7 +50,7 @@ const services = [
     slug: "strategie-nasongon",
     description: "5 vidéos pour apprendre ma nouvelle stratégie nasongon. Objectif : 100$ par jour avec 20$ de capital.",
     cover: "/images/SERVICES 01.jpg",
-    price: 17500,
+    price: 27500,
     featured: true,
     available: true,
   },
@@ -405,8 +405,7 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                         className="button-primary cta-pulse"
                         onClick={() => {
                           window.open("https://docs.google.com/forms/d/e/1FAIpQLScamqcelNW4CWLxk256vN6aC7mzyf1BaetoYA2saDncdSHcTQ/viewform?usp=header", "_blank");
-                        }}
-                        
+                        }} 
                       >
                         Precommande
                       </button>

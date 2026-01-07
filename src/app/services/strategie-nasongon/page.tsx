@@ -44,7 +44,7 @@ const product = {
   cover: "/images/3.jpg",
   thumbnail: "/images/Instructeur.jpg",
   description: productDescription,
-  price: 17500,
+  price: 27500,
   originalPrice: 39700,
   salePercent: 30,
   saleEndsAt: "2025-12-31T00:00:00Z",
