@@ -404,7 +404,7 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                         type="button"
                         className="button-primary cta-pulse"
                         onClick={() => {
-                          window.open("https://docs.google.com/forms/d/e/1FAIpQLScamqcelNW4CWLxk256vN6aC7mzyf1BaetoYA2saDncdSHcTQ/viewform?usp=header", "_blank");
+                          window.open(store.support.whatsapp, "_blank");
                         }} 
                       >
                         Commander le livre
