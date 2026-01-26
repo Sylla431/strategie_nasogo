@@ -362,7 +362,7 @@ export default function Home() {
                 {/* Image bientôt pour le livre */}
                 <div className="relative h-[500px] w-full rounded-2xl overflow-hidden bg-white shadow-lg flex items-center justify-center">
                   <Image
-                    src="/images/livre_cover.jpg"
+                    src="/images/livre.officiel.jpg"
                     alt="Bientôt disponible"
                     fill
                     className="object-cover"
@@ -407,14 +407,14 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                           window.open("https://docs.google.com/forms/d/e/1FAIpQLScamqcelNW4CWLxk256vN6aC7mzyf1BaetoYA2saDncdSHcTQ/viewform?usp=header", "_blank");
                         }} 
                       >
-                        Precommande
+                        Commander le livre
                       </button>
                       <Link
                         href={store.support.whatsapp}
                         target="_blank"
                         className="button-secondary text-center"
                       >
-                        En savoir plus
+                        Plus d'informations
                       </Link>
                     </div>
                   </div>

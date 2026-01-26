@@ -1,4 +1,9 @@
-<!-- 6ca8dea5-cb2b-438e-8738-b8e3c92b1842 63532af0-057f-4659-8e0f-9669eed59822 -->
+---
+name: Restructuration du site VB Sniper Académie
+overview: ""
+todos: []
+---
+
 # Restructuration du site VB Sniper Académie
 
 ## Vue d'ensemble
