@@ -11,6 +11,8 @@ function PaymentSuccessContent() {
   const [loading, setLoading] = useState(true);
   const [orderStatus, setOrderStatus] = useState<"paid" | "pending" | "failed" | null>(null);
   const orderId = searchParams.get("order_id");
+  const paymentStatus = searchParams.get("paymentStatus"); // Paramètre de Moneroo
+  const paymentId = searchParams.get("paymentId"); // ID de paiement Moneroo
 
   useEffect(() => {
     const checkOrderStatus = async () => {
@@ -26,6 +28,20 @@ function PaymentSuccessContent() {
           return;
         }
 
+        // Si paymentStatus est fourni dans l'URL (Moneroo), l'utiliser en priorité
+        // Note: Le webhook Moneroo devrait déjà avoir mis à jour le statut en base
+        if (paymentStatus) {
+          if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+            // Afficher immédiatement l'échec si indiqué dans l'URL
+            setOrderStatus("failed");
+            // Continuer à vérifier en base pour confirmer
+          } else if (paymentStatus === "success") {
+            // Pour Moneroo, vérifier le statut réel en base de données
+            // car le webhook peut avoir déjà mis à jour le statut
+          }
+        }
+
+        // Vérifier le statut réel de la commande en base de données
         const res = await fetch("/api/orders", {
           headers: { Authorization: `Bearer ${session.access_token}` },
         });
@@ -38,18 +54,27 @@ function PaymentSuccessContent() {
           };
           const order = orders.find((o: Order) => o.id === orderId);
           if (order) {
-            setOrderStatus(order.status);
+            setOrderStatus(order.status as "paid" | "pending" | "failed");
+          } else {
+            // Si la commande n'est pas trouvée et paymentStatus indique un échec
+            if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+              setOrderStatus("failed");
+            }
           }
         }
       } catch (error) {
         console.error("Error checking order status:", error);
+        // En cas d'erreur, utiliser paymentStatus si disponible
+        if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+          setOrderStatus("failed");
+        }
       } finally {
         setLoading(false);
       }
     };
 
     checkOrderStatus();
-  }, [orderId, router]);
+  }, [orderId, paymentStatus, paymentId, router]);
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-gradient-to-b from-neutral-50 to-white">
@@ -101,7 +126,7 @@ function PaymentSuccessContent() {
               : orderStatus === "paid"
               ? "Votre paiement a été confirmé. Vous avez maintenant accès au cours."
               : orderStatus === "failed"
-              ? "Votre paiement n&apos;a pas pu être traité. Veuillez réessayer ou contacter le support si le problème persiste."
+              ? "Votre paiement n&apos;a pas pu être traité. Cela peut être dû à plusieurs raisons : fonds insuffisants, problème de connexion, ou annulation de votre part. Veuillez réessayer ou contacter le support si le problème persiste."
               : "Votre paiement est en cours de traitement. Vous recevrez un email de confirmation une fois le paiement validé."}
           </p>
         </div>
@@ -115,10 +140,18 @@ function PaymentSuccessContent() {
         )}
 
         {orderStatus === "failed" && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
-            <p className="text-sm text-red-800 text-center">
-              ⚠️ Le paiement n&apos;a pas pu être validé. Vous pouvez réessayer en créant une nouvelle commande.
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-4 space-y-2">
+            <p className="text-sm text-red-800 text-center font-medium">
+              ⚠️ Le paiement n&apos;a pas pu être validé
             </p>
+            <p className="text-xs text-red-700 text-center">
+              Vous pouvez réessayer en créant une nouvelle commande. Si le problème persiste, contactez notre support.
+            </p>
+            {paymentId && (
+              <p className="text-xs text-red-600 text-center mt-2">
+                ID de transaction: {paymentId}
+              </p>
+            )}
           </div>
         )}
 
@@ -141,7 +174,7 @@ function PaymentSuccessContent() {
           ) : orderStatus === "failed" ? (
             <>
               <Link
-                href="/"
+                href={`/services/strategie-nasongon${orderId ? `?retry_order=${orderId}` : ""}`}
                 className="button-primary w-full text-center block"
               >
                 Réessayer le paiement
@@ -152,6 +185,14 @@ function PaymentSuccessContent() {
               >
                 Voir mes commandes
               </Link>
+              <a
+                href="https://wa.me/+22373695125"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-secondary w-full text-center block border-green-200 text-green-700 hover:bg-green-50"
+              >
+                Contacter le support
+              </a>
             </>
           ) : (
             <>

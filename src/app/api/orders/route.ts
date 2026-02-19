@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
   if (!courseId) return NextResponse.json({ error: "courseId requis" }, { status: 400 });
 
   // Valider le payment_method
-  if (payment_method !== "cash" && payment_method !== "orange_money") {
+  const validPaymentMethods = ["cash", "orange_money", "paytech", "moneroo"];
+  if (!validPaymentMethods.includes(payment_method)) {
     return NextResponse.json({ error: "payment_method invalide" }, { status: 400 });
   }
 
@@ -124,10 +125,23 @@ export async function POST(req: NextRequest) {
   
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  // Si c'est Orange Money, initier le paiement et retourner l'URL de redirection
-  if (payment_method === "orange_money") {
+  // Router vers le bon provider selon le payment_method
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
+  
+  // Si c'est un paiement en ligne, initier le paiement et retourner l'URL de redirection
+  if (payment_method === "orange_money" || payment_method === "paytech" || payment_method === "moneroo") {
     try {
-      const initiateRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/api/payments/orange-money/initiate`, {
+      // Déterminer l'endpoint selon le provider
+      let endpoint = "";
+      if (payment_method === "orange_money") {
+        endpoint = `${baseUrl}/api/payments/orange-money/initiate`;
+      } else if (payment_method === "paytech") {
+        endpoint = `${baseUrl}/api/payments/paytech/initiate`;
+      } else if (payment_method === "moneroo") {
+        endpoint = `${baseUrl}/api/payments/moneroo/initiate`;
+      }
+
+      const initiateRes = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -145,16 +159,20 @@ export async function POST(req: NextRequest) {
         }, { status: 201 });
       }
 
-      const { payment_url, pay_token, notif_token } = await initiateRes.json();
+      const responseData = await initiateRes.json();
+      // Adapter selon le format de réponse de chaque provider
+      const payment_url = responseData.payment_url || responseData.redirectUrl;
+      
       return NextResponse.json({
         ...order,
         payment_url,
-        pay_token,
-        notif_token,
+        payment_id: responseData.payment_id,
+        pay_token: responseData.pay_token,
+        notif_token: responseData.notif_token,
         redirect_required: true,
       }, { status: 201 });
     } catch (error) {
-      console.error("Error initiating Orange Money payment:", error);
+      console.error(`Error initiating ${payment_method} payment:`, error);
       // On retourne quand même la commande créée
       return NextResponse.json({
         ...order,

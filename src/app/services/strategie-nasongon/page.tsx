@@ -396,8 +396,16 @@ export default function Home() {
       return;
     }
 
-    // Si Orange Money est sélectionné, créer la commande et rediriger vers le paiement
-    if (paymentInfo === "Mobile Money (Orange money)") {
+    // Mapping des moyens de paiement vers leurs codes
+    const paymentMethodMap: Record<string, string> = {
+      "Mobile Money (Orange money)": "orange_money",
+      "PayTech": "paytech",
+      "Moneroo": "moneroo",
+    };
+
+    // Si c'est un paiement en ligne (Orange Money, PayTech, Moneroo)
+    const paymentMethodCode = paymentMethodMap[paymentInfo || ""];
+    if (paymentMethodCode) {
       try {
         setSubmitted(true);
         setError(null);
@@ -419,7 +427,7 @@ export default function Home() {
         // Utiliser le premier cours disponible
         const courseId = courses[0].id;
         
-        // Créer la commande avec Orange Money
+        // Créer la commande avec le moyen de paiement sélectionné
         const orderRes = await fetch("/api/orders", {
           method: "POST",
           headers: {
@@ -428,7 +436,7 @@ export default function Home() {
           },
           body: JSON.stringify({
             courseId,
-            payment_method: "orange_money",
+            payment_method: paymentMethodCode,
           }),
         });
         
@@ -439,7 +447,7 @@ export default function Home() {
         
         const orderData = await orderRes.json();
         
-        // Si une URL de paiement est retournée, rediriger vers Orange Money
+        // Si une URL de paiement est retournée, rediriger vers le provider
         if (orderData.payment_url) {
           window.location.href = orderData.payment_url;
         } else if (orderData.payment_initiation_error) {
@@ -450,19 +458,12 @@ export default function Home() {
           router.push("/client");
         }
       } catch (error) {
-        console.error("Error processing Orange Money payment:", error);
+        console.error(`Error processing ${paymentInfo} payment:`, error);
         setError(error instanceof Error ? error.message : "Erreur lors du traitement du paiement");
         setSubmitted(false);
       }
       return;
     }
-    
-    // Carte bancaire - Pas encore intégrée
-    // TODO: Implémenter l'intégration de la carte bancaire
-    // if (paymentInfo === "Carte bancaire (Visa / MasterCard)") {
-    //   // Code pour gérer le paiement par carte bancaire
-    //   return;
-    // }
     
     // Si aucun moyen de paiement reconnu, afficher une erreur
     setError("Moyen de paiement non reconnu. Veuillez en choisir un autre.");
@@ -800,9 +801,9 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
                   "Mobile Money (Orange money)",
+                  "PayTech",
+                  "Moneroo",
                   // "Carte bancaire (Visa / MasterCard)", // Pas encore intégrée
-                  // "Wave",
-                  // "PayPal",
                 ].map((method) => (
                   <button
                     key={method}
