@@ -798,6 +798,9 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
                   Choisissez votre moyen de paiement
                 </span>
               </div>
+              <p className="text-xs sm:text-sm text-neutral-500 italic">
+                Bientôt disponible
+              </p>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
                   "Mobile Money (Orange money)",
@@ -808,16 +811,10 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
                   <button
                     key={method}
                     type="button"
-                    className={`pill-neutral text-xs sm:text-sm px-3 sm:px-4 py-2 transition-all ${
-                      paymentInfo === method 
-                        ? "bg-brand text-white shadow-md scale-105" 
-                        : "hover:bg-neutral-100"
-                    }`}
-                    onClick={() => {
-                      setPaymentInfo(method);
-                      setError(null);
-                      setMessage(null);
-                    }}
+                    disabled
+                    className="pill-neutral text-xs sm:text-sm px-3 sm:px-4 py-2 transition-all opacity-60 cursor-not-allowed bg-neutral-100 text-neutral-500 border-neutral-200"
+                    onClick={() => {}}
+                    title="Bientôt disponible"
                   >
                     {method}
                   </button>
