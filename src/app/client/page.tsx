@@ -263,7 +263,7 @@ export default function ClientSpace() {
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900">Espace client</h1>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
-          <Link href="/" className="pill-neutral text-sm sm:text-base">
+          <Link href="/services/strategie-nasongon" className="pill-neutral text-sm sm:text-base">
             Accueil
           </Link>
           <button
