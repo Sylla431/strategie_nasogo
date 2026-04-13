@@ -19,13 +19,13 @@ const formatPrice = (value: number) =>
 export default function ServiceCard({ service }: { service: Service }) {
   return (
     <div className="group relative overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-sm transition-all hover:shadow-lg hover:scale-[1.02]">
-      <div className="relative h-64 sm:h-72 md:h-80 w-full overflow-hidden bg-white">
+      <div className="relative aspect-[4/3] w-full overflow-hidden bg-white">
         {service.available === false ? (
           <Image
             src="/images/bientot.png"
             alt="Bientôt disponible"
             fill
-            className="object-contain transition-transform group-hover:scale-105"
+            className="object-cover object-center transition-transform group-hover:scale-105"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
