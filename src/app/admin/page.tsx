@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
+import Link from "next/link";
 
 type CourseVideo = {
   id: string;
@@ -49,6 +50,18 @@ type CourseAccess = {
   users_profile?: UserProfile;
 };
 
+type StudentSummary = {
+  id: string;
+  full_name: string | null;
+  email: string | null;
+  phone: string | null;
+  created_at: string;
+  courses_count: number;
+  last_order_status: string | null;
+  last_order_at: string | null;
+  has_id_card_photo: boolean;
+};
+
 export default function AdminDashboard() {
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<string | null>(null);
@@ -67,6 +80,9 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [quickStudents, setQuickStudents] = useState<StudentSummary[]>([]);
+  const [quickStudentsLoading, setQuickStudentsLoading] = useState(false);
+  const [quickStudentsError, setQuickStudentsError] = useState<string | null>(null);
   
   // États pour l'envoi d'emails promotionnels
   const [emailPromoData, setEmailPromoData] = useState({
@@ -112,6 +128,27 @@ export default function AdminDashboard() {
     } catch (err) {
       console.error("Erreur réseau lors du chargement des accès:", err);
       setError("Erreur de connexion lors du chargement des accès.");
+    }
+  };
+
+  const loadQuickStudents = async (tok: string) => {
+    setQuickStudentsLoading(true);
+    setQuickStudentsError(null);
+    try {
+      const res = await fetch("/api/students?limit=6", {
+        headers: { Authorization: `Bearer ${tok}` },
+      });
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({}));
+        setQuickStudentsError(b.error || "Erreur chargement étudiants");
+        return;
+      }
+      const data = (await res.json()) as StudentSummary[];
+      setQuickStudents(data || []);
+    } catch {
+      setQuickStudentsError("Erreur réseau lors du chargement des étudiants");
+    } finally {
+      setQuickStudentsLoading(false);
     }
   };
 
@@ -164,7 +201,7 @@ export default function AdminDashboard() {
         setLoading(false);
         return;
       }
-      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok)]);
+      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok), loadQuickStudents(tok)]);
       setLoading(false);
     };
     load();
@@ -467,7 +504,17 @@ export default function AdminDashboard() {
 
   return (
     <div className="layout-shell py-10 space-y-8">
-      <h1 className="text-3xl font-semibold">Dashboard admin</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h1 className="text-3xl font-semibold">Dashboard admin</h1>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/students" className="button-secondary">
+            Gérer les étudiants
+          </Link>
+          <Link href="/services/strategie-nasongon" className="button-secondary">
+            Retour site
+          </Link>
+        </div>
+      </div>
       {loading && <p>Chargement...</p>}
       {error && <p className="text-sm text-red-600">{error}</p>}
       {message && <p className="text-sm text-green-600">{message}</p>}
@@ -684,6 +731,43 @@ export default function AdminDashboard() {
           </div>
 
           <div className="space-y-6">
+          <section className="card p-4 md:p-6 space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-xl font-semibold">Étudiants (aperçu)</h2>
+              <Link href="/admin/students" className="button-secondary text-sm">
+                Voir tout
+              </Link>
+            </div>
+            {quickStudentsLoading && <p className="text-sm text-neutral-600">Chargement des étudiants...</p>}
+            {quickStudentsError && <p className="text-sm text-red-600">{quickStudentsError}</p>}
+            {!quickStudentsLoading && !quickStudentsError && quickStudents.length === 0 && (
+              <p className="text-sm text-neutral-600">Aucun étudiant trouvé.</p>
+            )}
+            <div className="space-y-3">
+              {quickStudents.map((student) => (
+                <div
+                  key={student.id}
+                  className="rounded-lg border border-neutral-200 p-3 bg-white flex items-center justify-between gap-3"
+                >
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">
+                      {student.full_name || student.email || "Étudiant"}
+                    </p>
+                    <p className="text-xs text-neutral-600 truncate">{student.email || "Email non renseigné"}</p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {student.courses_count} cours • {student.last_order_status || "Aucune commande"}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/admin/students?student=${student.id}`}
+                    className="text-xs font-semibold text-brand hover:underline whitespace-nowrap"
+                  >
+                    Voir profil
+                  </Link>
+                </div>
+              ))}
+            </div>
+          </section>
           <section className="card p-4 md:p-6 space-y-4">
             <h2 className="text-xl font-semibold">Liste des cours et vidéos</h2>
             <div className="space-y-3">

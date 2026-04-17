@@ -510,9 +510,14 @@ export default function Home() {
                   </Link>
                 )}
                 {userRole === "admin" && (
-                  <Link href="/admin" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
-                    Admin
-                  </Link>
+                  <>
+                    <Link href="/admin" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
+                      Admin
+                    </Link>
+                    <Link href="/admin/students" className="pill-neutral text-xs sm:text-sm whitespace-nowrap">
+                      Étudiants
+                    </Link>
+                  </>
                 )}
                 <div className="relative">
                   <button
@@ -575,22 +580,31 @@ export default function Home() {
                             Erreur rôle: {roleLoadError}
                           </p>
                         )}
-                        <div className="mt-4 flex flex-col sm:flex-row gap-2">
+                        <div className="mt-4 flex flex-col gap-2">
                           <Link 
                             href="/client" 
-                            className="pill-neutral text-center text-sm sm:text-base"
+                            className="pill-neutral w-full text-center text-sm sm:text-base"
                             onClick={() => setUserMenuOpen(false)}
                           >
                             Espace client
                           </Link>
                           {userRole === "admin" && (
-                            <Link 
-                              href="/admin" 
-                              className="pill-neutral text-center text-sm sm:text-base"
-                              onClick={() => setUserMenuOpen(false)}
-                            >
-                              Admin
-                            </Link>
+                            <>
+                              <Link 
+                                href="/admin" 
+                                className="pill-neutral w-full text-center text-sm sm:text-base"
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                Admin
+                              </Link>
+                              <Link 
+                                href="/admin/students" 
+                                className="pill-neutral w-full text-center text-sm sm:text-base"
+                                onClick={() => setUserMenuOpen(false)}
+                              >
+                                Étudiants
+                              </Link>
+                            </>
                           )}
                         </div>
                         <button

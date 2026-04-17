@@ -29,8 +29,8 @@ export async function addContactToResend(params: AddContactToResendParams): Prom
 
   try {
     // Séparer le prénom et nom si full_name est fourni
-    let firstName = params.firstName;
-    let lastName = params.lastName;
+    const firstName = params.firstName;
+    const lastName = params.lastName;
 
     // Si on a un full_name mais pas de firstName/lastName séparés
     // On peut essayer de le séparer (optionnel, à améliorer si nécessaire)

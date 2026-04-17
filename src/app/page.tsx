@@ -415,7 +415,7 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                         target="_blank"
                         className="button-secondary text-center"
                       >
-                        Plus d'informations
+                        Plus d&apos;informations
                       </Link>
                     </div>
                   </div>
