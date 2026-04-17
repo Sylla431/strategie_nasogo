@@ -20,6 +20,7 @@ type StudentListItem = {
   phone: string | null;
   created_at: string;
   id_card_photo_path: string | null;
+  linked_user_id?: string | null;
 };
 
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
@@ -71,7 +72,7 @@ export async function GET(req: NextRequest) {
 
     const { data: students, error: studentsError } = await supabaseAdmin
       .from("students")
-      .select("id, full_name, email, phone, created_at, id_card_photo_path")
+      .select("id, full_name, email, phone, created_at, id_card_photo_path, linked_user_id")
       .order("created_at", { ascending: false })
       .limit(limit);
 
@@ -132,14 +133,72 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    /** Utilisateurs liés à un compte site : compter aussi les cours depuis course_access (source de vérité accès). */
+    type AccessAgg = { distinctCourses: Set<string>; latestTitle: string | null; latestGrantedAt: string | null };
+    const accessByUserId = new Map<string, AccessAgg>();
+
+    const linkedUserIds = Array.from(
+      new Set(searched.map((s) => s.linked_user_id).filter((id): id is string => Boolean(id))),
+    );
+
+    if (linkedUserIds.length > 0) {
+      const { data: accessRows, error: accessError } = await supabaseAdmin
+        .from("course_access")
+        .select("user_id, course_id, granted_at, courses(title)")
+        .in("user_id", linkedUserIds);
+
+      if (accessError) return NextResponse.json({ error: accessError.message }, { status: 400 });
+
+      for (const row of accessRows ?? []) {
+        const uid = row.user_id as string;
+        if (!uid || !row.course_id) continue;
+
+        let agg = accessByUserId.get(uid);
+        if (!agg) {
+          agg = { distinctCourses: new Set(), latestTitle: null, latestGrantedAt: null };
+          accessByUserId.set(uid, agg);
+        }
+        agg.distinctCourses.add(row.course_id as string);
+
+        const grantedAt = typeof row.granted_at === "string" ? row.granted_at : null;
+        const courseRel = Array.isArray(row.courses) ? row.courses[0] : row.courses;
+        const title =
+          courseRel && typeof courseRel === "object" && "title" in courseRel
+            ? (courseRel.title as string | null)
+            : null;
+
+        if (grantedAt && (!agg.latestGrantedAt || grantedAt > agg.latestGrantedAt)) {
+          agg.latestGrantedAt = grantedAt;
+          agg.latestTitle = title && title.trim() ? title : agg.latestTitle;
+        }
+      }
+    }
+
     const response = searched.map((student) => {
       const lastPayment = lastPaymentByStudent.get(student.id);
+      const paymentCourseCount = coursesCountByStudent.get(student.id) ?? 0;
+      const titleFromPayments = lastCourseTitleByStudent.get(student.id) ?? null;
+
+      const linkedId = student.linked_user_id ?? null;
+      const accessAgg = linkedId ? accessByUserId.get(linkedId) : undefined;
+      const accessCourseCount = accessAgg?.distinctCourses.size ?? 0;
+
+      const coursesCount = Math.max(paymentCourseCount, accessCourseCount);
+      const lastCourseTitle = titleFromPayments ?? accessAgg?.latestTitle ?? null;
+
+      let lastOrderStatus = lastPayment?.status ?? null;
+      let lastOrderAt = lastPayment?.created_at ?? null;
+      if (!lastPayment && accessCourseCount > 0) {
+        lastOrderStatus = "paid";
+        lastOrderAt = accessAgg?.latestGrantedAt ?? null;
+      }
+
       return {
         ...student,
-        courses_count: coursesCountByStudent.get(student.id) ?? 0,
-        last_course_title: lastCourseTitleByStudent.get(student.id) ?? null,
-        last_order_status: lastPayment?.status ?? null,
-        last_order_at: lastPayment?.created_at ?? null,
+        courses_count: coursesCount,
+        last_course_title: lastCourseTitle,
+        last_order_status: lastOrderStatus,
+        last_order_at: lastOrderAt,
         has_id_card_photo: Boolean(student.id_card_photo_path),
       };
     });

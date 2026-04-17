@@ -327,7 +327,7 @@ export default function AdminStudentsPage() {
         return;
       }
       setMessage(
-        `Synchronisation terminée: ${body.synced_profiles ?? 0}/${body.total_users ?? 0} profils mis à jour.`,
+        `Synchronisation terminée: ${body.imported_students ?? 0} étudiants importés, ${body.synced_payments ?? 0} accès cours synchronisés.`,
       );
       await loadStudents(token, searchQuery);
     } catch {

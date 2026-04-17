@@ -76,8 +76,7 @@ export async function GET(req: NextRequest) {
             position,
             created_at
           )
-        ),
-        users_profile!course_access_user_id_fkey(*)
+        )
       `)
     .eq("user_id", authData.user.id)
     .order("granted_at", { ascending: false });
