@@ -19,6 +19,15 @@ type AuthUserFallback = {
   phone: string | null;
 };
 
+type StudentListItem = {
+  id: string;
+  full_name: string | null;
+  email?: string | null;
+  phone: string | null;
+  created_at: string;
+  id_card_photo_path: string | null;
+};
+
 async function getAuthFallbackByUserId(userIds: string[]) {
   if (!supabaseAdmin || userIds.length === 0) return new Map<string, AuthUserFallback>();
 
@@ -99,14 +108,7 @@ export async function GET(req: NextRequest) {
 
     // Compatibilité DB: certains environnements n'ont pas users_profile.email.
     // On essaie d'abord avec email, puis fallback sans email.
-    let students: Array<{
-      id: string;
-      full_name: string | null;
-      email?: string | null;
-      phone: string | null;
-      created_at: string;
-      id_card_photo_path: string | null;
-    }> | null = null;
+    let students: StudentListItem[] = [];
     let studentsError: { message: string } | null = null;
 
     const withEmail = await supabaseAdmin
@@ -123,10 +125,10 @@ export async function GET(req: NextRequest) {
         .eq("role", "client")
         .order("created_at", { ascending: false })
         .limit(limit);
-      students = fallback.data as typeof students;
+      students = (fallback.data ?? []) as StudentListItem[];
       studentsError = fallback.error ? { message: fallback.error.message } : null;
     } else {
-      students = withEmail.data as typeof students;
+      students = (withEmail.data ?? []) as StudentListItem[];
       studentsError = withEmail.error ? { message: withEmail.error.message } : null;
     }
 
@@ -134,7 +136,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: studentsError.message }, { status: 400 });
     }
 
-    if (!students || students.length === 0) {
+    if (students.length === 0) {
       return NextResponse.json([]);
     }
 

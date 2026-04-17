@@ -14,6 +14,16 @@ type AdminUser = {
   id: string;
 };
 
+type StudentProfile = {
+  id: string;
+  full_name: string | null;
+  email?: string | null;
+  phone: string | null;
+  created_at: string;
+  role: string;
+  id_card_photo_path: string | null;
+};
+
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
   if (!supabaseAdmin) {
     return {
@@ -60,17 +70,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
 
     // Compatibilité DB: certains environnements n'ont pas users_profile.email.
-    let student:
-      | {
-          id: string;
-          full_name: string | null;
-          email?: string | null;
-          phone: string | null;
-          created_at: string;
-          role: string;
-          id_card_photo_path: string | null;
-        }
-      | null = null;
+    let student: StudentProfile | null = null;
     let studentError: { message: string } | null = null;
 
     const withEmail = await supabaseAdmin
@@ -87,15 +87,16 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
         .eq("id", id)
         .eq("role", "client")
         .maybeSingle();
-      student = fallback.data as typeof student;
+      student = fallback.data as StudentProfile | null;
       studentError = fallback.error ? { message: fallback.error.message } : null;
     } else {
-      student = withEmail.data as typeof student;
+      student = withEmail.data as StudentProfile | null;
       studentError = withEmail.error ? { message: withEmail.error.message } : null;
     }
 
     if (studentError) return NextResponse.json({ error: studentError.message }, { status: 400 });
     if (!student) return NextResponse.json({ error: "Étudiant introuvable" }, { status: 404 });
+    const currentStudent: StudentProfile = student;
 
     const [{ data: accesses, error: accessError }, { data: orders, error: ordersError }] = await Promise.all([
       supabaseAdmin
@@ -114,10 +115,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (ordersError) return NextResponse.json({ error: ordersError.message }, { status: 400 });
 
     let idCardPhotoSignedUrl: string | null = null;
-    if (student.id_card_photo_path) {
+    if (currentStudent.id_card_photo_path) {
       const { data: signed, error: signedError } = await supabaseAdmin.storage
         .from(STUDENT_CARD_BUCKET)
-        .createSignedUrl(student.id_card_photo_path, 60 * 30);
+        .createSignedUrl(currentStudent.id_card_photo_path, 60 * 30);
       if (!signedError) {
         idCardPhotoSignedUrl = signed.signedUrl;
       }
@@ -128,13 +129,13 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const authFullName = (authUserData?.user?.user_metadata?.full_name as string | undefined) ?? null;
     const authPhone = (authUserData?.user?.user_metadata?.phone as string | undefined) ?? null;
 
-    const email = (typeof student.email === "string" ? student.email : null) ?? authEmail;
-    const fullName = (typeof student.full_name === "string" ? student.full_name : null) ?? authFullName;
-    const phone = (typeof student.phone === "string" ? student.phone : null) ?? authPhone;
+    const email = (typeof currentStudent.email === "string" ? currentStudent.email : null) ?? authEmail;
+    const fullName = (typeof currentStudent.full_name === "string" ? currentStudent.full_name : null) ?? authFullName;
+    const phone = (typeof currentStudent.phone === "string" ? currentStudent.phone : null) ?? authPhone;
 
     return NextResponse.json({
       student: {
-        ...student,
+        ...currentStudent,
         email,
         full_name: fullName,
         phone,
