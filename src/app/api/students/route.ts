@@ -13,10 +13,16 @@ type AdminUser = {
   id: string;
 };
 
-async function getEmailsByUserId(userIds: string[]) {
-  if (!supabaseAdmin || userIds.length === 0) return new Map<string, string | null>();
+type AuthUserFallback = {
+  email: string | null;
+  full_name: string | null;
+  phone: string | null;
+};
 
-  const emailMap = new Map<string, string | null>();
+async function getAuthFallbackByUserId(userIds: string[]) {
+  if (!supabaseAdmin || userIds.length === 0) return new Map<string, AuthUserFallback>();
+
+  const fallbackMap = new Map<string, AuthUserFallback>();
   const uniqueIds = Array.from(new Set(userIds));
 
   const { data, error } = await supabaseAdmin.auth.admin.listUsers({
@@ -24,17 +30,19 @@ async function getEmailsByUserId(userIds: string[]) {
     perPage: 1000,
   });
 
-  if (error || !data?.users) {
-    return emailMap;
-  }
+  if (error || !data?.users) return fallbackMap;
 
   for (const user of data.users) {
     if (uniqueIds.includes(user.id)) {
-      emailMap.set(user.id, user.email ?? null);
+      fallbackMap.set(user.id, {
+        email: user.email ?? null,
+        full_name: (user.user_metadata?.full_name as string | undefined) ?? null,
+        phone: (user.user_metadata?.phone as string | undefined) ?? null,
+      });
     }
   }
 
-  return emailMap;
+  return fallbackMap;
 }
 
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
@@ -131,7 +139,7 @@ export async function GET(req: NextRequest) {
     }
 
     const studentIds = students.map((s) => s.id);
-    const emailMap = await getEmailsByUserId(studentIds);
+    const fallbackMap = await getAuthFallbackByUserId(studentIds);
 
     const [{ data: accessRows, error: accessError }, { data: orderRows, error: orderError }] = await Promise.all([
       supabaseAdmin.from("course_access").select("user_id").in("user_id", studentIds),
@@ -162,7 +170,18 @@ export async function GET(req: NextRequest) {
 
     const normalized = students.map((student) => ({
       ...student,
-      email: (typeof student.email === "string" ? student.email : null) ?? emailMap.get(student.id) ?? null,
+      email:
+        (typeof student.email === "string" ? student.email : null) ??
+        fallbackMap.get(student.id)?.email ??
+        null,
+      full_name:
+        (typeof student.full_name === "string" ? student.full_name : null) ??
+        fallbackMap.get(student.id)?.full_name ??
+        null,
+      phone:
+        (typeof student.phone === "string" ? student.phone : null) ??
+        fallbackMap.get(student.id)?.phone ??
+        null,
     }));
 
     const searched = query

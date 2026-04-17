@@ -76,6 +76,7 @@ export default function AdminStudentsPage() {
   });
   const [cardFile, setCardFile] = useState<File | null>(null);
   const [createdTempPassword, setCreatedTempPassword] = useState<string | null>(null);
+  const [syncingProfiles, setSyncingProfiles] = useState(false);
 
   const debouncedQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
 
@@ -251,6 +252,32 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const handleSyncProfiles = async () => {
+    if (!token) return;
+    setSyncingProfiles(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/students/sync-profiles", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(body.error || "Erreur de synchronisation");
+        return;
+      }
+      setMessage(
+        `Synchronisation terminée: ${body.synced_profiles ?? 0}/${body.total_users ?? 0} profils mis à jour.`,
+      );
+      await loadStudents(token, searchQuery);
+    } catch {
+      setError("Erreur réseau lors de la synchronisation");
+    } finally {
+      setSyncingProfiles(false);
+    }
+  };
+
   if (loading) {
     return <div className="layout-shell py-10">Chargement...</div>;
   }
@@ -263,6 +290,14 @@ export default function AdminStudentsPage() {
           <p className="text-sm text-neutral-600 mt-1">Liste, recherche, détail et création d&apos;étudiants.</p>
         </div>
         <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <button
+            type="button"
+            className="button-secondary w-full sm:w-auto"
+            onClick={handleSyncProfiles}
+            disabled={syncingProfiles}
+          >
+            {syncingProfiles ? "Synchronisation..." : "Synchroniser profils"}
+          </button>
           <button type="button" className="button-primary w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             Ajouter un étudiant
           </button>

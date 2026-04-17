@@ -124,12 +124,20 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     }
 
     const { data: authUserData } = await supabaseAdmin.auth.admin.getUserById(id);
-    const email = (typeof student.email === "string" ? student.email : null) ?? authUserData?.user?.email ?? null;
+    const authEmail = authUserData?.user?.email ?? null;
+    const authFullName = (authUserData?.user?.user_metadata?.full_name as string | undefined) ?? null;
+    const authPhone = (authUserData?.user?.user_metadata?.phone as string | undefined) ?? null;
+
+    const email = (typeof student.email === "string" ? student.email : null) ?? authEmail;
+    const fullName = (typeof student.full_name === "string" ? student.full_name : null) ?? authFullName;
+    const phone = (typeof student.phone === "string" ? student.phone : null) ?? authPhone;
 
     return NextResponse.json({
       student: {
         ...student,
         email,
+        full_name: fullName,
+        phone,
         id_card_photo_signed_url: idCardPhotoSignedUrl,
       },
       accesses: accesses ?? [],
