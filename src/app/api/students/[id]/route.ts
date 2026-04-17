@@ -17,11 +17,17 @@ type AdminUser = {
 type StudentProfile = {
   id: string;
   full_name: string | null;
-  email?: string | null;
+  email: string | null;
   phone: string | null;
   created_at: string;
-  role: string;
   id_card_photo_path: string | null;
+};
+
+type CourseRelation = {
+  id: string;
+  title: string;
+  price: number;
+  cover_url?: string | null;
 };
 
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
@@ -69,50 +75,23 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     const { id } = await params;
     if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
 
-    // Compatibilité DB: certains environnements n'ont pas users_profile.email.
-    let student: StudentProfile | null = null;
-    let studentError: { message: string } | null = null;
-
-    const withEmail = await supabaseAdmin
-      .from("users_profile")
-      .select("id, full_name, email, phone, created_at, role, id_card_photo_path")
+    const { data: student, error: studentError } = await supabaseAdmin
+      .from("students")
+      .select("id, full_name, email, phone, created_at, id_card_photo_path")
       .eq("id", id)
-      .eq("role", "client")
       .maybeSingle();
-
-    if (withEmail.error && withEmail.error.message.toLowerCase().includes("column")) {
-      const fallback = await supabaseAdmin
-        .from("users_profile")
-        .select("id, full_name, phone, created_at, role, id_card_photo_path")
-        .eq("id", id)
-        .eq("role", "client")
-        .maybeSingle();
-      student = fallback.data as StudentProfile | null;
-      studentError = fallback.error ? { message: fallback.error.message } : null;
-    } else {
-      student = withEmail.data as StudentProfile | null;
-      studentError = withEmail.error ? { message: withEmail.error.message } : null;
-    }
 
     if (studentError) return NextResponse.json({ error: studentError.message }, { status: 400 });
     if (!student) return NextResponse.json({ error: "Étudiant introuvable" }, { status: 404 });
     const currentStudent: StudentProfile = student;
 
-    const [{ data: accesses, error: accessError }, { data: orders, error: ordersError }] = await Promise.all([
-      supabaseAdmin
-        .from("course_access")
-        .select("id, user_id, course_id, granted_at, courses(id, title, price, cover_url)")
-        .eq("user_id", id)
-        .order("granted_at", { ascending: false }),
-      supabaseAdmin
-        .from("orders")
-        .select("id, user_id, status, payment_method, payment_reference, created_at, paid_at, courses(id, title, price, cover_url)")
-        .eq("user_id", id)
-        .order("created_at", { ascending: false }),
-    ]);
+    const { data: payments, error: paymentsError } = await supabaseAdmin
+      .from("student_course_payments")
+      .select("id, student_id, course_id, payment_status, amount_paid, remaining_amount, course_price, created_at, updated_at, courses(id, title, price, cover_url)")
+      .eq("student_id", id)
+      .order("created_at", { ascending: false });
 
-    if (accessError) return NextResponse.json({ error: accessError.message }, { status: 400 });
-    if (ordersError) return NextResponse.json({ error: ordersError.message }, { status: 400 });
+    if (paymentsError) return NextResponse.json({ error: paymentsError.message }, { status: 400 });
 
     let idCardPhotoSignedUrl: string | null = null;
     if (currentStudent.id_card_photo_path) {
@@ -124,25 +103,49 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       }
     }
 
-    const { data: authUserData } = await supabaseAdmin.auth.admin.getUserById(id);
-    const authEmail = authUserData?.user?.email ?? null;
-    const authFullName = (authUserData?.user?.user_metadata?.full_name as string | undefined) ?? null;
-    const authPhone = (authUserData?.user?.user_metadata?.phone as string | undefined) ?? null;
+    const mappedOrders = (payments ?? []).map((payment) => {
+      const courseRelation = Array.isArray(payment.courses) ? payment.courses[0] : payment.courses;
+      const course: CourseRelation | null =
+        courseRelation && typeof courseRelation === "object"
+          ? {
+              id: String(courseRelation.id ?? payment.course_id),
+              title:
+                typeof courseRelation.title === "string" && courseRelation.title.trim().length > 0
+                  ? courseRelation.title
+                  : "Cours",
+              price: Number(courseRelation.price ?? payment.course_price ?? 0),
+              cover_url:
+                typeof courseRelation.cover_url === "string"
+                  ? courseRelation.cover_url
+                  : null,
+            }
+          : null;
 
-    const email = (typeof currentStudent.email === "string" ? currentStudent.email : null) ?? authEmail;
-    const fullName = (typeof currentStudent.full_name === "string" ? currentStudent.full_name : null) ?? authFullName;
-    const phone = (typeof currentStudent.phone === "string" ? currentStudent.phone : null) ?? authPhone;
+      return {
+        id: payment.id,
+        status: payment.payment_status,
+        payment_method: "cash",
+        created_at: payment.created_at,
+        paid_at: payment.payment_status === "paid" ? payment.updated_at ?? payment.created_at : null,
+        courses: course,
+        amount_paid: Number(payment.amount_paid ?? 0),
+        remaining_amount: Number(payment.remaining_amount ?? 0),
+        course_price: Number(payment.course_price ?? 0),
+      };
+    });
 
     return NextResponse.json({
       student: {
         ...currentStudent,
-        email,
-        full_name: fullName,
-        phone,
         id_card_photo_signed_url: idCardPhotoSignedUrl,
       },
-      accesses: accesses ?? [],
-      orders: orders ?? [],
+      accesses: mappedOrders.map((order) => ({
+        id: order.id,
+        course_id: order.courses?.id ?? "",
+        granted_at: order.created_at,
+        courses: order.courses,
+      })),
+      orders: mappedOrders,
     });
   } catch (error) {
     return NextResponse.json(

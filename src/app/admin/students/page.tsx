@@ -12,6 +12,7 @@ type StudentSummary = {
   phone: string | null;
   created_at: string;
   courses_count: number;
+  last_course_title?: string | null;
   last_order_status: string | null;
   last_order_at: string | null;
   has_id_card_photo: boolean;
@@ -40,7 +41,16 @@ type StudentDetailResponse = {
     created_at: string;
     paid_at?: string | null;
     courses?: { id: string; title: string; price: number } | null;
+    amount_paid?: number;
+    remaining_amount?: number;
+    course_price?: number;
   }>;
+};
+
+type CourseOption = {
+  id: string;
+  title: string;
+  price: number;
 };
 
 const statusLabel: Record<string, string> = {
@@ -73,10 +83,13 @@ export default function AdminStudentsPage() {
     email: "",
     full_name: "",
     phone: "",
+    course_id: "",
+    initial_paid_amount: "",
   });
   const [cardFile, setCardFile] = useState<File | null>(null);
-  const [createdTempPassword, setCreatedTempPassword] = useState<string | null>(null);
   const [syncingProfiles, setSyncingProfiles] = useState(false);
+  const [courses, setCourses] = useState<CourseOption[]>([]);
+  const [coursesLoading, setCoursesLoading] = useState(false);
 
   const debouncedQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
 
@@ -125,6 +138,27 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const loadCourses = async (currentToken: string) => {
+    setCoursesLoading(true);
+    try {
+      const res = await fetch("/api/courses", {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as Array<{ id: string; title: string; price: number | string }>;
+      const normalized = (data ?? [])
+        .map((course) => ({
+          id: course.id,
+          title: course.title,
+          price: Number(course.price),
+        }))
+        .filter((course) => Number.isFinite(course.price) && course.price >= 0);
+      setCourses(normalized);
+    } finally {
+      setCoursesLoading(false);
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.auth.getSession();
@@ -158,7 +192,7 @@ export default function AdminStudentsPage() {
         return;
       }
 
-      await loadStudents(currentToken);
+      await Promise.all([loadStudents(currentToken), loadCourses(currentToken)]);
       const initialStudentId = new URLSearchParams(window.location.search).get("student");
       if (initialStudentId) {
         setSelectedStudentId(initialStudentId);
@@ -173,6 +207,23 @@ export default function AdminStudentsPage() {
     if (!token || role !== "admin") return;
     void loadStudents(token, debouncedQuery);
   }, [debouncedQuery, token, role]);
+
+  const selectedCourse = useMemo(
+    () => courses.find((course) => course.id === createForm.course_id) ?? null,
+    [courses, createForm.course_id],
+  );
+
+  const paidAmountValue = useMemo(() => {
+    const raw = createForm.initial_paid_amount.trim();
+    if (!raw) return 0;
+    const numeric = Number(raw);
+    return Number.isFinite(numeric) && numeric >= 0 ? numeric : 0;
+  }, [createForm.initial_paid_amount]);
+
+  const remainingAmountValue = useMemo(() => {
+    if (!selectedCourse) return 0;
+    return Math.max(selectedCourse.price - paidAmountValue, 0);
+  }, [selectedCourse, paidAmountValue]);
 
   const openDetail = (studentId: string) => {
     setSelectedStudentId(studentId);
@@ -197,7 +248,6 @@ export default function AdminStudentsPage() {
     setCreating(true);
     setError(null);
     setMessage(null);
-    setCreatedTempPassword(null);
 
     try {
       let cardPath: string | null = null;
@@ -230,6 +280,8 @@ export default function AdminStudentsPage() {
           full_name: createForm.full_name.trim() || null,
           phone: createForm.phone.trim() || null,
           id_card_photo_path: cardPath,
+          course_id: createForm.course_id || null,
+          initial_paid_amount: createForm.course_id ? (createForm.initial_paid_amount.trim() || 0) : null,
         }),
       });
 
@@ -240,11 +292,18 @@ export default function AdminStudentsPage() {
         return;
       }
 
-      const created = (await createRes.json()) as { temp_password?: string | null };
-      setCreatedTempPassword(created.temp_password ?? null);
-      setMessage("Étudiant créé avec succès.");
+      const created = (await createRes.json()) as {
+        created_payment?: { remaining_amount?: number; course_price?: number; amount_paid?: number } | null;
+      };
+      if (created.created_payment && Number.isFinite(Number(created.created_payment.course_price))) {
+        const paid = Number(created.created_payment.amount_paid ?? 0);
+        const remaining = Number(created.created_payment.remaining_amount ?? 0);
+        setMessage(`Étudiant créé. Paiement initial: ${paid} FCFA, reste à payer: ${remaining} FCFA.`);
+      } else {
+        setMessage("Étudiant enregistré avec succès (sans création de compte).");
+      }
       setCreateOpen(false);
-      setCreateForm({ email: "", full_name: "", phone: "" });
+      setCreateForm({ email: "", full_name: "", phone: "", course_id: "", initial_paid_amount: "" });
       setCardFile(null);
       await loadStudents(token, searchQuery);
     } finally {
@@ -309,12 +368,6 @@ export default function AdminStudentsPage() {
 
       {error && <p className="text-sm text-red-600">{error}</p>}
       {message && <p className="text-sm text-green-600">{message}</p>}
-      {createdTempPassword && (
-        <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md p-3">
-          Mot de passe temporaire généré: <span className="font-semibold">{createdTempPassword}</span>
-        </p>
-      )}
-
       <section className="card p-4 md:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold">Étudiants</h2>
@@ -347,6 +400,9 @@ export default function AdminStudentsPage() {
                   <p className="text-sm text-neutral-700 break-all">{student.email || "Email non renseigné"}</p>
                   <p className="text-sm text-neutral-600">{student.phone || "Téléphone non renseigné"}</p>
                   <div className="flex items-center justify-between gap-2 pt-2">
+                    <p className="text-xs text-neutral-500">
+                      Cours: {student.last_course_title || "-"}
+                    </p>
                     <p className="text-xs text-neutral-500">
                       Paiement: {student.last_order_status ? (statusLabel[student.last_order_status] || student.last_order_status) : "-"}
                     </p>
@@ -384,7 +440,7 @@ export default function AdminStudentsPage() {
                     <td className="py-3 pr-3">{student.full_name || "-"}</td>
                     <td className="py-3 pr-3 break-all">{student.email || "-"}</td>
                     <td className="py-3 pr-3">{student.phone || "-"}</td>
-                    <td className="py-3 pr-3">{student.courses_count}</td>
+                    <td className="py-3 pr-3">{student.last_course_title || `${student.courses_count} cours`}</td>
                     <td className="py-3 pr-3">{student.last_order_status ? (statusLabel[student.last_order_status] || student.last_order_status) : "-"}</td>
                     <td className="py-3 pr-3">{student.has_id_card_photo ? "Oui" : "Non"}</td>
                     <td className="py-3">
@@ -477,6 +533,11 @@ export default function AdminStudentsPage() {
                           <p className="text-sm">
                             Statut: <span className="font-semibold">{statusLabel[order.status] || order.status}</span> • Paiement: {order.payment_method}
                           </p>
+                          <p className="text-sm">
+                            Payé: <span className="font-semibold">{Number(order.amount_paid ?? 0)} FCFA</span> • Reste:{" "}
+                            <span className="font-semibold">{Number(order.remaining_amount ?? 0)} FCFA</span> • Total:{" "}
+                            <span className="font-semibold">{Number(order.course_price ?? order.courses?.price ?? 0)} FCFA</span>
+                          </p>
                           <p className="text-xs text-neutral-500">
                             Créée le {new Date(order.created_at).toLocaleDateString("fr-FR")}
                           </p>
@@ -531,6 +592,50 @@ export default function AdminStudentsPage() {
                   className="form-control"
                   onChange={(e) => setCardFile(e.target.files?.[0] ?? null)}
                 />
+              </div>
+              <div className="border-t pt-3 space-y-3">
+                <label className="text-sm font-semibold block">Inscription à un cours (optionnel)</label>
+                <p className="text-xs text-neutral-500">
+                  Ce formulaire enregistre l&apos;étudiant sans créer de compte site.
+                </p>
+                <select
+                  className="form-control"
+                  value={createForm.course_id}
+                  onChange={(e) => setCreateForm((v) => ({ ...v, course_id: e.target.value }))}
+                  disabled={coursesLoading}
+                >
+                  <option value="">Aucun cours sélectionné</option>
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title} - {course.price} FCFA
+                    </option>
+                  ))}
+                </select>
+
+                {createForm.course_id && (
+                  <>
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      className="form-control"
+                      placeholder="Montant payé en première tranche"
+                      value={createForm.initial_paid_amount}
+                      onChange={(e) => setCreateForm((v) => ({ ...v, initial_paid_amount: e.target.value }))}
+                    />
+                    <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm space-y-1">
+                      <p>
+                        Total du cours: <span className="font-semibold">{selectedCourse?.price ?? 0} FCFA</span>
+                      </p>
+                      <p>
+                        Payé maintenant: <span className="font-semibold">{paidAmountValue} FCFA</span>
+                      </p>
+                      <p>
+                        Reste à payer: <span className="font-semibold">{remainingAmountValue} FCFA</span>
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
 

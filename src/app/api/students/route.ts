@@ -13,46 +13,14 @@ type AdminUser = {
   id: string;
 };
 
-type AuthUserFallback = {
-  email: string | null;
-  full_name: string | null;
-  phone: string | null;
-};
-
 type StudentListItem = {
   id: string;
   full_name: string | null;
-  email?: string | null;
+  email: string | null;
   phone: string | null;
   created_at: string;
   id_card_photo_path: string | null;
 };
-
-async function getAuthFallbackByUserId(userIds: string[]) {
-  if (!supabaseAdmin || userIds.length === 0) return new Map<string, AuthUserFallback>();
-
-  const fallbackMap = new Map<string, AuthUserFallback>();
-  const uniqueIds = Array.from(new Set(userIds));
-
-  const { data, error } = await supabaseAdmin.auth.admin.listUsers({
-    page: 1,
-    perPage: 1000,
-  });
-
-  if (error || !data?.users) return fallbackMap;
-
-  for (const user of data.users) {
-    if (uniqueIds.includes(user.id)) {
-      fallbackMap.set(user.id, {
-        email: user.email ?? null,
-        full_name: (user.user_metadata?.full_name as string | undefined) ?? null,
-        phone: (user.user_metadata?.phone as string | undefined) ?? null,
-      });
-    }
-  }
-
-  return fallbackMap;
-}
 
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
   if (!supabaseAdmin) {
@@ -90,11 +58,6 @@ async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null;
   return { user: { id: user.id }, error: null };
 }
 
-function generateTempPassword() {
-  const random = Math.random().toString(36).slice(2, 10);
-  return `Tmp#${random}A9!`;
-}
-
 export async function GET(req: NextRequest) {
   try {
     const adminCheck = await requireAdmin(req);
@@ -106,88 +69,24 @@ export async function GET(req: NextRequest) {
     const limitParam = Number(searchParams.get("limit") ?? "50");
     const limit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 200) : 50;
 
-    // Compatibilité DB: certains environnements n'ont pas users_profile.email.
-    // On essaie d'abord avec email, puis fallback sans email.
-    let students: StudentListItem[] = [];
-    let studentsError: { message: string } | null = null;
-
-    const withEmail = await supabaseAdmin
-      .from("users_profile")
+    const { data: students, error: studentsError } = await supabaseAdmin
+      .from("students")
       .select("id, full_name, email, phone, created_at, id_card_photo_path")
-      .eq("role", "client")
       .order("created_at", { ascending: false })
       .limit(limit);
-
-    if (withEmail.error && withEmail.error.message.toLowerCase().includes("column")) {
-      const fallback = await supabaseAdmin
-        .from("users_profile")
-        .select("id, full_name, phone, created_at, id_card_photo_path")
-        .eq("role", "client")
-        .order("created_at", { ascending: false })
-        .limit(limit);
-      students = (fallback.data ?? []) as StudentListItem[];
-      studentsError = fallback.error ? { message: fallback.error.message } : null;
-    } else {
-      students = (withEmail.data ?? []) as StudentListItem[];
-      studentsError = withEmail.error ? { message: withEmail.error.message } : null;
-    }
 
     if (studentsError) {
       return NextResponse.json({ error: studentsError.message }, { status: 400 });
     }
 
-    if (students.length === 0) {
+    const safeStudents = (students ?? []) as StudentListItem[];
+
+    if (safeStudents.length === 0) {
       return NextResponse.json([]);
     }
 
-    const studentIds = students.map((s) => s.id);
-    const fallbackMap = await getAuthFallbackByUserId(studentIds);
-
-    const [{ data: accessRows, error: accessError }, { data: orderRows, error: orderError }] = await Promise.all([
-      supabaseAdmin.from("course_access").select("user_id").in("user_id", studentIds),
-      supabaseAdmin
-        .from("orders")
-        .select("user_id, status, created_at")
-        .in("user_id", studentIds)
-        .order("created_at", { ascending: false }),
-    ]);
-
-    if (accessError) return NextResponse.json({ error: accessError.message }, { status: 400 });
-    if (orderError) return NextResponse.json({ error: orderError.message }, { status: 400 });
-
-    const accessCountByUser = new Map<string, number>();
-    for (const row of accessRows ?? []) {
-      accessCountByUser.set(row.user_id, (accessCountByUser.get(row.user_id) ?? 0) + 1);
-    }
-
-    const lastOrderByUser = new Map<string, { status: string; created_at: string }>();
-    for (const row of orderRows ?? []) {
-      if (!lastOrderByUser.has(row.user_id)) {
-        lastOrderByUser.set(row.user_id, {
-          status: row.status,
-          created_at: row.created_at,
-        });
-      }
-    }
-
-    const normalized = students.map((student) => ({
-      ...student,
-      email:
-        (typeof student.email === "string" ? student.email : null) ??
-        fallbackMap.get(student.id)?.email ??
-        null,
-      full_name:
-        (typeof student.full_name === "string" ? student.full_name : null) ??
-        fallbackMap.get(student.id)?.full_name ??
-        null,
-      phone:
-        (typeof student.phone === "string" ? student.phone : null) ??
-        fallbackMap.get(student.id)?.phone ??
-        null,
-    }));
-
     const searched = query
-      ? normalized.filter((student) => {
+      ? safeStudents.filter((student) => {
           const q = query.toLowerCase();
           return (
             (student.full_name ?? "").toLowerCase().includes(q) ||
@@ -195,15 +94,52 @@ export async function GET(req: NextRequest) {
             (student.phone ?? "").toLowerCase().includes(q)
           );
         })
-      : normalized;
+      : safeStudents;
+
+    if (searched.length === 0) {
+      return NextResponse.json([]);
+    }
+
+    const studentIds = searched.map((s) => s.id);
+
+    const { data: paymentRows, error: paymentsError } = await supabaseAdmin
+      .from("student_course_payments")
+      .select("student_id, payment_status, created_at, courses(title)")
+      .in("student_id", studentIds)
+      .order("created_at", { ascending: false });
+
+    if (paymentsError) return NextResponse.json({ error: paymentsError.message }, { status: 400 });
+
+    const coursesCountByStudent = new Map<string, number>();
+    const lastPaymentByStudent = new Map<string, { status: string; created_at: string }>();
+    const lastCourseTitleByStudent = new Map<string, string | null>();
+
+    for (const row of paymentRows ?? []) {
+      coursesCountByStudent.set(row.student_id, (coursesCountByStudent.get(row.student_id) ?? 0) + 1);
+      if (!lastPaymentByStudent.has(row.student_id)) {
+        lastPaymentByStudent.set(row.student_id, {
+          status: row.payment_status,
+          created_at: row.created_at,
+        });
+      }
+      if (!lastCourseTitleByStudent.has(row.student_id)) {
+        const courseRelation = Array.isArray(row.courses) ? row.courses[0] : row.courses;
+        const title =
+          courseRelation && typeof courseRelation === "object" && "title" in courseRelation
+            ? (courseRelation.title as string | null)
+            : null;
+        lastCourseTitleByStudent.set(row.student_id, title);
+      }
+    }
 
     const response = searched.map((student) => {
-      const lastOrder = lastOrderByUser.get(student.id);
+      const lastPayment = lastPaymentByStudent.get(student.id);
       return {
         ...student,
-        courses_count: accessCountByUser.get(student.id) ?? 0,
-        last_order_status: lastOrder?.status ?? null,
-        last_order_at: lastOrder?.created_at ?? null,
+        courses_count: coursesCountByStudent.get(student.id) ?? 0,
+        last_course_title: lastCourseTitleByStudent.get(student.id) ?? null,
+        last_order_status: lastPayment?.status ?? null,
+        last_order_at: lastPayment?.created_at ?? null,
         has_id_card_photo: Boolean(student.id_card_photo_path),
       };
     });
@@ -222,7 +158,8 @@ type CreateStudentPayload = {
   full_name?: string;
   phone?: string;
   id_card_photo_path?: string | null;
-  password?: string;
+  course_id?: string | null;
+  initial_paid_amount?: number | string | null;
 };
 
 export async function POST(req: NextRequest) {
@@ -236,60 +173,120 @@ export async function POST(req: NextRequest) {
     const fullName = body.full_name?.trim() || null;
     const phone = body.phone?.trim() || null;
     const idCardPhotoPath = body.id_card_photo_path?.trim() || null;
+    const courseId = body.course_id?.trim() || null;
+    const parsedInitialPaidRaw =
+      body.initial_paid_amount === null || body.initial_paid_amount === undefined || body.initial_paid_amount === ""
+        ? 0
+        : Number(body.initial_paid_amount);
+    const initialPaidAmount = Number.isFinite(parsedInitialPaidRaw) ? parsedInitialPaidRaw : Number.NaN;
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
     }
-
-    const generatedEmail = `student-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@no-email.local`;
-    const authEmail = email ?? generatedEmail;
-    const password = body.password?.trim() || generateTempPassword();
-
-    const { data: createdUser, error: createUserError } = await supabaseAdmin.auth.admin.createUser({
-      email: authEmail,
-      password,
-      email_confirm: true,
-      user_metadata: {
-        full_name: fullName,
-        phone,
-        contact_email_provided: Boolean(email),
-      },
-    });
-
-    if (createUserError || !createdUser.user) {
-      const message = createUserError?.message ?? "Impossible de créer l'étudiant";
-      const status = message.toLowerCase().includes("already") ? 409 : 400;
-      return NextResponse.json({ error: message }, { status });
+    if (!Number.isFinite(initialPaidAmount) || initialPaidAmount < 0) {
+      return NextResponse.json({ error: "Le montant payé initial est invalide" }, { status: 400 });
     }
 
-    const userId = createdUser.user.id;
+    const { data: createdStudent, error: createStudentError } = await supabaseAdmin
+      .from("students")
+      .insert([
+        {
+          full_name: fullName,
+          email,
+          phone,
+          id_card_photo_path: idCardPhotoPath,
+          created_by: adminCheck.user?.id ?? null,
+        },
+      ])
+      .select("id, full_name, email, phone, id_card_photo_path, created_at")
+      .single();
 
-    const { error: upsertError } = await supabaseAdmin.from("users_profile").upsert({
-      id: userId,
-      role: "client",
-      full_name: fullName,
-      phone,
-      id_card_photo_path: idCardPhotoPath,
-    });
+    if (createStudentError || !createdStudent) {
+      const message = createStudentError?.message ?? "Impossible d'enregistrer l'étudiant";
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
 
-    if (upsertError) {
-      await supabaseAdmin.auth.admin.deleteUser(userId);
-      return NextResponse.json(
-        { error: `Erreur enregistrement profil: ${upsertError.message}` },
-        { status: 400 },
-      );
+    let createdPayment:
+      | {
+          id: string;
+          course_id: string;
+          payment_status: "pending" | "paid";
+          amount_paid: number;
+          remaining_amount: number;
+          course_price: number;
+        }
+      | null = null;
+
+    if (courseId) {
+      const { data: course, error: courseError } = await supabaseAdmin
+        .from("courses")
+        .select("id, price")
+        .eq("id", courseId)
+        .maybeSingle();
+
+      if (courseError || !course) {
+        await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+        return NextResponse.json(
+          { error: courseError?.message || "Cours introuvable" },
+          { status: 400 },
+        );
+      }
+
+      const coursePrice = Number(course.price ?? 0);
+      if (!Number.isFinite(coursePrice) || coursePrice < 0) {
+        await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+        return NextResponse.json({ error: "Prix du cours invalide" }, { status: 400 });
+      }
+
+      if (initialPaidAmount > coursePrice) {
+        await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+        return NextResponse.json(
+          { error: "Le montant payé ne peut pas dépasser le prix du cours" },
+          { status: 400 },
+        );
+      }
+
+      const remainingAmount = Math.max(coursePrice - initialPaidAmount, 0);
+      const paymentStatus: "pending" | "paid" = remainingAmount === 0 ? "paid" : "pending";
+
+      const { data: paymentData, error: paymentError } = await supabaseAdmin
+        .from("student_course_payments")
+        .insert([
+          {
+            student_id: createdStudent.id,
+            course_id: courseId,
+            course_price: coursePrice,
+            amount_paid: initialPaidAmount,
+            remaining_amount: remainingAmount,
+            payment_status: paymentStatus,
+          },
+        ])
+        .select("id, course_id, payment_status, amount_paid, remaining_amount, course_price")
+        .single();
+
+      if (paymentError || !paymentData) {
+        await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+        return NextResponse.json(
+          { error: `Erreur enregistrement paiement étudiant: ${paymentError?.message ?? "unknown"}` },
+          { status: 400 },
+        );
+      }
+
+      createdPayment = {
+        id: paymentData.id,
+        course_id: paymentData.course_id,
+        payment_status: paymentData.payment_status as "pending" | "paid",
+        amount_paid: Number(paymentData.amount_paid ?? initialPaidAmount),
+        remaining_amount: Number(paymentData.remaining_amount ?? remainingAmount),
+        course_price: Number(paymentData.course_price ?? coursePrice),
+      };
     }
 
     return NextResponse.json(
       {
-        id: userId,
-        email: authEmail,
-        contact_email_provided: Boolean(email),
-        full_name: fullName,
-        phone,
-        id_card_photo_path: idCardPhotoPath,
-        temp_password: body.password ? null : password,
+        ...createdStudent,
+        created_payment: createdPayment,
       },
       { status: 201 },
     );
