@@ -36,6 +36,7 @@ type StudentDetailResponse = {
   }>;
   orders: Array<{
     id: string;
+    course_id: string;
     status: string;
     payment_method: string;
     created_at: string;
@@ -76,6 +77,14 @@ export default function AdminStudentsPage() {
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<StudentDetailResponse | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
   const [detailError, setDetailError] = useState<string | null>(null);
+  const [editingStudent, setEditingStudent] = useState(false);
+  const [savingStudent, setSavingStudent] = useState(false);
+  const [editForm, setEditForm] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    course_id: "",
+  });
 
   const [createOpen, setCreateOpen] = useState(false);
   const [creating, setCreating] = useState(false);
@@ -225,6 +234,21 @@ export default function AdminStudentsPage() {
     return Math.max(selectedCourse.price - paidAmountValue, 0);
   }, [selectedCourse, paidAmountValue]);
 
+  const selectedEditCourse = useMemo(
+    () => courses.find((course) => course.id === editForm.course_id) ?? null,
+    [courses, editForm.course_id],
+  );
+
+  const editPaidAmountValue = useMemo(() => {
+    if (!selectedStudentDetail) return 0;
+    return Number(selectedStudentDetail.orders[0]?.amount_paid ?? 0);
+  }, [selectedStudentDetail]);
+
+  const editRemainingAmountValue = useMemo(() => {
+    if (!selectedEditCourse) return 0;
+    return Math.max(selectedEditCourse.price - editPaidAmountValue, 0);
+  }, [selectedEditCourse, editPaidAmountValue]);
+
   const openDetail = (studentId: string) => {
     setSelectedStudentId(studentId);
     setSelectedStudentDetail(null);
@@ -239,6 +263,9 @@ export default function AdminStudentsPage() {
     setSelectedStudentId(null);
     setSelectedStudentDetail(null);
     setDetailError(null);
+    setEditingStudent(false);
+    setSavingStudent(false);
+    setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
     router.replace("/admin/students");
   };
 
@@ -337,6 +364,76 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const startEditStudent = () => {
+    if (!selectedStudentDetail) return;
+    const existingCourseId =
+      selectedStudentDetail.orders[0]?.course_id ||
+      selectedStudentDetail.accesses[0]?.course_id ||
+      "";
+    setEditForm({
+      full_name: selectedStudentDetail.student.full_name ?? "",
+      email: selectedStudentDetail.student.email ?? "",
+      phone: selectedStudentDetail.student.phone ?? "",
+      course_id: existingCourseId,
+    });
+    setDetailError(null);
+    setEditingStudent(true);
+  };
+
+  const cancelEditStudent = () => {
+    setEditingStudent(false);
+    setSavingStudent(false);
+    setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
+    setDetailError(null);
+  };
+
+  const handleUpdateStudent = async () => {
+    if (!token || !selectedStudentId) return;
+    setSavingStudent(true);
+    setError(null);
+    setMessage(null);
+    setDetailError(null);
+    const previousCourseTitle = selectedStudentDetail?.orders[0]?.courses?.title?.trim() || "Aucun cours";
+    const nextCourseTitle = editForm.course_id
+      ? (courses.find((course) => course.id === editForm.course_id)?.title ?? "Cours sélectionné")
+      : "Aucun cours";
+
+    try {
+      const res = await fetch(`/api/students/${selectedStudentId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          full_name: editForm.full_name,
+          email: editForm.email,
+          phone: editForm.phone,
+          ...(editForm.course_id ? { course_id: editForm.course_id } : {}),
+        }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDetailError(body.error || "Erreur modification étudiant");
+        return;
+      }
+
+      const courseChanged = previousCourseTitle !== nextCourseTitle;
+      setMessage(
+        courseChanged
+          ? `Informations étudiant modifiées. Cours changé de ${previousCourseTitle} vers ${nextCourseTitle}.`
+          : "Informations étudiant modifiées avec succès.",
+      );
+      await Promise.all([loadStudentDetail(token, selectedStudentId), loadStudents(token, searchQuery)]);
+      setEditingStudent(false);
+      setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
+    } catch {
+      setDetailError("Erreur réseau lors de la modification étudiant");
+    } finally {
+      setSavingStudent(false);
+    }
+  };
+
   if (loading) {
     return <div className="layout-shell py-10">Chargement...</div>;
   }
@@ -346,7 +443,7 @@ export default function AdminStudentsPage() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold">Gestion des étudiants</h1>
-          <p className="text-sm text-neutral-600 mt-1">Liste, recherche, détail et création d&apos;étudiants.</p>
+          <p className="text-sm text-neutral-600 mt-1">Liste, recherche, détail, ajout et modification d&apos;étudiants.</p>
         </div>
         <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full sm:w-auto">
           <button
@@ -466,9 +563,26 @@ export default function AdminStudentsPage() {
           <div className="w-full max-w-4xl bg-white rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 h-[88vh] sm:h-auto sm:max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-start justify-between gap-4">
               <h3 className="text-xl font-semibold">Détail étudiant</h3>
-              <button type="button" onClick={closeDetail} className="button-secondary">
-                Fermer
-              </button>
+              <div className="flex flex-wrap items-center justify-end gap-2">
+                {selectedStudentDetail && !editingStudent && (
+                  <button type="button" className="button-secondary" onClick={startEditStudent}>
+                    Modifier
+                  </button>
+                )}
+                {selectedStudentDetail && editingStudent && (
+                  <>
+                    <button type="button" className="button-secondary" onClick={cancelEditStudent} disabled={savingStudent}>
+                      Annuler
+                    </button>
+                    <button type="button" className="button-primary" onClick={handleUpdateStudent} disabled={savingStudent}>
+                      {savingStudent ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+                  </>
+                )}
+                <button type="button" onClick={closeDetail} className="button-secondary">
+                  Fermer
+                </button>
+              </div>
             </div>
 
             {detailLoading && <p className="mt-4 text-sm text-neutral-600">Chargement du profil...</p>}
@@ -478,9 +592,70 @@ export default function AdminStudentsPage() {
               <div className="mt-5 space-y-6">
                 <section className="space-y-2">
                   <h4 className="font-semibold text-neutral-900">Profil</h4>
-                  <p><span className="font-medium">Nom:</span> {selectedStudentDetail.student.full_name || "-"}</p>
-                  <p><span className="font-medium">Email:</span> {selectedStudentDetail.student.email || "-"}</p>
-                  <p><span className="font-medium">Téléphone:</span> {selectedStudentDetail.student.phone || "-"}</p>
+                  {!editingStudent ? (
+                    <>
+                      <p><span className="font-medium">Nom:</span> {selectedStudentDetail.student.full_name || "-"}</p>
+                      <p><span className="font-medium">Email:</span> {selectedStudentDetail.student.email || "-"}</p>
+                      <p><span className="font-medium">Téléphone:</span> {selectedStudentDetail.student.phone || "-"}</p>
+                      <p><span className="font-medium">Cours:</span> {selectedStudentDetail.orders[0]?.courses?.title || "-"}</p>
+                    </>
+                  ) : (
+                    <div className="grid gap-3">
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Nom complet"
+                        value={editForm.full_name}
+                        onChange={(e) => setEditForm((v) => ({ ...v, full_name: e.target.value }))}
+                        disabled={savingStudent}
+                      />
+                      <input
+                        type="email"
+                        className="form-control"
+                        placeholder="Email"
+                        value={editForm.email}
+                        onChange={(e) => setEditForm((v) => ({ ...v, email: e.target.value }))}
+                        disabled={savingStudent}
+                      />
+                      <input
+                        type="text"
+                        className="form-control"
+                        placeholder="Téléphone"
+                        value={editForm.phone}
+                        onChange={(e) => setEditForm((v) => ({ ...v, phone: e.target.value }))}
+                        disabled={savingStudent}
+                      />
+                      <div className="border-t pt-3 space-y-3">
+                        <label className="text-sm font-semibold block">Cours de l&apos;étudiant</label>
+                        <select
+                          className="form-control"
+                          value={editForm.course_id}
+                          onChange={(e) => setEditForm((v) => ({ ...v, course_id: e.target.value }))}
+                          disabled={savingStudent || coursesLoading}
+                        >
+                          <option value="">Aucun cours sélectionné</option>
+                          {courses.map((course) => (
+                            <option key={course.id} value={course.id}>
+                              {course.title} - {course.price} FCFA
+                            </option>
+                          ))}
+                        </select>
+                        {editForm.course_id && (
+                          <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm space-y-1">
+                            <p>
+                              Total du cours: <span className="font-semibold">{selectedEditCourse?.price ?? 0} FCFA</span>
+                            </p>
+                            <p>
+                              Déjà payé: <span className="font-semibold">{editPaidAmountValue} FCFA</span>
+                            </p>
+                            <p>
+                              Reste à payer: <span className="font-semibold">{editRemainingAmountValue} FCFA</span>
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                   <p>
                     <span className="font-medium">Inscription:</span>{" "}
                     {new Date(selectedStudentDetail.student.created_at).toLocaleDateString("fr-FR")}
