@@ -54,6 +54,8 @@ type CourseOption = {
   price: number;
 };
 
+type StudentSortOption = "created_desc" | "created_asc" | "name_asc" | "name_desc" | "courses_desc" | "courses_asc";
+
 const statusLabel: Record<string, string> = {
   paid: "Payé",
   pending: "En attente",
@@ -72,6 +74,7 @@ export default function AdminStudentsPage() {
   const [students, setStudents] = useState<StudentSummary[]>([]);
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<StudentSortOption>("created_desc");
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<StudentDetailResponse | null>(null);
@@ -96,6 +99,7 @@ export default function AdminStudentsPage() {
     initial_paid_amount: "",
   });
   const [cardFile, setCardFile] = useState<File | null>(null);
+  const [editCardFile, setEditCardFile] = useState<File | null>(null);
   const [syncingProfiles, setSyncingProfiles] = useState(false);
   const [courses, setCourses] = useState<CourseOption[]>([]);
   const [coursesLoading, setCoursesLoading] = useState(false);
@@ -234,6 +238,33 @@ export default function AdminStudentsPage() {
     return Math.max(selectedCourse.price - paidAmountValue, 0);
   }, [selectedCourse, paidAmountValue]);
 
+  const sortedStudents = useMemo(() => {
+    const base = [...students];
+    const compareDate = (a: string, b: string) => new Date(a).getTime() - new Date(b).getTime();
+    const compareText = (a: string | null, b: string | null) => (a || "").localeCompare(b || "", "fr", { sensitivity: "base" });
+    const compareNumber = (a: number, b: number) => a - b;
+
+    base.sort((a, b) => {
+      switch (sortBy) {
+        case "created_asc":
+          return compareDate(a.created_at, b.created_at);
+        case "created_desc":
+          return compareDate(b.created_at, a.created_at);
+        case "name_asc":
+          return compareText(a.full_name, b.full_name);
+        case "name_desc":
+          return compareText(b.full_name, a.full_name);
+        case "courses_asc":
+          return compareNumber(a.courses_count, b.courses_count);
+        case "courses_desc":
+          return compareNumber(b.courses_count, a.courses_count);
+        default:
+          return 0;
+      }
+    });
+    return base;
+  }, [students, sortBy]);
+
   const selectedEditCourse = useMemo(
     () => courses.find((course) => course.id === editForm.course_id) ?? null,
     [courses, editForm.course_id],
@@ -266,6 +297,7 @@ export default function AdminStudentsPage() {
     setEditingStudent(false);
     setSavingStudent(false);
     setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
+    setEditCardFile(null);
     router.replace("/admin/students");
   };
 
@@ -384,6 +416,7 @@ export default function AdminStudentsPage() {
     setEditingStudent(false);
     setSavingStudent(false);
     setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
+    setEditCardFile(null);
     setDetailError(null);
   };
 
@@ -397,8 +430,27 @@ export default function AdminStudentsPage() {
     const nextCourseTitle = editForm.course_id
       ? (courses.find((course) => course.id === editForm.course_id)?.title ?? "Cours sélectionné")
       : "Aucun cours";
+    const hadCardPhoto = Boolean(selectedStudentDetail?.student.id_card_photo_path);
 
     try {
+      let uploadedCardPath: string | null = null;
+      if (editCardFile) {
+        const formData = new FormData();
+        formData.append("file", editCardFile);
+        const uploadRes = await fetch("/api/students/upload-card", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+        if (!uploadRes.ok) {
+          const uploadBody = await uploadRes.json().catch(() => ({}));
+          setDetailError(uploadBody.error || "Erreur upload photo de carte");
+          return;
+        }
+        const uploadData = (await uploadRes.json()) as { path: string };
+        uploadedCardPath = uploadData.path;
+      }
+
       const res = await fetch(`/api/students/${selectedStudentId}`, {
         method: "PUT",
         headers: {
@@ -410,6 +462,7 @@ export default function AdminStudentsPage() {
           email: editForm.email,
           phone: editForm.phone,
           ...(editForm.course_id ? { course_id: editForm.course_id } : {}),
+          ...(uploadedCardPath ? { id_card_photo_path: uploadedCardPath } : {}),
         }),
       });
       const body = await res.json().catch(() => ({}));
@@ -419,14 +472,20 @@ export default function AdminStudentsPage() {
       }
 
       const courseChanged = previousCourseTitle !== nextCourseTitle;
+      const cardChanged = Boolean(uploadedCardPath) && (hadCardPhoto || !hadCardPhoto);
       setMessage(
-        courseChanged
-          ? `Informations étudiant modifiées. Cours changé de ${previousCourseTitle} vers ${nextCourseTitle}.`
-          : "Informations étudiant modifiées avec succès.",
+        courseChanged && cardChanged
+          ? `Informations étudiant modifiées. Cours changé de ${previousCourseTitle} vers ${nextCourseTitle}. Image mise à jour.`
+          : courseChanged
+            ? `Informations étudiant modifiées. Cours changé de ${previousCourseTitle} vers ${nextCourseTitle}.`
+            : cardChanged
+              ? "Informations étudiant modifiées. Image mise à jour."
+              : "Informations étudiant modifiées avec succès.",
       );
       await Promise.all([loadStudentDetail(token, selectedStudentId), loadStudents(token, searchQuery)]);
       setEditingStudent(false);
       setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
+      setEditCardFile(null);
     } catch {
       setDetailError("Erreur réseau lors de la modification étudiant");
     } finally {
@@ -468,13 +527,27 @@ export default function AdminStudentsPage() {
       <section className="card p-4 md:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold">Étudiants</h2>
-          <input
-            type="text"
-            className="form-control sm:max-w-md"
-            placeholder="Rechercher par nom, email ou téléphone..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
+          <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:w-auto">
+            <input
+              type="text"
+              className="form-control sm:max-w-md"
+              placeholder="Rechercher par nom, email ou téléphone..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <select
+              className="form-control sm:w-auto"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as StudentSortOption)}
+            >
+              <option value="created_desc">Tri: plus récents</option>
+              <option value="created_asc">Tri: plus anciens</option>
+              <option value="name_asc">Tri: nom A-Z</option>
+              <option value="name_desc">Tri: nom Z-A</option>
+              <option value="courses_desc">Tri: cours (décroissant)</option>
+              <option value="courses_asc">Tri: cours (croissant)</option>
+            </select>
+          </div>
         </div>
 
         {studentsLoading ? (
@@ -484,7 +557,7 @@ export default function AdminStudentsPage() {
         ) : (
           <>
             <div className="sm:hidden space-y-3">
-              {students.map((student) => (
+              {sortedStudents.map((student) => (
                 <div key={student.id} className="rounded-xl border border-neutral-200 p-4 bg-white space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <p className="font-semibold text-neutral-900 break-words">
@@ -532,7 +605,7 @@ export default function AdminStudentsPage() {
                 </tr>
               </thead>
               <tbody>
-                {students.map((student) => (
+                {sortedStudents.map((student) => (
                   <tr key={student.id} className="border-b border-neutral-100">
                     <td className="py-3 pr-3">{student.full_name || "-"}</td>
                     <td className="py-3 pr-3 break-all">{student.email || "-"}</td>
@@ -652,6 +725,19 @@ export default function AdminStudentsPage() {
                               Reste à payer: <span className="font-semibold">{editRemainingAmountValue} FCFA</span>
                             </p>
                           </div>
+                        )}
+                      </div>
+                      <div className="border-t pt-3 space-y-2">
+                        <label className="text-sm font-semibold block">Modifier la photo de carte (optionnel)</label>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="form-control"
+                          onChange={(e) => setEditCardFile(e.target.files?.[0] ?? null)}
+                          disabled={savingStudent}
+                        />
+                        {editCardFile && (
+                          <p className="text-xs text-neutral-600">Fichier sélectionné: {editCardFile.name}</p>
                         )}
                       </div>
                     </div>

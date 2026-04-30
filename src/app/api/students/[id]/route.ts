@@ -35,6 +35,7 @@ type UpdateStudentPayload = {
   email?: string | null;
   phone?: string | null;
   course_id?: string | null;
+  id_card_photo_path?: string | null;
 };
 
 async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
@@ -178,6 +179,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const phone = typeof body.phone === "string" ? body.phone.trim() : "";
     const hasCourseIdInPayload = Object.prototype.hasOwnProperty.call(body, "course_id");
     const courseId = typeof body.course_id === "string" ? body.course_id.trim() : "";
+    const hasCardPathInPayload = Object.prototype.hasOwnProperty.call(body, "id_card_photo_path");
+    const cardPath = typeof body.id_card_photo_path === "string" ? body.id_card_photo_path.trim() : "";
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
@@ -190,6 +193,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
         full_name: fullName || null,
         email: email || null,
         phone: phone || null,
+        ...(hasCardPathInPayload ? { id_card_photo_path: cardPath || null } : {}),
       })
       .eq("id", id)
       .select("id, full_name, email, phone, created_at, id_card_photo_path")
