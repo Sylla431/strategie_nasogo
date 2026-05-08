@@ -67,6 +67,7 @@ export async function GET(req: NextRequest) {
 
     const { searchParams } = new URL(req.url);
     const query = (searchParams.get("q") ?? "").trim();
+    const courseIdFilter = (searchParams.get("course_id") ?? "").trim();
     const limitParam = Number(searchParams.get("limit") ?? "50");
     const limit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 200) : 50;
 
@@ -105,7 +106,7 @@ export async function GET(req: NextRequest) {
 
     const { data: paymentRows, error: paymentsError } = await supabaseAdmin
       .from("student_course_payments")
-      .select("student_id, payment_status, created_at, courses(title)")
+      .select("student_id, course_id, payment_status, created_at, courses(title)")
       .in("student_id", studentIds)
       .order("created_at", { ascending: false });
 
@@ -114,9 +115,16 @@ export async function GET(req: NextRequest) {
     const coursesCountByStudent = new Map<string, number>();
     const lastPaymentByStudent = new Map<string, { status: string; created_at: string }>();
     const lastCourseTitleByStudent = new Map<string, string | null>();
+    const paymentCourseIdsByStudent = new Map<string, Set<string>>();
 
     for (const row of paymentRows ?? []) {
       coursesCountByStudent.set(row.student_id, (coursesCountByStudent.get(row.student_id) ?? 0) + 1);
+      const paymentCourseId = typeof row.course_id === "string" ? row.course_id : "";
+      if (paymentCourseId) {
+        const current = paymentCourseIdsByStudent.get(row.student_id) ?? new Set<string>();
+        current.add(paymentCourseId);
+        paymentCourseIdsByStudent.set(row.student_id, current);
+      }
       if (!lastPaymentByStudent.has(row.student_id)) {
         lastPaymentByStudent.set(row.student_id, {
           status: row.payment_status,
@@ -134,7 +142,12 @@ export async function GET(req: NextRequest) {
     }
 
     /** Utilisateurs liés à un compte site : compter aussi les cours depuis course_access (source de vérité accès). */
-    type AccessAgg = { distinctCourses: Set<string>; latestTitle: string | null; latestGrantedAt: string | null };
+    type AccessAgg = {
+      distinctCourses: Set<string>;
+      latestTitle: string | null;
+      latestGrantedAt: string | null;
+      courseIds: Set<string>;
+    };
     const accessByUserId = new Map<string, AccessAgg>();
 
     const linkedUserIds = Array.from(
@@ -155,10 +168,11 @@ export async function GET(req: NextRequest) {
 
         let agg = accessByUserId.get(uid);
         if (!agg) {
-          agg = { distinctCourses: new Set(), latestTitle: null, latestGrantedAt: null };
+          agg = { distinctCourses: new Set(), latestTitle: null, latestGrantedAt: null, courseIds: new Set() };
           accessByUserId.set(uid, agg);
         }
         agg.distinctCourses.add(row.course_id as string);
+        agg.courseIds.add(row.course_id as string);
 
         const grantedAt = typeof row.granted_at === "string" ? row.granted_at : null;
         const courseRel = Array.isArray(row.courses) ? row.courses[0] : row.courses;
@@ -174,7 +188,15 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const response = searched.map((student) => {
+    const response = searched
+      .filter((student) => {
+        if (!courseIdFilter) return true;
+        const hasPaymentCourse = paymentCourseIdsByStudent.get(student.id)?.has(courseIdFilter) ?? false;
+        const linkedId = student.linked_user_id ?? null;
+        const hasAccessCourse = linkedId ? (accessByUserId.get(linkedId)?.courseIds.has(courseIdFilter) ?? false) : false;
+        return hasPaymentCourse || hasAccessCourse;
+      })
+      .map((student) => {
       const lastPayment = lastPaymentByStudent.get(student.id);
       const paymentCourseCount = coursesCountByStudent.get(student.id) ?? 0;
       const titleFromPayments = lastCourseTitleByStudent.get(student.id) ?? null;

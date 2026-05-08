@@ -75,6 +75,7 @@ export default function AdminStudentsPage() {
   const [studentsLoading, setStudentsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<StudentSortOption>("created_desc");
+  const [selectedCourseFilterId, setSelectedCourseFilterId] = useState("");
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<StudentDetailResponse | null>(null);
@@ -106,13 +107,14 @@ export default function AdminStudentsPage() {
 
   const debouncedQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
 
-  const loadStudents = async (currentToken: string, query = "") => {
+  const loadStudents = async (currentToken: string, query = "", courseId = "") => {
     setStudentsLoading(true);
     setError(null);
     try {
       const params = new URLSearchParams();
       params.set("limit", "50");
       if (query.trim()) params.set("q", query.trim());
+      if (courseId.trim()) params.set("course_id", courseId.trim());
       const res = await fetch(`/api/students?${params.toString()}`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
@@ -205,7 +207,7 @@ export default function AdminStudentsPage() {
         return;
       }
 
-      await Promise.all([loadStudents(currentToken), loadCourses(currentToken)]);
+      await Promise.all([loadStudents(currentToken, "", selectedCourseFilterId), loadCourses(currentToken)]);
       const initialStudentId = new URLSearchParams(window.location.search).get("student");
       if (initialStudentId) {
         setSelectedStudentId(initialStudentId);
@@ -218,8 +220,8 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     if (!token || role !== "admin") return;
-    void loadStudents(token, debouncedQuery);
-  }, [debouncedQuery, token, role]);
+    void loadStudents(token, debouncedQuery, selectedCourseFilterId);
+  }, [debouncedQuery, token, role, selectedCourseFilterId]);
 
   const selectedCourse = useMemo(
     () => courses.find((course) => course.id === createForm.course_id) ?? null,
@@ -364,7 +366,7 @@ export default function AdminStudentsPage() {
       setCreateOpen(false);
       setCreateForm({ email: "", full_name: "", phone: "", course_id: "", initial_paid_amount: "" });
       setCardFile(null);
-      await loadStudents(token, searchQuery);
+      await loadStudents(token, searchQuery, selectedCourseFilterId);
     } finally {
       setCreating(false);
     }
@@ -388,7 +390,7 @@ export default function AdminStudentsPage() {
       setMessage(
         `Synchronisation terminée: ${body.imported_students ?? 0} étudiants importés, ${body.synced_payments ?? 0} accès cours synchronisés.`,
       );
-      await loadStudents(token, searchQuery);
+      await loadStudents(token, searchQuery, selectedCourseFilterId);
     } catch {
       setError("Erreur réseau lors de la synchronisation");
     } finally {
@@ -482,7 +484,10 @@ export default function AdminStudentsPage() {
               ? "Informations étudiant modifiées. Image mise à jour."
               : "Informations étudiant modifiées avec succès.",
       );
-      await Promise.all([loadStudentDetail(token, selectedStudentId), loadStudents(token, searchQuery)]);
+      await Promise.all([
+        loadStudentDetail(token, selectedStudentId),
+        loadStudents(token, searchQuery, selectedCourseFilterId),
+      ]);
       setEditingStudent(false);
       setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
       setEditCardFile(null);
@@ -501,10 +506,11 @@ export default function AdminStudentsPage() {
     <div className="layout-shell py-10 space-y-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-semibold">Gestion des étudiants</h1>
+          <h1 className="text-3xl font-semibold pt-5">Gestion des étudiants</h1>
           <p className="text-sm text-neutral-600 mt-1">Liste, recherche, détail, ajout et modification d&apos;étudiants.</p>
         </div>
-        <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full sm:w-auto">
+        <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full sm:w-auto pt-4">
+         
           <button
             type="button"
             className="button-secondary w-full sm:w-auto"
@@ -516,6 +522,7 @@ export default function AdminStudentsPage() {
           <button type="button" className="button-primary w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             Ajouter un étudiant
           </button>
+         
           <Link href="/admin" className="button-secondary w-full sm:w-auto text-center">
             Retour admin
           </Link>
@@ -542,11 +549,24 @@ export default function AdminStudentsPage() {
             >
               <option value="created_desc">Tri: plus récents</option>
               <option value="created_asc">Tri: plus anciens</option>
-              <option value="name_asc">Tri: nom A-Z</option>
+              {/* <option value="name_asc">Tri: nom A-Z</option>
               <option value="name_desc">Tri: nom Z-A</option>
               <option value="courses_desc">Tri: cours (décroissant)</option>
-              <option value="courses_asc">Tri: cours (croissant)</option>
+              <option value="courses_asc">Tri: cours (croissant)</option> */}
             </select>
+            <select
+            className="form-control w-full sm:w-52 md:w-56 lg:w-64 shrink"
+            value={selectedCourseFilterId}
+            onChange={(e) => setSelectedCourseFilterId(e.target.value)}
+            disabled={coursesLoading}
+          >
+            <option value="">Cours: tous</option>
+            {courses.map((course) => (
+              <option key={course.id} value={course.id}>
+                {course.title}
+              </option>
+            ))}
+          </select>
           </div>
         </div>
 
