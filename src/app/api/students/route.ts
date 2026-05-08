@@ -240,6 +240,7 @@ type CreateStudentPayload = {
   phone?: string;
   id_card_photo_path?: string | null;
   course_id?: string | null;
+  discounted_course_price?: number | string | null;
   initial_paid_amount?: number | string | null;
 };
 
@@ -255,6 +256,16 @@ export async function POST(req: NextRequest) {
     const phone = body.phone?.trim() || null;
     const idCardPhotoPath = body.id_card_photo_path?.trim() || null;
     const courseId = body.course_id?.trim() || null;
+    const parsedDiscountedPriceRaw =
+      body.discounted_course_price === null || body.discounted_course_price === undefined || body.discounted_course_price === ""
+        ? null
+        : Number(body.discounted_course_price);
+    const discountedCoursePrice =
+      parsedDiscountedPriceRaw === null
+        ? null
+        : Number.isFinite(parsedDiscountedPriceRaw)
+          ? parsedDiscountedPriceRaw
+          : Number.NaN;
     const parsedInitialPaidRaw =
       body.initial_paid_amount === null || body.initial_paid_amount === undefined || body.initial_paid_amount === ""
         ? 0
@@ -267,6 +278,9 @@ export async function POST(req: NextRequest) {
     }
     if (!Number.isFinite(initialPaidAmount) || initialPaidAmount < 0) {
       return NextResponse.json({ error: "Le montant payé initial est invalide" }, { status: 400 });
+    }
+    if (discountedCoursePrice !== null && (!Number.isFinite(discountedCoursePrice) || discountedCoursePrice < 0)) {
+      return NextResponse.json({ error: "Le prix ajusté du cours est invalide" }, { status: 400 });
     }
 
     const { data: createdStudent, error: createStudentError } = await supabaseAdmin
@@ -320,7 +334,16 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: "Prix du cours invalide" }, { status: 400 });
       }
 
-      if (initialPaidAmount > coursePrice) {
+      const appliedCoursePrice = discountedCoursePrice ?? coursePrice;
+      if (appliedCoursePrice > coursePrice) {
+        await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+        return NextResponse.json(
+          { error: "Le prix ajusté doit être inférieur ou égal au prix catalogue du cours" },
+          { status: 400 },
+        );
+      }
+
+      if (initialPaidAmount > appliedCoursePrice) {
         await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
         return NextResponse.json(
           { error: "Le montant payé ne peut pas dépasser le prix du cours" },
@@ -328,7 +351,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const remainingAmount = Math.max(coursePrice - initialPaidAmount, 0);
+      const remainingAmount = Math.max(appliedCoursePrice - initialPaidAmount, 0);
       const paymentStatus: "pending" | "paid" = remainingAmount === 0 ? "paid" : "pending";
 
       const { data: paymentData, error: paymentError } = await supabaseAdmin
@@ -337,7 +360,7 @@ export async function POST(req: NextRequest) {
           {
             student_id: createdStudent.id,
             course_id: courseId,
-            course_price: coursePrice,
+            course_price: appliedCoursePrice,
             amount_paid: initialPaidAmount,
             remaining_amount: remainingAmount,
             payment_status: paymentStatus,
@@ -360,7 +383,7 @@ export async function POST(req: NextRequest) {
         payment_status: paymentData.payment_status as "pending" | "paid",
         amount_paid: Number(paymentData.amount_paid ?? initialPaidAmount),
         remaining_amount: Number(paymentData.remaining_amount ?? remainingAmount),
-        course_price: Number(paymentData.course_price ?? coursePrice),
+        course_price: Number(paymentData.course_price ?? appliedCoursePrice),
       };
     }
 

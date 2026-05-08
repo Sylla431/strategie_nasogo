@@ -279,3 +279,43 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   }
 }
 
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const adminCheck = await requireAdmin(req);
+    if (adminCheck.error) return adminCheck.error;
+    if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
+
+    const { id } = await params;
+    if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+
+    const { data: student, error: studentError } = await supabaseAdmin
+      .from("students")
+      .select("id")
+      .eq("id", id)
+      .maybeSingle();
+
+    if (studentError) return NextResponse.json({ error: studentError.message }, { status: 400 });
+    if (!student) return NextResponse.json({ error: "Étudiant introuvable" }, { status: 404 });
+
+    const { error: deletePaymentsError } = await supabaseAdmin
+      .from("student_course_payments")
+      .delete()
+      .eq("student_id", id);
+    if (deletePaymentsError) {
+      return NextResponse.json({ error: deletePaymentsError.message }, { status: 400 });
+    }
+
+    const { error: deleteStudentError } = await supabaseAdmin.from("students").delete().eq("id", id);
+    if (deleteStudentError) {
+      return NextResponse.json({ error: deleteStudentError.message }, { status: 400 });
+    }
+
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    return NextResponse.json(
+      { error: error instanceof Error ? error.message : "Erreur serveur" },
+      { status: 500 },
+    );
+  }
+}
+

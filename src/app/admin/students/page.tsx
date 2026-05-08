@@ -83,6 +83,7 @@ export default function AdminStudentsPage() {
   const [detailError, setDetailError] = useState<string | null>(null);
   const [editingStudent, setEditingStudent] = useState(false);
   const [savingStudent, setSavingStudent] = useState(false);
+  const [deletingStudent, setDeletingStudent] = useState(false);
   const [editForm, setEditForm] = useState({
     full_name: "",
     email: "",
@@ -97,6 +98,7 @@ export default function AdminStudentsPage() {
     full_name: "",
     phone: "",
     course_id: "",
+    discounted_course_price: "",
     initial_paid_amount: "",
   });
   const [cardFile, setCardFile] = useState<File | null>(null);
@@ -235,10 +237,24 @@ export default function AdminStudentsPage() {
     return Number.isFinite(numeric) && numeric >= 0 ? numeric : 0;
   }, [createForm.initial_paid_amount]);
 
+  const discountedCoursePriceValue = useMemo(() => {
+    const raw = createForm.discounted_course_price.trim();
+    if (!raw) return null;
+    const numeric = Number(raw);
+    if (!Number.isFinite(numeric) || numeric < 0) return null;
+    return numeric;
+  }, [createForm.discounted_course_price]);
+
+  const effectiveCoursePriceValue = useMemo(() => {
+    if (!selectedCourse) return 0;
+    if (discountedCoursePriceValue === null) return selectedCourse.price;
+    return discountedCoursePriceValue;
+  }, [selectedCourse, discountedCoursePriceValue]);
+
   const remainingAmountValue = useMemo(() => {
     if (!selectedCourse) return 0;
-    return Math.max(selectedCourse.price - paidAmountValue, 0);
-  }, [selectedCourse, paidAmountValue]);
+    return Math.max(effectiveCoursePriceValue - paidAmountValue, 0);
+  }, [selectedCourse, effectiveCoursePriceValue, paidAmountValue]);
 
   const sortedStudents = useMemo(() => {
     const base = [...students];
@@ -298,6 +314,7 @@ export default function AdminStudentsPage() {
     setDetailError(null);
     setEditingStudent(false);
     setSavingStudent(false);
+    setDeletingStudent(false);
     setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
     setEditCardFile(null);
     router.replace("/admin/students");
@@ -311,6 +328,19 @@ export default function AdminStudentsPage() {
     setMessage(null);
 
     try {
+      if (createForm.course_id && selectedCourse) {
+        if (discountedCoursePriceValue !== null && discountedCoursePriceValue > selectedCourse.price) {
+          setError("Le prix ajusté doit être inférieur ou égal au prix catalogue du cours.");
+          setCreating(false);
+          return;
+        }
+        if (paidAmountValue > effectiveCoursePriceValue) {
+          setError("Le montant payé ne peut pas dépasser le prix appliqué.");
+          setCreating(false);
+          return;
+        }
+      }
+
       let cardPath: string | null = null;
       if (cardFile) {
         const formData = new FormData();
@@ -342,6 +372,7 @@ export default function AdminStudentsPage() {
           phone: createForm.phone.trim() || null,
           id_card_photo_path: cardPath,
           course_id: createForm.course_id || null,
+          discounted_course_price: createForm.course_id ? (createForm.discounted_course_price.trim() || null) : null,
           initial_paid_amount: createForm.course_id ? (createForm.initial_paid_amount.trim() || 0) : null,
         }),
       });
@@ -364,7 +395,7 @@ export default function AdminStudentsPage() {
         setMessage("Étudiant enregistré avec succès (sans création de compte).");
       }
       setCreateOpen(false);
-      setCreateForm({ email: "", full_name: "", phone: "", course_id: "", initial_paid_amount: "" });
+      setCreateForm({ email: "", full_name: "", phone: "", course_id: "", discounted_course_price: "", initial_paid_amount: "" });
       setCardFile(null);
       await loadStudents(token, searchQuery, selectedCourseFilterId);
     } finally {
@@ -495,6 +526,37 @@ export default function AdminStudentsPage() {
       setDetailError("Erreur réseau lors de la modification étudiant");
     } finally {
       setSavingStudent(false);
+    }
+  };
+
+  const handleDeleteStudent = async () => {
+    if (!token || !selectedStudentId) return;
+    const confirmed = window.confirm("Supprimer cet étudiant ? Cette action est irréversible.");
+    if (!confirmed) return;
+
+    setDeletingStudent(true);
+    setError(null);
+    setMessage(null);
+    setDetailError(null);
+
+    try {
+      const res = await fetch(`/api/students/${selectedStudentId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDetailError(body.error || "Erreur suppression étudiant");
+        return;
+      }
+
+      setMessage("Étudiant supprimé avec succès.");
+      closeDetail();
+      await loadStudents(token, searchQuery, selectedCourseFilterId);
+    } catch {
+      setDetailError("Erreur réseau lors de la suppression étudiant");
+    } finally {
+      setDeletingStudent(false);
     }
   };
 
@@ -660,6 +722,16 @@ export default function AdminStudentsPage() {
                 {selectedStudentDetail && !editingStudent && (
                   <button type="button" className="button-secondary" onClick={startEditStudent}>
                     Modifier
+                  </button>
+                )}
+                {selectedStudentDetail && !editingStudent && (
+                  <button
+                    type="button"
+                    className="button-secondary !text-red-600"
+                    onClick={handleDeleteStudent}
+                    disabled={deletingStudent}
+                  >
+                    {deletingStudent ? "Suppression..." : "Supprimer"}
                   </button>
                 )}
                 {selectedStudentDetail && editingStudent && (
@@ -900,13 +972,25 @@ export default function AdminStudentsPage() {
                       min={0}
                       step="0.01"
                       className="form-control"
+                      placeholder="Prix ajusté du cours (optionnel, réduction)"
+                      value={createForm.discounted_course_price}
+                      onChange={(e) => setCreateForm((v) => ({ ...v, discounted_course_price: e.target.value }))}
+                    />
+                    <input
+                      type="number"
+                      min={0}
+                      step="0.01"
+                      className="form-control"
                       placeholder="Montant payé en première tranche"
                       value={createForm.initial_paid_amount}
                       onChange={(e) => setCreateForm((v) => ({ ...v, initial_paid_amount: e.target.value }))}
                     />
                     <div className="rounded-lg border border-neutral-200 bg-neutral-50 p-3 text-sm space-y-1">
                       <p>
-                        Total du cours: <span className="font-semibold">{selectedCourse?.price ?? 0} FCFA</span>
+                        Prix catalogue: <span className="font-semibold">{selectedCourse?.price ?? 0} FCFA</span>
+                      </p>
+                      <p>
+                        Prix appliqué: <span className="font-semibold">{effectiveCoursePriceValue} FCFA</span>
                       </p>
                       <p>
                         Payé maintenant: <span className="font-semibold">{paidAmountValue} FCFA</span>
