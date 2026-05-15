@@ -1,58 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-
-const supabaseAdmin =
-  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
-
-type AdminUser = {
-  id: string;
-};
+import { requireAdmin } from "@/lib/requireAdmin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { insertStudentPaymentInstallment } from "@/lib/studentInstallments";
+import { isUuid } from "@/lib/studentSecurity";
 
 type RecordPaymentPayload = {
   payment_id?: string;
   amount?: number | string;
 };
-
-async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
-  if (!supabaseAdmin) {
-    return {
-      user: null,
-      error: NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 }),
-    };
-  }
-
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { user: null, error: NextResponse.json({ error: "Non authentifié" }, { status: 401 }) };
-  }
-
-  const token = authHeader.slice("Bearer ".length);
-  const {
-    data: { user },
-    error: userError,
-  } = await supabaseAdmin.auth.getUser(token);
-
-  if (userError || !user) {
-    return { user: null, error: NextResponse.json({ error: "Token invalide" }, { status: 401 }) };
-  }
-
-  const { data: profile, error: profileError } = await supabaseAdmin
-    .from("users_profile")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
-    return { user: null, error: NextResponse.json({ error: "Accès admin requis" }, { status: 403 }) };
-  }
-
-  return { user: { id: user.id }, error: null };
-}
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -61,14 +16,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
     const { id: studentId } = await params;
-    if (!studentId) return NextResponse.json({ error: "id étudiant requis" }, { status: 400 });
+    if (!studentId || !isUuid(studentId)) {
+      return NextResponse.json({ error: "id étudiant invalide" }, { status: 400 });
+    }
 
     const body = (await req.json()) as RecordPaymentPayload;
     const paymentId = typeof body.payment_id === "string" ? body.payment_id.trim() : "";
     const parsedAmount = body.amount === null || body.amount === undefined || body.amount === "" ? Number.NaN : Number(body.amount);
 
-    if (!paymentId) {
-      return NextResponse.json({ error: "payment_id requis" }, { status: 400 });
+    if (!paymentId || !isUuid(paymentId)) {
+      return NextResponse.json({ error: "payment_id invalide" }, { status: 400 });
     }
     if (!Number.isFinite(parsedAmount) || parsedAmount <= 0) {
       return NextResponse.json({ error: "Le montant du versement est invalide" }, { status: 400 });
@@ -117,6 +74,19 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
     if (updateError || !updated) {
       return NextResponse.json({ error: updateError?.message ?? "Erreur enregistrement versement" }, { status: 400 });
+    }
+
+    const installmentResult = await insertStudentPaymentInstallment(supabaseAdmin, {
+      studentCoursePaymentId: paymentId,
+      studentId,
+      amount: parsedAmount,
+      recordedBy: adminCheck.user?.id ?? null,
+    });
+    if (installmentResult.error) {
+      return NextResponse.json(
+        { error: `Versement enregistré mais historique non sauvegardé: ${installmentResult.error}` },
+        { status: 400 },
+      );
     }
 
     return NextResponse.json({

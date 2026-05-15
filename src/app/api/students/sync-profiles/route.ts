@@ -1,46 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-
-const supabaseAdmin =
-  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
-
-async function requireAdmin(req: NextRequest) {
-  if (!supabaseAdmin) {
-    return { error: NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 }) };
-  }
-
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { error: NextResponse.json({ error: "Non authentifié" }, { status: 401 }) };
-  }
-
-  const token = authHeader.slice("Bearer ".length);
-  const {
-    data: { user },
-    error: userError,
-  } = await supabaseAdmin.auth.getUser(token);
-
-  if (userError || !user) {
-    return { error: NextResponse.json({ error: "Token invalide" }, { status: 401 }) };
-  }
-
-  const { data: profile, error: profileError } = await supabaseAdmin
-    .from("users_profile")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
-    return { error: NextResponse.json({ error: "Accès admin requis" }, { status: 403 }) };
-  }
-
-  return { error: null, userId: user.id };
-}
+import { requireAdmin } from "@/lib/requireAdmin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 type ProfileRow = {
   id: string;
@@ -180,7 +140,7 @@ export async function POST(req: NextRequest) {
             email,
             phone,
             linked_user_id: userId,
-            created_by: auth.userId,
+            created_by: auth.user?.id ?? null,
           },
         ])
         .select("id, linked_user_id")

@@ -1,17 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
-
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
-
-const supabaseAdmin =
-  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
-
-type AdminUser = {
-  id: string;
-};
+import { requireAdmin } from "@/lib/requireAdmin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { insertStudentPaymentInstallment } from "@/lib/studentInstallments";
+import { isValidStudentCardPath, isValidPhone, sanitizePhoneInput, STUDENT_FIELD_LIMITS } from "@/lib/studentSecurity";
 
 type StudentListItem = {
   id: string;
@@ -22,42 +13,6 @@ type StudentListItem = {
   id_card_photo_path: string | null;
   linked_user_id?: string | null;
 };
-
-async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
-  if (!supabaseAdmin) {
-    return {
-      user: null,
-      error: NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 }),
-    };
-  }
-
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { user: null, error: NextResponse.json({ error: "Non authentifié" }, { status: 401 }) };
-  }
-
-  const token = authHeader.slice("Bearer ".length);
-  const {
-    data: { user },
-    error: userError,
-  } = await supabaseAdmin.auth.getUser(token);
-
-  if (userError || !user) {
-    return { user: null, error: NextResponse.json({ error: "Token invalide" }, { status: 401 }) };
-  }
-
-  const { data: profile, error: profileError } = await supabaseAdmin
-    .from("users_profile")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
-    return { user: null, error: NextResponse.json({ error: "Accès admin requis" }, { status: 403 }) };
-  }
-
-  return { user: { id: user.id }, error: null };
-}
 
 export async function GET(req: NextRequest) {
   try {
@@ -253,7 +208,8 @@ export async function POST(req: NextRequest) {
     const body = (await req.json()) as CreateStudentPayload;
     const email = body.email?.trim().toLowerCase() || null;
     const fullName = body.full_name?.trim() || null;
-    const phone = body.phone?.trim() || null;
+    const phoneRaw = body.phone?.trim() || "";
+    const phone = phoneRaw ? sanitizePhoneInput(phoneRaw) || null : null;
     const idCardPhotoPath = body.id_card_photo_path?.trim() || null;
     const courseId = body.course_id?.trim() || null;
     const parsedDiscountedPriceRaw =
@@ -275,6 +231,21 @@ export async function POST(req: NextRequest) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
+    if (email && email.length > STUDENT_FIELD_LIMITS.email) {
+      return NextResponse.json({ error: "Email trop long" }, { status: 400 });
+    }
+    if (fullName && fullName.length > STUDENT_FIELD_LIMITS.fullName) {
+      return NextResponse.json({ error: "Nom trop long" }, { status: 400 });
+    }
+    if (phone && !isValidPhone(phone)) {
+      return NextResponse.json(
+        { error: "Numéro de téléphone invalide (8 à 30 chiffres)" },
+        { status: 400 },
+      );
+    }
+    if (idCardPhotoPath && !isValidStudentCardPath(idCardPhotoPath, adminCheck.user?.id)) {
+      return NextResponse.json({ error: "Chemin photo de carte invalide" }, { status: 400 });
     }
     if (!Number.isFinite(initialPaidAmount) || initialPaidAmount < 0) {
       return NextResponse.json({ error: "Le montant payé initial est invalide" }, { status: 400 });
@@ -375,6 +346,23 @@ export async function POST(req: NextRequest) {
           { error: `Erreur enregistrement paiement étudiant: ${paymentError?.message ?? "unknown"}` },
           { status: 400 },
         );
+      }
+
+      if (initialPaidAmount > 0) {
+        const installmentResult = await insertStudentPaymentInstallment(supabaseAdmin, {
+          studentCoursePaymentId: paymentData.id,
+          studentId: createdStudent.id,
+          amount: initialPaidAmount,
+          recordedBy: adminCheck.user?.id ?? null,
+        });
+        if (installmentResult.error) {
+          await supabaseAdmin.from("student_course_payments").delete().eq("id", paymentData.id);
+          await supabaseAdmin.from("students").delete().eq("id", createdStudent.id);
+          return NextResponse.json(
+            { error: `Erreur enregistrement historique versement: ${installmentResult.error}` },
+            { status: 400 },
+          );
+        }
       }
 
       createdPayment = {

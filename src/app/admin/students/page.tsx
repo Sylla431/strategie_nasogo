@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabaseClient";
+import { sanitizePhoneInput } from "@/lib/studentSecurity";
 
 type StudentSummary = {
   id: string;
@@ -54,6 +55,14 @@ type CourseOption = {
   price: number;
 };
 
+type PaymentInstallment = {
+  id: string;
+  amount: number;
+  created_at: string;
+  payment_id: string;
+  course_title: string;
+};
+
 type StudentSortOption = "created_desc" | "created_asc" | "name_asc" | "name_desc" | "courses_desc" | "courses_asc";
 
 const statusLabel: Record<string, string> = {
@@ -86,6 +95,10 @@ export default function AdminStudentsPage() {
   const [deletingStudent, setDeletingStudent] = useState(false);
   const [recordingPaymentId, setRecordingPaymentId] = useState<string | null>(null);
   const [paymentAmountByOrderId, setPaymentAmountByOrderId] = useState<Record<string, string>>({});
+  const [paymentHistoryOpen, setPaymentHistoryOpen] = useState(false);
+  const [paymentHistoryLoading, setPaymentHistoryLoading] = useState(false);
+  const [paymentHistoryError, setPaymentHistoryError] = useState<string | null>(null);
+  const [paymentHistory, setPaymentHistory] = useState<PaymentInstallment[]>([]);
   const [editForm, setEditForm] = useState({
     full_name: "",
     email: "",
@@ -300,6 +313,11 @@ export default function AdminStudentsPage() {
     return Math.max(selectedEditCourse.price - editPaidAmountValue, 0);
   }, [selectedEditCourse, editPaidAmountValue]);
 
+  const hasPaymentHistory = useMemo(() => {
+    if (!selectedStudentDetail) return false;
+    return selectedStudentDetail.orders.some((order) => Number(order.amount_paid ?? 0) > 0);
+  }, [selectedStudentDetail]);
+
   const openDetail = (studentId: string) => {
     setSelectedStudentId(studentId);
     setSelectedStudentDetail(null);
@@ -321,7 +339,40 @@ export default function AdminStudentsPage() {
     setEditCardFile(null);
     setRecordingPaymentId(null);
     setPaymentAmountByOrderId({});
+    setPaymentHistoryOpen(false);
+    setPaymentHistory([]);
+    setPaymentHistoryError(null);
+    setPaymentHistoryLoading(false);
     router.replace("/admin/students");
+  };
+
+  const loadPaymentHistory = async (studentId: string) => {
+    if (!token) return;
+    setPaymentHistoryLoading(true);
+    setPaymentHistoryError(null);
+    try {
+      const res = await fetch(`/api/students/${studentId}/payment-history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setPaymentHistoryError(body.error || "Erreur chargement historique des versements");
+        setPaymentHistory([]);
+        return;
+      }
+      setPaymentHistory((body.installments as PaymentInstallment[]) ?? []);
+    } catch {
+      setPaymentHistoryError("Erreur réseau lors du chargement de l'historique");
+      setPaymentHistory([]);
+    } finally {
+      setPaymentHistoryLoading(false);
+    }
+  };
+
+  const openPaymentHistory = async () => {
+    if (!selectedStudentId) return;
+    setPaymentHistoryOpen(true);
+    await loadPaymentHistory(selectedStudentId);
   };
 
   const handleCreateStudent = async () => {
@@ -580,6 +631,7 @@ export default function AdminStudentsPage() {
       await Promise.all([
         loadStudentDetail(token, selectedStudentId),
         loadStudents(token, searchQuery, selectedCourseFilterId),
+        ...(paymentHistoryOpen ? [loadPaymentHistory(selectedStudentId)] : []),
       ]);
     } catch {
       setDetailError("Erreur réseau lors de l'enregistrement du versement");
@@ -797,6 +849,15 @@ export default function AdminStudentsPage() {
                     {deletingStudent ? "Suppression..." : "Supprimer"}
                   </button>
                 )}
+                {selectedStudentDetail && !editingStudent && hasPaymentHistory && (
+                  <button
+                    type="button"
+                    className="button-secondary col-span-2 w-full min-h-11 text-sm sm:col-span-1 sm:w-auto sm:min-h-0 sm:text-base"
+                    onClick={() => void openPaymentHistory()}
+                  >
+                    Historique versements
+                  </button>
+                )}
                 {selectedStudentDetail && editingStudent && (
                   <>
                     <button
@@ -860,11 +921,16 @@ export default function AdminStudentsPage() {
                         disabled={savingStudent}
                       />
                       <input
-                        type="text"
+                        type="tel"
+                        inputMode="numeric"
+                        autoComplete="tel"
+                        pattern="[0-9]*"
                         className="form-control"
-                        placeholder="Téléphone"
+                        placeholder="Téléphone (chiffres uniquement)"
                         value={editForm.phone}
-                        onChange={(e) => setEditForm((v) => ({ ...v, phone: e.target.value }))}
+                        onChange={(e) =>
+                          setEditForm((v) => ({ ...v, phone: sanitizePhoneInput(e.target.value) }))
+                        }
                         disabled={savingStudent}
                       />
                       <div className="border-t pt-3 space-y-3">
@@ -1024,6 +1090,54 @@ export default function AdminStudentsPage() {
         </div>
       )}
 
+      {paymentHistoryOpen && selectedStudentId && (
+        <div
+          className="fixed inset-0 z-[60] bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          onClick={() => setPaymentHistoryOpen(false)}
+        >
+          <div
+            className="w-full max-w-lg bg-white rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 max-h-[80vh] overflow-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4 mb-4">
+              <h3 className="text-lg font-semibold">Historique des versements</h3>
+              <button
+                type="button"
+                className="button-secondary"
+                onClick={() => setPaymentHistoryOpen(false)}
+              >
+                Fermer
+              </button>
+            </div>
+
+            {paymentHistoryLoading && (
+              <p className="text-sm text-neutral-600">Chargement de l&apos;historique...</p>
+            )}
+            {paymentHistoryError && (
+              <p className="text-sm text-red-600">{paymentHistoryError}</p>
+            )}
+            {!paymentHistoryLoading && !paymentHistoryError && paymentHistory.length === 0 && (
+              <p className="text-sm text-neutral-600">Aucun versement enregistré.</p>
+            )}
+            {!paymentHistoryLoading && !paymentHistoryError && paymentHistory.length > 0 && (
+              <div className="space-y-2">
+                {paymentHistory.map((item) => (
+                  <div key={item.id} className="rounded-lg border border-neutral-200 p-3">
+                    <p className="font-medium text-neutral-900">{item.course_title}</p>
+                    <p className="text-sm mt-1">
+                      Montant: <span className="font-semibold">{item.amount} FCFA</span>
+                    </p>
+                    <p className="text-xs text-neutral-500 mt-1">
+                      {new Date(item.created_at).toLocaleString("fr-FR")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {createOpen && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={() => setCreateOpen(false)}>
           <div className="w-full max-w-xl bg-white rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 space-y-4 h-[88vh] sm:h-auto sm:max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
@@ -1050,11 +1164,16 @@ export default function AdminStudentsPage() {
                 onChange={(e) => setCreateForm((v) => ({ ...v, full_name: e.target.value }))}
               />
               <input
-                type="text"
+                type="tel"
+                inputMode="numeric"
+                autoComplete="tel"
+                pattern="[0-9]*"
                 className="form-control"
-                placeholder="Téléphone"
+                placeholder="Téléphone (chiffres uniquement)"
                 value={createForm.phone}
-                onChange={(e) => setCreateForm((v) => ({ ...v, phone: e.target.value }))}
+                onChange={(e) =>
+                  setCreateForm((v) => ({ ...v, phone: sanitizePhoneInput(e.target.value) }))
+                }
               />
               <div>
                 <label className="text-sm font-semibold block mb-1">Photo de carte (jpeg/png/webp, max 5MB)</label>

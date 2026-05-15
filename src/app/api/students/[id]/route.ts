@@ -1,18 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { requireAdmin } from "@/lib/requireAdmin";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { isUuid, isValidPhone, isValidStudentCardPath, sanitizePhoneInput, STUDENT_FIELD_LIMITS } from "@/lib/studentSecurity";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
-const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
 const STUDENT_CARD_BUCKET = "student-cards";
-
-const supabaseAdmin =
-  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
-    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
-    : null;
-
-type AdminUser = {
-  id: string;
-};
 
 type StudentProfile = {
   id: string;
@@ -38,42 +29,6 @@ type UpdateStudentPayload = {
   id_card_photo_path?: string | null;
 };
 
-async function requireAdmin(req: NextRequest): Promise<{ user: AdminUser | null; error: NextResponse | null }> {
-  if (!supabaseAdmin) {
-    return {
-      user: null,
-      error: NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 }),
-    };
-  }
-
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return { user: null, error: NextResponse.json({ error: "Non authentifié" }, { status: 401 }) };
-  }
-
-  const token = authHeader.slice("Bearer ".length);
-  const {
-    data: { user },
-    error: userError,
-  } = await supabaseAdmin.auth.getUser(token);
-
-  if (userError || !user) {
-    return { user: null, error: NextResponse.json({ error: "Token invalide" }, { status: 401 }) };
-  }
-
-  const { data: profile, error: profileError } = await supabaseAdmin
-    .from("users_profile")
-    .select("role")
-    .eq("id", user.id)
-    .maybeSingle();
-
-  if (profileError || profile?.role !== "admin") {
-    return { user: null, error: NextResponse.json({ error: "Accès admin requis" }, { status: 403 }) };
-  }
-
-  return { user: { id: user.id }, error: null };
-}
-
 export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const adminCheck = await requireAdmin(req);
@@ -81,7 +36,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
     const { id } = await params;
-    if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+    if (!id || !isUuid(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
 
     const { data: student, error: studentError } = await supabaseAdmin
       .from("students")
@@ -102,7 +57,10 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
     if (paymentsError) return NextResponse.json({ error: paymentsError.message }, { status: 400 });
 
     let idCardPhotoSignedUrl: string | null = null;
-    if (currentStudent.id_card_photo_path) {
+    if (
+      currentStudent.id_card_photo_path &&
+      isValidStudentCardPath(currentStudent.id_card_photo_path)
+    ) {
       const { data: signed, error: signedError } = await supabaseAdmin.storage
         .from(STUDENT_CARD_BUCKET)
         .createSignedUrl(currentStudent.id_card_photo_path, 60 * 30);
@@ -171,12 +129,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
     const { id } = await params;
-    if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+    if (!id || !isUuid(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
 
     const body = (await req.json()) as UpdateStudentPayload;
     const fullName = typeof body.full_name === "string" ? body.full_name.trim() : "";
     const email = typeof body.email === "string" ? body.email.trim().toLowerCase() : "";
-    const phone = typeof body.phone === "string" ? body.phone.trim() : "";
+    const phoneRaw = typeof body.phone === "string" ? body.phone.trim() : "";
+    const phone = phoneRaw ? sanitizePhoneInput(phoneRaw) : "";
     const hasCourseIdInPayload = Object.prototype.hasOwnProperty.call(body, "course_id");
     const courseId = typeof body.course_id === "string" ? body.course_id.trim() : "";
     const hasCardPathInPayload = Object.prototype.hasOwnProperty.call(body, "id_card_photo_path");
@@ -185,6 +144,21 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (email && !emailRegex.test(email)) {
       return NextResponse.json({ error: "Email invalide" }, { status: 400 });
+    }
+    if (email && email.length > STUDENT_FIELD_LIMITS.email) {
+      return NextResponse.json({ error: "Email trop long" }, { status: 400 });
+    }
+    if (fullName && fullName.length > STUDENT_FIELD_LIMITS.fullName) {
+      return NextResponse.json({ error: "Nom trop long" }, { status: 400 });
+    }
+    if (phone && !isValidPhone(phone)) {
+      return NextResponse.json(
+        { error: "Numéro de téléphone invalide (8 à 30 chiffres)" },
+        { status: 400 },
+      );
+    }
+    if (hasCardPathInPayload && cardPath && !isValidStudentCardPath(cardPath, adminCheck.user?.id)) {
+      return NextResponse.json({ error: "Chemin photo de carte invalide" }, { status: 400 });
     }
 
     const { data: updatedStudent, error: updateError } = await supabaseAdmin
@@ -286,7 +260,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
     const { id } = await params;
-    if (!id) return NextResponse.json({ error: "id requis" }, { status: 400 });
+    if (!id || !isUuid(id)) return NextResponse.json({ error: "id invalide" }, { status: 400 });
 
     const { data: student, error: studentError } = await supabaseAdmin
       .from("students")
