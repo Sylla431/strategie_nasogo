@@ -84,6 +84,8 @@ export default function AdminStudentsPage() {
   const [editingStudent, setEditingStudent] = useState(false);
   const [savingStudent, setSavingStudent] = useState(false);
   const [deletingStudent, setDeletingStudent] = useState(false);
+  const [recordingPaymentId, setRecordingPaymentId] = useState<string | null>(null);
+  const [paymentAmountByOrderId, setPaymentAmountByOrderId] = useState<Record<string, string>>({});
   const [editForm, setEditForm] = useState({
     full_name: "",
     email: "",
@@ -317,6 +319,8 @@ export default function AdminStudentsPage() {
     setDeletingStudent(false);
     setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
     setEditCardFile(null);
+    setRecordingPaymentId(null);
+    setPaymentAmountByOrderId({});
     router.replace("/admin/students");
   };
 
@@ -529,6 +533,61 @@ export default function AdminStudentsPage() {
     }
   };
 
+  const handleRecordPayment = async (paymentId: string, remainingAmount: number) => {
+    if (!token || !selectedStudentId) return;
+    const raw = (paymentAmountByOrderId[paymentId] ?? "").trim();
+    const amount = raw === "" ? remainingAmount : Number(raw);
+    if (!Number.isFinite(amount) || amount <= 0) {
+      setDetailError("Indique un montant de versement valide.");
+      return;
+    }
+    if (amount > remainingAmount) {
+      setDetailError(`Le versement ne peut pas dépasser ${remainingAmount} FCFA.`);
+      return;
+    }
+
+    setRecordingPaymentId(paymentId);
+    setDetailError(null);
+    setMessage(null);
+
+    try {
+      const res = await fetch(`/api/students/${selectedStudentId}/record-payment`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ payment_id: paymentId, amount }),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setDetailError(body.error || "Erreur enregistrement du versement");
+        return;
+      }
+
+      const recorded = Number(body.recorded_amount ?? amount);
+      const newRemaining = Number(body.payment?.remaining_amount ?? 0);
+      setMessage(
+        newRemaining === 0
+          ? `Versement de ${recorded} FCFA enregistré. Cours entièrement payé.`
+          : `Versement de ${recorded} FCFA enregistré. Reste à payer: ${newRemaining} FCFA.`,
+      );
+      setPaymentAmountByOrderId((prev) => {
+        const next = { ...prev };
+        delete next[paymentId];
+        return next;
+      });
+      await Promise.all([
+        loadStudentDetail(token, selectedStudentId),
+        loadStudents(token, searchQuery, selectedCourseFilterId),
+      ]);
+    } catch {
+      setDetailError("Erreur réseau lors de l'enregistrement du versement");
+    } finally {
+      setRecordingPaymentId(null);
+    }
+  };
+
   const handleDeleteStudent = async () => {
     if (!token || !selectedStudentId) return;
     const confirmed = window.confirm("Supprimer cet étudiant ? Cette action est irréversible.");
@@ -716,18 +775,22 @@ export default function AdminStudentsPage() {
       {selectedStudentId && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={closeDetail}>
           <div className="w-full max-w-4xl bg-white rounded-t-2xl sm:rounded-2xl p-4 sm:p-6 h-[88vh] sm:h-auto sm:max-h-[90vh] overflow-auto" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-start justify-between gap-4">
-              <h3 className="text-xl font-semibold">Détail étudiant</h3>
-              <div className="flex flex-wrap items-center justify-end gap-2">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+              <h3 className="text-lg sm:text-xl font-semibold">Détail étudiant</h3>
+              <div className="grid grid-cols-2 gap-2 w-full sm:flex sm:flex-wrap sm:w-auto sm:justify-end sm:gap-2">
                 {selectedStudentDetail && !editingStudent && (
-                  <button type="button" className="button-secondary" onClick={startEditStudent}>
+                  <button
+                    type="button"
+                    className="button-secondary w-full min-h-11 text-sm sm:w-auto sm:min-h-0 sm:text-base"
+                    onClick={startEditStudent}
+                  >
                     Modifier
                   </button>
                 )}
                 {selectedStudentDetail && !editingStudent && (
                   <button
                     type="button"
-                    className="button-secondary !text-red-600"
+                    className="button-secondary w-full min-h-11 text-sm !text-red-600 sm:w-auto sm:min-h-0 sm:text-base"
                     onClick={handleDeleteStudent}
                     disabled={deletingStudent}
                   >
@@ -736,15 +799,29 @@ export default function AdminStudentsPage() {
                 )}
                 {selectedStudentDetail && editingStudent && (
                   <>
-                    <button type="button" className="button-secondary" onClick={cancelEditStudent} disabled={savingStudent}>
+                    <button
+                      type="button"
+                      className="button-secondary w-full min-h-11 text-sm sm:w-auto sm:min-h-0 sm:text-base"
+                      onClick={cancelEditStudent}
+                      disabled={savingStudent}
+                    >
                       Annuler
                     </button>
-                    <button type="button" className="button-primary" onClick={handleUpdateStudent} disabled={savingStudent}>
+                    <button
+                      type="button"
+                      className="button-primary w-full min-h-11 text-sm sm:w-auto sm:min-h-0 sm:text-base"
+                      onClick={handleUpdateStudent}
+                      disabled={savingStudent}
+                    >
                       {savingStudent ? "Enregistrement..." : "Enregistrer"}
                     </button>
                   </>
                 )}
-                <button type="button" onClick={closeDetail} className="button-secondary">
+                <button
+                  type="button"
+                  onClick={closeDetail}
+                  className="button-secondary col-span-2 w-full min-h-11 text-sm sm:col-span-1 sm:w-auto sm:min-h-0 sm:text-base"
+                >
                   Fermer
                 </button>
               </div>
@@ -880,22 +957,64 @@ export default function AdminStudentsPage() {
                     <p className="text-sm text-neutral-600">Aucune commande.</p>
                   ) : (
                     <div className="space-y-2">
-                      {selectedStudentDetail.orders.map((order) => (
-                        <div key={order.id} className="rounded-lg border border-neutral-200 p-3">
+                      {selectedStudentDetail.orders.map((order) => {
+                        const remaining = Number(order.remaining_amount ?? 0);
+                        const canRecordPayment = remaining > 0 && order.status !== "paid" && !editingStudent;
+                        return (
+                        <div key={order.id} className="rounded-lg border border-neutral-200 p-3 space-y-3">
                           <p className="font-medium">{order.courses?.title || "Cours supprimé"}</p>
                           <p className="text-sm">
                             Statut: <span className="font-semibold">{statusLabel[order.status] || order.status}</span> • Paiement: {order.payment_method}
                           </p>
                           <p className="text-sm">
                             Payé: <span className="font-semibold">{Number(order.amount_paid ?? 0)} FCFA</span> • Reste:{" "}
-                            <span className="font-semibold">{Number(order.remaining_amount ?? 0)} FCFA</span> • Total:{" "}
+                            <span className="font-semibold">{remaining} FCFA</span> • Total:{" "}
                             <span className="font-semibold">{Number(order.course_price ?? order.courses?.price ?? 0)} FCFA</span>
                           </p>
                           <p className="text-xs text-neutral-500">
                             Créée le {new Date(order.created_at).toLocaleDateString("fr-FR")}
                           </p>
+                          {canRecordPayment && (
+                            <div className="border-t pt-3 space-y-2">
+                              <p className="text-sm font-semibold text-neutral-900">Enregistrer un versement</p>
+                              <div className="flex flex-col sm:flex-row gap-2">
+                                <input
+                                  type="number"
+                                  min={0}
+                                  max={remaining}
+                                  step="0.01"
+                                  className="form-control flex-1"
+                                  placeholder={`Montant (max ${remaining} FCFA)`}
+                                  value={paymentAmountByOrderId[order.id] ?? ""}
+                                  onChange={(e) =>
+                                    setPaymentAmountByOrderId((prev) => ({ ...prev, [order.id]: e.target.value }))
+                                  }
+                                  disabled={recordingPaymentId === order.id}
+                                />
+                                <button
+                                  type="button"
+                                  className="button-primary whitespace-nowrap"
+                                  onClick={() => handleRecordPayment(order.id, remaining)}
+                                  disabled={recordingPaymentId === order.id}
+                                >
+                                  {recordingPaymentId === order.id ? "Enregistrement..." : "Enregistrer versement"}
+                                </button>
+                              </div>
+                              <button
+                                type="button"
+                                className="text-xs text-brand font-semibold hover:underline"
+                                onClick={() =>
+                                  setPaymentAmountByOrderId((prev) => ({ ...prev, [order.id]: String(remaining) }))
+                                }
+                                disabled={recordingPaymentId === order.id}
+                              >
+                                Remplir le reste ({remaining} FCFA)
+                              </button>
+                            </div>
+                          )}
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </section>
