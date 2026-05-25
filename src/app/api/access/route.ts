@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { createSupabaseFromRequest } from "@/lib/supabaseServer";
 
 async function getProfileRole(
@@ -115,8 +116,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "email et course_id requis" }, { status: 400 });
   }
 
-  // Trouver l'utilisateur par email dans auth.users via fonction SQL
-  const { data: userIdData, error: findError } = await supabase.rpc("find_user_by_email", {
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
+  }
+
+  // Recherche email via service role (find_user_by_email n'est plus exécutable côté client authentifié)
+  const { data: userIdData, error: findError } = await supabaseAdmin.rpc("find_user_by_email", {
     user_email: email.toLowerCase().trim(),
   });
 
@@ -132,8 +137,7 @@ export async function POST(req: NextRequest) {
   // Obtenir l'ID de l'admin qui accorde l'accès
   const grantedBy = authData.user.id;
 
-  // Utiliser la fonction SQL qui contourne RLS et crée automatiquement le profil si nécessaire
-  const { data: accessData, error: accessError } = await supabase.rpc("grant_course_access", {
+  const { data: accessData, error: accessError } = await supabaseAdmin.rpc("grant_course_access", {
     p_user_id: userId,
     p_course_id: course_id,
     p_granted_by: grantedBy,
@@ -166,8 +170,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "L'utilisateur a déjà accès à ce cours" }, { status: 409 });
   }
 
-  // Récupérer les données complètes avec le cours
-  const { data: fullData, error: fetchError } = await supabase
+  const { data: fullData, error: fetchError } = await supabaseAdmin
     .from("course_access")
     .select("*, courses(*)")
     .eq("user_id", userId)
