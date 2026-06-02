@@ -64,6 +64,7 @@ type PaymentInstallment = {
 };
 
 type StudentSortOption = "created_desc" | "created_asc" | "name_asc" | "name_desc" | "courses_desc" | "courses_asc";
+type StudentPaymentFilterOption = "" | "pending" | "paid" | "failed" | "refunded" | "none";
 
 const statusLabel: Record<string, string> = {
   paid: "Payé",
@@ -85,6 +86,7 @@ export default function AdminStudentsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<StudentSortOption>("created_desc");
   const [selectedCourseFilterId, setSelectedCourseFilterId] = useState("");
+  const [selectedPaymentFilter, setSelectedPaymentFilter] = useState<StudentPaymentFilterOption>("");
 
   const [selectedStudentId, setSelectedStudentId] = useState<string | null>(null);
   const [selectedStudentDetail, setSelectedStudentDetail] = useState<StudentDetailResponse | null>(null);
@@ -124,7 +126,12 @@ export default function AdminStudentsPage() {
 
   const debouncedQuery = useMemo(() => searchQuery.trim(), [searchQuery]);
 
-  const loadStudents = async (currentToken: string, query = "", courseId = "") => {
+  const loadStudents = async (
+    currentToken: string,
+    query = "",
+    courseId = "",
+    paymentStatus: StudentPaymentFilterOption = "",
+  ) => {
     setStudentsLoading(true);
     setError(null);
     try {
@@ -132,6 +139,7 @@ export default function AdminStudentsPage() {
       params.set("limit", "50");
       if (query.trim()) params.set("q", query.trim());
       if (courseId.trim()) params.set("course_id", courseId.trim());
+      if (paymentStatus.trim()) params.set("payment_status", paymentStatus.trim());
       const res = await fetch(`/api/students?${params.toString()}`, {
         headers: { Authorization: `Bearer ${currentToken}` },
       });
@@ -224,7 +232,7 @@ export default function AdminStudentsPage() {
         return;
       }
 
-      await Promise.all([loadStudents(currentToken, "", selectedCourseFilterId), loadCourses(currentToken)]);
+      await Promise.all([loadStudents(currentToken, "", selectedCourseFilterId, selectedPaymentFilter), loadCourses(currentToken)]);
       const initialStudentId = new URLSearchParams(window.location.search).get("student");
       if (initialStudentId) {
         setSelectedStudentId(initialStudentId);
@@ -237,8 +245,8 @@ export default function AdminStudentsPage() {
 
   useEffect(() => {
     if (!token || role !== "admin") return;
-    void loadStudents(token, debouncedQuery, selectedCourseFilterId);
-  }, [debouncedQuery, token, role, selectedCourseFilterId]);
+    void loadStudents(token, debouncedQuery, selectedCourseFilterId, selectedPaymentFilter);
+  }, [debouncedQuery, token, role, selectedCourseFilterId, selectedPaymentFilter]);
 
   const selectedCourse = useMemo(
     () => courses.find((course) => course.id === createForm.course_id) ?? null,
@@ -452,7 +460,7 @@ export default function AdminStudentsPage() {
       setCreateOpen(false);
       setCreateForm({ email: "", full_name: "", phone: "", course_id: "", discounted_course_price: "", initial_paid_amount: "" });
       setCardFile(null);
-      await loadStudents(token, searchQuery, selectedCourseFilterId);
+      await loadStudents(token, searchQuery, selectedCourseFilterId, selectedPaymentFilter);
     } finally {
       setCreating(false);
     }
@@ -476,7 +484,7 @@ export default function AdminStudentsPage() {
       setMessage(
         `Synchronisation terminée: ${body.imported_students ?? 0} étudiants importés, ${body.synced_payments ?? 0} accès cours synchronisés.`,
       );
-      await loadStudents(token, searchQuery, selectedCourseFilterId);
+      await loadStudents(token, searchQuery, selectedCourseFilterId, selectedPaymentFilter);
     } catch {
       setError("Erreur réseau lors de la synchronisation");
     } finally {
@@ -572,7 +580,7 @@ export default function AdminStudentsPage() {
       );
       await Promise.all([
         loadStudentDetail(token, selectedStudentId),
-        loadStudents(token, searchQuery, selectedCourseFilterId),
+        loadStudents(token, searchQuery, selectedCourseFilterId, selectedPaymentFilter),
       ]);
       setEditingStudent(false);
       setEditForm({ full_name: "", email: "", phone: "", course_id: "" });
@@ -630,7 +638,7 @@ export default function AdminStudentsPage() {
       });
       await Promise.all([
         loadStudentDetail(token, selectedStudentId),
-        loadStudents(token, searchQuery, selectedCourseFilterId),
+        loadStudents(token, searchQuery, selectedCourseFilterId, selectedPaymentFilter),
         ...(paymentHistoryOpen ? [loadPaymentHistory(selectedStudentId)] : []),
       ]);
     } catch {
@@ -663,7 +671,7 @@ export default function AdminStudentsPage() {
 
       setMessage("Étudiant supprimé avec succès.");
       closeDetail();
-      await loadStudents(token, searchQuery, selectedCourseFilterId);
+      await loadStudents(token, searchQuery, selectedCourseFilterId, selectedPaymentFilter);
     } catch {
       setDetailError("Erreur réseau lors de la suppression étudiant");
     } finally {
@@ -740,6 +748,18 @@ export default function AdminStudentsPage() {
               </option>
             ))}
           </select>
+            <select
+              className="form-control w-full sm:w-52 md:w-56 lg:w-64 shrink"
+              value={selectedPaymentFilter}
+              onChange={(e) => setSelectedPaymentFilter(e.target.value as StudentPaymentFilterOption)}
+            >
+              <option value="">Paiement: tous</option>
+              <option value="pending">Paiement: en attente</option>
+              <option value="paid">Paiement: payé</option>
+              {/* <option value="failed">Paiement: échoué</option>
+              <option value="refunded">Paiement: remboursé</option> */}
+              {/* <option value="none">Paiement: aucun</option> */}
+            </select>
           </div>
         </div>
 

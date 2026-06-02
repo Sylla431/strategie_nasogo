@@ -23,6 +23,9 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const query = (searchParams.get("q") ?? "").trim();
     const courseIdFilter = (searchParams.get("course_id") ?? "").trim();
+    const paymentStatusFilterRaw = (searchParams.get("payment_status") ?? "").trim().toLowerCase();
+    const allowedPaymentStatuses = new Set(["pending", "paid", "failed", "refunded", "none"]);
+    const paymentStatusFilter = allowedPaymentStatuses.has(paymentStatusFilterRaw) ? paymentStatusFilterRaw : "";
     const limitParam = Number(searchParams.get("limit") ?? "50");
     const limit = Number.isFinite(limitParam) ? Math.min(Math.max(limitParam, 1), 200) : 50;
 
@@ -178,7 +181,12 @@ export async function GET(req: NextRequest) {
         last_order_at: lastOrderAt,
         has_id_card_photo: Boolean(student.id_card_photo_path),
       };
-    });
+    })
+      .filter((student) => {
+        if (!paymentStatusFilter) return true;
+        if (paymentStatusFilter === "none") return !student.last_order_status;
+        return student.last_order_status === paymentStatusFilter;
+      });
 
     return NextResponse.json(response);
   } catch (error) {
