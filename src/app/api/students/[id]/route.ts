@@ -40,7 +40,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
 
     const { data: student, error: studentError } = await supabaseAdmin
       .from("students")
-      .select("id, full_name, email, phone, created_at, id_card_photo_path")
+      .select("id, full_name, email, phone, created_at, id_card_photo_path, linked_user_id")
       .eq("id", id)
       .maybeSingle();
 

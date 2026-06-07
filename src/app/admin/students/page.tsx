@@ -28,6 +28,7 @@ type StudentDetailResponse = {
     created_at: string;
     id_card_photo_path: string | null;
     id_card_photo_signed_url: string | null;
+    linked_user_id?: string | null;
   };
   accesses: Array<{
     id: string;
@@ -101,6 +102,15 @@ export default function AdminStudentsPage() {
   const [paymentHistoryLoading, setPaymentHistoryLoading] = useState(false);
   const [paymentHistoryError, setPaymentHistoryError] = useState<string | null>(null);
   const [paymentHistory, setPaymentHistory] = useState<PaymentInstallment[]>([]);
+  const [telegramSub, setTelegramSub] = useState<{
+    status: string;
+    subscription_expires_at: string;
+    telegram_user_id: number | null;
+    telegram_username: string | null;
+  } | null>(null);
+  const [telegramActive, setTelegramActive] = useState(false);
+  const [telegramLoading, setTelegramLoading] = useState(false);
+  const [telegramActionLoading, setTelegramActionLoading] = useState(false);
   const [editForm, setEditForm] = useState({
     full_name: "",
     email: "",
@@ -160,6 +170,8 @@ export default function AdminStudentsPage() {
   const loadStudentDetail = async (currentToken: string, studentId: string) => {
     setDetailLoading(true);
     setDetailError(null);
+    setTelegramSub(null);
+    setTelegramActive(false);
     try {
       const res = await fetch(`/api/students/${studentId}`, {
         headers: { Authorization: `Bearer ${currentToken}` },
@@ -171,10 +183,85 @@ export default function AdminStudentsPage() {
       }
       const data = (await res.json()) as StudentDetailResponse;
       setSelectedStudentDetail(data);
+      await loadTelegramSubscription(currentToken, data);
     } catch {
       setDetailError("Erreur réseau lors du chargement du détail étudiant");
     } finally {
       setDetailLoading(false);
+    }
+  };
+
+  const loadTelegramSubscription = async (currentToken: string, detail: StudentDetailResponse) => {
+    const userId = detail.student.linked_user_id;
+    const email = detail.student.email;
+    if (!userId && !email) return;
+
+    setTelegramLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (userId) params.set("user_id", userId);
+      else if (email) params.set("email", email);
+
+      const res = await fetch(`/api/telegram/subscriptions?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${currentToken}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setTelegramSub(data.subscription ?? null);
+      setTelegramActive(Boolean(data.active));
+    } finally {
+      setTelegramLoading(false);
+    }
+  };
+
+  const handleTelegramAction = async (action: "grant" | "extend" | "revoke", months = 1) => {
+    if (!token || !selectedStudentDetail) return;
+    setTelegramActionLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const body: { action?: string; months?: number; user_id?: string; email?: string } = {};
+      if (selectedStudentDetail.student.linked_user_id) {
+        body.user_id = selectedStudentDetail.student.linked_user_id;
+      } else if (selectedStudentDetail.student.email) {
+        body.email = selectedStudentDetail.student.email;
+      } else {
+        setError("Aucun email ou compte web lié pour activer Telegram.");
+        return;
+      }
+
+      const res = await fetch("/api/telegram/subscriptions", {
+        method: action === "revoke" ? "PATCH" : action === "grant" ? "POST" : "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          action === "grant"
+            ? { ...body, months }
+            : action === "extend"
+              ? { ...body, action: "extend", months }
+              : { ...body, action: "revoke" },
+        ),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Erreur abonnement Telegram");
+        return;
+      }
+
+      if (action === "revoke") {
+        setMessage("Abonnement Telegram révoqué.");
+        setTelegramSub((prev) => (prev ? { ...prev, status: "revoked" } : null));
+        setTelegramActive(false);
+      } else {
+        setMessage(action === "grant" ? "Abonnement Telegram activé (1 mois)." : "Abonnement Telegram prolongé.");
+        setTelegramSub(data.subscription ?? null);
+        setTelegramActive(Boolean(data.active));
+      }
+    } finally {
+      setTelegramActionLoading(false);
     }
   };
 
@@ -1034,6 +1121,84 @@ export default function AdminStudentsPage() {
                         </div>
                       ))}
                     </div>
+                  )}
+                </section>
+
+                <section className="space-y-3 border-t pt-4">
+                  <h4 className="font-semibold text-neutral-900">Abonnement Telegram</h4>
+                  {telegramLoading ? (
+                    <p className="text-sm text-neutral-600">Chargement...</p>
+                  ) : (
+                    <>
+                      {!selectedStudentDetail.student.linked_user_id && !selectedStudentDetail.student.email ? (
+                        <p className="text-sm text-neutral-600">
+                          Ajoutez un email ou liez un compte web pour gérer l&apos;accès Telegram.
+                        </p>
+                      ) : (
+                        <>
+                          {telegramSub ? (
+                            <div className="rounded-lg border border-neutral-200 p-3 space-y-1 text-sm">
+                              <p>
+                                Statut:{" "}
+                                <span className="font-semibold">
+                                  {telegramActive ? "Actif" : telegramSub.status}
+                                </span>
+                              </p>
+                              <p>
+                                Expire le:{" "}
+                                <span className="font-semibold">
+                                  {new Date(telegramSub.subscription_expires_at).toLocaleDateString("fr-FR")}
+                                </span>
+                              </p>
+                              <p>
+                                Telegram:{" "}
+                                {telegramSub.telegram_user_id
+                                  ? telegramSub.telegram_username
+                                    ? `@${telegramSub.telegram_username}`
+                                    : `ID ${telegramSub.telegram_user_id}`
+                                  : "Non lié (l'utilisateur doit cliquer Accès Telegram sur le site)"}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-sm text-neutral-600">Aucun abonnement Telegram actif.</p>
+                          )}
+                          <div className="flex flex-wrap gap-2">
+                            {!telegramSub || !telegramActive ? (
+                              <button
+                                type="button"
+                                className="button-primary text-sm"
+                                disabled={telegramActionLoading}
+                                onClick={() => handleTelegramAction("grant", 1)}
+                              >
+                                {telegramActionLoading ? "..." : "Activer 1 mois"}
+                              </button>
+                            ) : (
+                              <button
+                                type="button"
+                                className="button-secondary text-sm"
+                                disabled={telegramActionLoading}
+                                onClick={() => handleTelegramAction("extend", 1)}
+                              >
+                                {telegramActionLoading ? "..." : "Prolonger 1 mois"}
+                              </button>
+                            )}
+                            {telegramSub && telegramSub.status !== "revoked" && (
+                              <button
+                                type="button"
+                                className="pill-neutral text-sm text-red-700 border-red-200"
+                                disabled={telegramActionLoading}
+                                onClick={() => handleTelegramAction("revoke")}
+                              >
+                                Révoquer
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-xs text-neutral-500">
+                            Après activation, l&apos;utilisateur verra le bouton Accès Telegram dans son espace client.
+                          </p>
+                        </>
+                      )}
+                    </>
                   )}
                 </section>
 

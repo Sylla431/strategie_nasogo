@@ -46,6 +46,10 @@ export default function ClientSpace() {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [telegramActive, setTelegramActive] = useState(false);
+  const [telegramExpiresAt, setTelegramExpiresAt] = useState<string | null>(null);
+  const [telegramLinked, setTelegramLinked] = useState(false);
+  const [telegramOpening, setTelegramOpening] = useState(false);
 
   const fetchOrders = useCallback(async (token: string) => {
       try {
@@ -92,6 +96,21 @@ export default function ClientSpace() {
       } catch (err) {
         console.error("Erreur réseau lors du chargement des accès:", err);
       }
+  }, []);
+
+  const fetchTelegramSubscription = useCallback(async (token: string) => {
+    try {
+      const res = await fetch("/api/telegram/subscription", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) return;
+      const data = await res.json();
+      setTelegramActive(Boolean(data.active));
+      setTelegramExpiresAt(data.subscription?.subscription_expires_at ?? null);
+      setTelegramLinked(Boolean(data.subscription?.telegram_linked));
+    } catch (err) {
+      console.error("Erreur chargement abonnement Telegram:", err);
+    }
   }, []);
 
   const fetchCourses = useCallback(async (token: string) => {
@@ -144,7 +163,12 @@ export default function ClientSpace() {
           return;
         }
         
-      await Promise.all([fetchOrders(token), fetchCourses(token), fetchAccessGrants(token)]);
+      await Promise.all([
+        fetchOrders(token),
+        fetchCourses(token),
+        fetchAccessGrants(token),
+        fetchTelegramSubscription(token),
+      ]);
       setLoading(false);
       } catch (err) {
         console.error("Erreur lors du chargement:", err);
@@ -177,7 +201,7 @@ export default function ClientSpace() {
     return () => {
       subscription.unsubscribe();
     };
-  }, [fetchOrders, fetchCourses, fetchAccessGrants]);
+  }, [fetchOrders, fetchCourses, fetchAccessGrants, fetchTelegramSubscription]);
 
   // Fonction pour créer une commande (actuellement commentée dans le JSX)
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -226,6 +250,31 @@ export default function ClientSpace() {
       console.error("Erreur lors de la déconnexion:", err);
       // Forcer le rechargement même en cas d'erreur
     window.location.href = "/";
+    }
+  };
+
+  const handleTelegramAccess = async () => {
+    if (!sessionToken) return;
+    setTelegramOpening(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/telegram/link-token", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${sessionToken}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Impossible d'ouvrir l'accès Telegram.");
+        return;
+      }
+      if (typeof data.bot_url === "string") {
+        window.open(data.bot_url, "_blank", "noopener,noreferrer");
+        setMessage("Ouvrez Telegram, appuyez sur Démarrer, puis utilisez le lien personnel envoyé par le bot.");
+      }
+    } catch {
+      setError("Erreur de connexion lors de l'accès Telegram.");
+    } finally {
+      setTelegramOpening(false);
     }
   };
 
@@ -305,8 +354,8 @@ export default function ClientSpace() {
         </p>
       </section> */}
 
-      {/* Section Communauté Telegram - visible uniquement pour les clients ayant payé */}
-      {allAccessibleCourses.length > 0 && (
+      {/* Section Communauté Telegram - visible si abonnement Telegram actif (validé par admin) */}
+      {telegramActive && (
         <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
@@ -317,21 +366,28 @@ export default function ClientSpace() {
             <div className="flex-1">
               <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté privée</h2>
               <p className="text-sm sm:text-base text-neutral-600 mt-1">
-                Rejoins notre groupe Telegram pour échanger avec les autres traders et bénéficier du coaching collectif
+                Accès Telegram actif
+                {telegramExpiresAt
+                  ? ` jusqu'au ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
+                  : ""}
+                . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel.
               </p>
+              {telegramLinked && (
+                <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
+              )}
             </div>
           </div>
-          <a
-            href="https://t.me/+Zi7RkQ3TAY5hY2Rk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center"
+          <button
+            type="button"
+            onClick={handleTelegramAccess}
+            disabled={telegramOpening}
+            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
           >
             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
               <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z"/>
             </svg>
-            Rejoindre le groupe Telegram
-          </a>
+            {telegramOpening ? "Ouverture..." : "Accès Telegram"}
+          </button>
         </section>
       )}
 
