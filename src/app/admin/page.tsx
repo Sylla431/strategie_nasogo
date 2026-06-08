@@ -73,6 +73,15 @@ export default function AdminDashboard() {
   const [tempVideo, setTempVideo] = useState({ title: "", video_url: "", position: 0 });
   const [grantAccessEmail, setGrantAccessEmail] = useState("");
   const [grantAccessCourseId, setGrantAccessCourseId] = useState<string>("");
+  const [telegramGrantEmail, setTelegramGrantEmail] = useState("");
+  const [telegramGrantMonths, setTelegramGrantMonths] = useState(1);
+  const [telegramGrantLoading, setTelegramGrantLoading] = useState(false);
+  const [telegramSubInfo, setTelegramSubInfo] = useState<{
+    active: boolean;
+    status?: string;
+    subscription_expires_at?: string;
+    telegram_linked?: boolean;
+  } | null>(null);
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(new Set());
   const [selectedVideo, setSelectedVideo] = useState<{ title: string; video_url: string } | null>(null);
   const [selectedCourseForVideos, setSelectedCourseForVideos] = useState<string>("");
@@ -297,6 +306,96 @@ export default function AdminDashboard() {
     setGrantAccessCourseId("");
     // Recharger les accès après attribution
     if (token) await loadCourseAccesses(token);
+  };
+
+  const checkTelegramSubscription = async () => {
+    if (!token || !telegramGrantEmail.trim()) {
+      setError("Email requis pour vérifier l'abonnement Telegram");
+      return;
+    }
+    setTelegramGrantLoading(true);
+    setError(null);
+    try {
+      const params = new URLSearchParams({ email: telegramGrantEmail.trim().toLowerCase() });
+      const res = await fetch(`/api/telegram/subscriptions?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || "Erreur vérification abonnement Telegram");
+        setTelegramSubInfo(null);
+        return;
+      }
+      if (!data.subscription) {
+        setTelegramSubInfo({ active: false });
+        setMessage("Aucun abonnement Telegram pour cet email.");
+        return;
+      }
+      setTelegramSubInfo({
+        active: Boolean(data.active),
+        status: data.subscription.status,
+        subscription_expires_at: data.subscription.subscription_expires_at,
+        telegram_linked: data.subscription.telegram_user_id != null,
+      });
+    } finally {
+      setTelegramGrantLoading(false);
+    }
+  };
+
+  const grantTelegramSubscription = async (action: "grant" | "extend" | "revoke") => {
+    if (!token || !telegramGrantEmail.trim()) {
+      setError("Email requis");
+      return;
+    }
+    setTelegramGrantLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const email = telegramGrantEmail.trim().toLowerCase();
+      const res = await fetch("/api/telegram/subscriptions", {
+        method: action === "revoke" ? "PATCH" : action === "grant" ? "POST" : "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(
+          action === "grant"
+            ? { email, months: telegramGrantMonths }
+            : action === "extend"
+              ? { email, action: "extend", months: telegramGrantMonths }
+              : { email, action: "revoke" },
+        ),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(
+          data.error ||
+            "Erreur abonnement Telegram. Vérifiez que l'utilisateur a créé un compte sur le site avec cet email.",
+        );
+        return;
+      }
+      if (action === "revoke") {
+        setMessage(`Abonnement Telegram révoqué pour ${email}`);
+        setTelegramSubInfo({ active: false, status: "revoked" });
+      } else {
+        const months = telegramGrantMonths;
+        setMessage(
+          action === "grant"
+            ? `Abonnement Telegram VIP activé (${months} mois) pour ${email}. L'utilisateur peut cliquer « Accès canal VIP » dans son espace client.`
+            : `Abonnement Telegram prolongé de ${months} mois pour ${email}.`,
+        );
+        if (data.subscription) {
+          setTelegramSubInfo({
+            active: Boolean(data.active),
+            status: data.subscription.status,
+            subscription_expires_at: data.subscription.subscription_expires_at,
+            telegram_linked: data.subscription.telegram_user_id != null,
+          });
+        }
+      }
+    } finally {
+      setTelegramGrantLoading(false);
+    }
   };
 
   const addVideoToCourse = async () => {
@@ -726,6 +825,99 @@ export default function AdminDashboard() {
               <button className="button-primary w-full sm:w-auto" onClick={grantAccess}>
                 Accorder l&apos;accès
               </button>
+            </div>
+          </section>
+
+          <section className="card p-4 md:p-6 space-y-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/80 to-orange-50/50">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP Signaux</p>
+              <h2 className="text-xl font-semibold">Valider l&apos;abonnement Telegram</h2>
+              <p className="text-sm text-neutral-600 mt-1">
+                Après paiement, activez l&apos;accès au canal VIP. L&apos;utilisateur doit avoir un compte sur le site
+                avec le même email, puis cliquer « Accès canal VIP » dans son espace client.
+              </p>
+            </div>
+            <div className="grid gap-3">
+              <input
+                className="form-control"
+                type="email"
+                placeholder="Email du client (compte site)"
+                value={telegramGrantEmail}
+                onChange={(e) => {
+                  setTelegramGrantEmail(e.target.value);
+                  setTelegramSubInfo(null);
+                }}
+              />
+              <select
+                className="form-control"
+                value={telegramGrantMonths}
+                onChange={(e) => setTelegramGrantMonths(Number(e.target.value))}
+              >
+                <option value={1}>1 mois</option>
+                <option value={3}>3 mois</option>
+                <option value={6}>6 mois</option>
+                <option value={12}>12 mois</option>
+              </select>
+              {telegramSubInfo && (
+                <div className="rounded-lg border border-amber-200 bg-white p-3 text-sm space-y-1">
+                  <p>
+                    Statut :{" "}
+                    <span className="font-semibold">
+                      {telegramSubInfo.active ? "Actif" : telegramSubInfo.status || "Inactif"}
+                    </span>
+                  </p>
+                  {telegramSubInfo.subscription_expires_at && (
+                    <p>
+                      Expire le :{" "}
+                      <span className="font-semibold">
+                        {new Date(telegramSubInfo.subscription_expires_at).toLocaleDateString("fr-FR")}
+                      </span>
+                    </p>
+                  )}
+                  <p>
+                    Telegram lié :{" "}
+                    <span className="font-semibold">{telegramSubInfo.telegram_linked ? "Oui" : "Non (en attente)"}</span>
+                  </p>
+                </div>
+              )}
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="button-secondary text-sm"
+                  onClick={checkTelegramSubscription}
+                  disabled={telegramGrantLoading}
+                >
+                  Vérifier le statut
+                </button>
+                <button
+                  type="button"
+                  className="button-primary text-sm"
+                  onClick={() => grantTelegramSubscription("grant")}
+                  disabled={telegramGrantLoading}
+                >
+                  {telegramGrantLoading ? "..." : "Valider / activer"}
+                </button>
+                {telegramSubInfo?.active && (
+                  <button
+                    type="button"
+                    className="button-secondary text-sm"
+                    onClick={() => grantTelegramSubscription("extend")}
+                    disabled={telegramGrantLoading}
+                  >
+                    Prolonger
+                  </button>
+                )}
+                {telegramSubInfo?.subscription_expires_at && telegramSubInfo.status !== "revoked" && (
+                  <button
+                    type="button"
+                    className="pill-neutral text-sm text-red-700 border-red-200"
+                    onClick={() => grantTelegramSubscription("revoke")}
+                    disabled={telegramGrantLoading}
+                  >
+                    Révoquer
+                  </button>
+                )}
+              </div>
             </div>
           </section>
           </div>
