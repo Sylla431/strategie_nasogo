@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { AdminFeedbackModal, AdminLoadingOverlay } from "@/components/admin/AdminOverlays";
 import { supabase } from "@/lib/supabaseClient";
 import { sanitizePhoneInput } from "@/lib/studentSecurity";
 
@@ -767,18 +767,20 @@ export default function AdminStudentsPage() {
   };
 
   if (loading) {
-    return <div className="layout-shell py-10">Chargement...</div>;
+    return <AdminLoadingOverlay />;
   }
 
   return (
-    <div className="layout-shell py-10 space-y-6">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-semibold pt-5">Gestion des étudiants</h1>
-          <p className="text-sm text-neutral-600 mt-1">Liste, recherche, détail, ajout et modification d&apos;étudiants.</p>
+    <>
+    <div className="space-y-6">
+      <header className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div className="space-y-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900">Étudiants</h1>
+          <p className="text-sm text-neutral-600">
+            Liste, recherche, détail, paiements et abonnement Telegram.
+          </p>
         </div>
-        <div className="grid grid-cols-1 sm:flex items-stretch sm:items-center gap-2 w-full sm:w-auto pt-4">
-         
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
           <button
             type="button"
             className="button-secondary w-full sm:w-auto"
@@ -790,15 +792,9 @@ export default function AdminStudentsPage() {
           <button type="button" className="button-primary w-full sm:w-auto" onClick={() => setCreateOpen(true)}>
             Ajouter un étudiant
           </button>
-         
-          <Link href="/admin" className="button-secondary w-full sm:w-auto text-center">
-            Retour admin
-          </Link>
         </div>
-      </div>
+      </header>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
-      {message && <p className="text-sm text-green-600">{message}</p>}
       <section className="card p-4 md:p-6 space-y-4">
         <div className="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
           <h2 className="text-xl font-semibold">Étudiants</h2>
@@ -1434,6 +1430,14 @@ export default function AdminStudentsPage() {
         </div>
       )}
     </div>
+
+      {error && (
+        <AdminFeedbackModal type="error" message={error} onClose={() => setError(null)} />
+      )}
+      {message && (
+        <AdminFeedbackModal type="success" message={message} onClose={() => setMessage(null)} />
+      )}
+    </>
   );
 }
 
