@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseFromRequest } from "@/lib/supabaseServer";
 import { createTelegramLinkToken } from "@/lib/telegram/linkToken";
-import { getTelegramConfig } from "@/lib/telegram/config";
+import { getTelegramConfig, getTelegramConfigMissing } from "@/lib/telegram/config";
 
 export async function POST(req: NextRequest) {
   const config = getTelegramConfig();
   if (!config) {
-    return NextResponse.json({ error: "Telegram non configuré" }, { status: 503 });
+    const missing = getTelegramConfigMissing();
+    return NextResponse.json(
+      {
+        error: "Telegram non configuré sur le serveur.",
+        missing_env: missing,
+      },
+      { status: 503 },
+    );
   }
 
   const { supabase } = createSupabaseFromRequest(req);

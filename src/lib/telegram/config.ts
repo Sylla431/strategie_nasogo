@@ -8,9 +8,25 @@ export type TelegramConfig = {
   inviteLinkExpireMinutes: number;
 };
 
+export function getTelegramConfigMissing(): string[] {
+  const missing: string[] = [];
+  if (!process.env.TELEGRAM_BOT_TOKEN?.trim()) missing.push("TELEGRAM_BOT_TOKEN");
+  if (!getBotUsername()) missing.push("NEXT_PUBLIC_TELEGRAM_BOT_USERNAME (ou TELEGRAM_BOT_USERNAME)");
+  if (!process.env.TELEGRAM_CHANNEL_ID?.trim()) missing.push("TELEGRAM_CHANNEL_ID");
+  return missing;
+}
+
+function getBotUsername(): string {
+  return (
+    process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.trim() ??
+    process.env.TELEGRAM_BOT_USERNAME?.trim() ??
+    ""
+  );
+}
+
 export function getTelegramConfig(): TelegramConfig | null {
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? "";
-  const botUsername = process.env.NEXT_PUBLIC_TELEGRAM_BOT_USERNAME?.trim() ?? "";
+  const botUsername = getBotUsername();
   const channelId = process.env.TELEGRAM_CHANNEL_ID?.trim() ?? "";
 
   if (!botToken || !botUsername || !channelId) {

@@ -37,6 +37,16 @@ type CourseAccess = {
   courses?: Course;
 };
 
+const NASONGON_COURSE_COMMUNITY_TELEGRAM_URL = "https://t.me/+Zi7RkQ3TAY5hY2Rk";
+
+function TelegramIcon({ className }: { className?: string }) {
+  return (
+    <svg className={className} fill="currentColor" viewBox="0 0 24 24" aria-hidden>
+      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z" />
+    </svg>
+  );
+}
+
 export default function ClientSpace() {
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [orders, setOrders] = useState<Order[]>([]);
@@ -307,6 +317,10 @@ export default function ClientSpace() {
     })
     .filter(Boolean) as Course[];
 
+  const hasNasongonCourseAccess = allAccessibleCourses.some((course) =>
+    course.title.toLowerCase().includes("nasongon"),
+  );
+
   return (
     <div className="layout-shell py-10 space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
@@ -354,40 +368,30 @@ export default function ClientSpace() {
         </p>
       </section> */}
 
-      {/* Section Communauté Telegram - visible si abonnement Telegram actif (validé par admin) */}
-      {telegramActive && (
+      {/* Communauté formation Nasongon — acheteurs du cours */}
+      {hasNasongonCourseAccess && (
         <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z"/>
-              </svg>
+              <TelegramIcon className="w-6 h-6 text-blue-600" />
             </div>
             <div className="flex-1">
-              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté privée</h2>
+              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté formation</h2>
               <p className="text-sm sm:text-base text-neutral-600 mt-1">
-                Accès Telegram actif
-                {telegramExpiresAt
-                  ? ` jusqu'au ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
-                  : ""}
-                . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel.
+                Rejoins le groupe Telegram réservé aux élèves de la Stratégie Nasongon pour échanger avec les autres
+                traders et bénéficier du coaching collectif.
               </p>
-              {telegramLinked && (
-                <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
-              )}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleTelegramAccess}
-            disabled={telegramOpening}
-            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
+          <a
+            href={NASONGON_COURSE_COMMUNITY_TELEGRAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221c-.129 1.726-.722 5.982-.901 7.068-.139.855-.413 1.14-.678 1.168-.577.055-1.014-.384-1.572-.752-.87-.574-1.363-.931-2.207-1.494-.959-.641-.337-.994.209-1.57.144-.19 2.595-2.38 2.644-2.584.006-.027.011-.125-.047-.185-.058-.06-.144-.037-.207-.022-.088.02-1.494.95-4.216 2.787-.399.238-.76.354-1.083.348-.357-.006-1.043-.201-1.551-.367-.625-.204-1.121-.312-1.08-.658.025-.216.325-.437.895-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.559.099.015.321.06.465.277.12.18.155.415.108.644z"/>
-            </svg>
-            {telegramOpening ? "Ouverture..." : "Accès Telegram"}
-          </button>
+            <TelegramIcon className="w-5 h-5" />
+            Rejoindre le groupe Telegram
+          </a>
         </section>
       )}
 
@@ -487,6 +491,40 @@ export default function ClientSpace() {
           })}
         </div>
       </section>
+
+      {/* Canal VIP signaux — abonnement mensuel validé par admin */}
+      {telegramActive && (
+        <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <TelegramIcon className="w-6 h-6 text-amber-700" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP</p>
+              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Canal privé — signaux</h2>
+              <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                Accès actif
+                {telegramExpiresAt
+                  ? ` jusqu'au ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
+                  : ""}
+                . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel vers le canal VIP.
+              </p>
+              {telegramLinked && (
+                <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
+              )}
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={handleTelegramAccess}
+            disabled={telegramOpening}
+            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
+          >
+            <TelegramIcon className="w-5 h-5" />
+            {telegramOpening ? "Ouverture..." : "Accès canal VIP"}
+          </button>
+        </section>
+      )}
 
       {/* <section className="card p-4 md:p-6 space-y-4">
         <h2 className="text-xl font-semibold">Mes commandes</h2>
