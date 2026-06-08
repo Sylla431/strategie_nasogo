@@ -24,6 +24,14 @@ function getBotUsername(): string {
   );
 }
 
+export function getTelegramWebhookBaseUrl(): string {
+  return (
+    process.env.TELEGRAM_WEBHOOK_URL?.trim().replace(/\/$/, "") ??
+    process.env.NEXT_PUBLIC_APP_URL?.trim().replace(/\/$/, "") ??
+    ""
+  );
+}
+
 export function getTelegramConfig(): TelegramConfig | null {
   const botToken = process.env.TELEGRAM_BOT_TOKEN?.trim() ?? "";
   const botUsername = getBotUsername();

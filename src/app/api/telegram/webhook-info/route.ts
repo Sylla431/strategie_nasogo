@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { callTelegramApi } from "@/lib/telegram/api";
-import { getTelegramConfig, getTelegramConfigMissing } from "@/lib/telegram/config";
+import { getTelegramConfig, getTelegramConfigMissing, getTelegramWebhookBaseUrl } from "@/lib/telegram/config";
 
 export async function GET(req: NextRequest) {
   const adminCheck = await requireAdmin(req);
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "";
+  const appUrl = getTelegramWebhookBaseUrl();
   const expectedWebhookUrl = appUrl ? `${appUrl}/api/telegram/webhook` : null;
 
   const info = await callTelegramApi<{
@@ -44,8 +44,10 @@ export async function GET(req: NextRequest) {
         ? `Dernière erreur Telegram: ${info.result.last_error_message}`
         : null,
       config.webhookSecret
-        ? "Vérifiez que TELEGRAM_WEBHOOK_SECRET (ou TELEGRAM_LINK_SECRET) = secret_token utilisé dans setWebhook"
-        : "Pas de secret webhook — setWebhook doit être appelé sans secret_token",
+        ? "Si le bot ne répond pas: le secret Vercel doit être IDENTIQUE à celui du setWebhook. Sinon supprimez TELEGRAM_WEBHOOK_SECRET, redeploy, puis refaites set-webhook."
+        : "Pas de secret webhook configuré (OK si setWebhook sans secret_token).",
+      "Utilisez la même URL avec ou sans www partout (ex: https://www.vbsniperacademie.com). Les redirections www peuvent bloquer les POST Telegram.",
+      "GET /api/telegram/webhook dans le navigateur ne prouve pas que Telegram envoie des POST — vérifiez telegram_webhook.url ci-dessus.",
     ].filter(Boolean),
   });
 }

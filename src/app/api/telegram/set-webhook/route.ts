@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { callTelegramApi } from "@/lib/telegram/api";
-import { getTelegramConfig } from "@/lib/telegram/config";
+import { getTelegramConfig, getTelegramWebhookBaseUrl } from "@/lib/telegram/config";
 
 export async function POST(req: NextRequest) {
   const adminCheck = await requireAdmin(req);
@@ -12,23 +12,30 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Variables Telegram manquantes" }, { status: 503 });
   }
 
-  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+  const appUrl = getTelegramWebhookBaseUrl();
   if (!appUrl) {
-    return NextResponse.json({ error: "NEXT_PUBLIC_APP_URL manquant" }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: "TELEGRAM_WEBHOOK_URL ou NEXT_PUBLIC_APP_URL manquant",
+        hint: "Utilisez l'URL exacte sans redirection, ex: https://www.vbsniperacademie.com",
+      },
+      { status: 500 },
+    );
   }
 
   const webhookUrl = `${appUrl}/api/telegram/webhook`;
-  const body: Record<string, unknown> = { url: webhookUrl };
+  const body: Record<string, unknown> = {
+    url: webhookUrl,
+    allowed_updates: ["message"],
+    drop_pending_updates: true,
+  };
   if (config.webhookSecret) {
     body.secret_token = config.webhookSecret;
   }
 
   await callTelegramApi("deleteWebhook", { drop_pending_updates: true });
 
-  const result = await callTelegramApi("setWebhook", {
-    ...body,
-    allowed_updates: ["message"],
-  });
+  const result = await callTelegramApi("setWebhook", body);
   if (!result.ok) {
     return NextResponse.json({ error: result.description ?? "Échec setWebhook" }, { status: 400 });
   }

@@ -82,6 +82,8 @@ export default function AdminDashboard() {
     subscription_expires_at?: string;
     telegram_linked?: boolean;
   } | null>(null);
+  const [webhookInfo, setWebhookInfo] = useState<string | null>(null);
+  const [webhookLoading, setWebhookLoading] = useState(false);
   const [expandedCourses, setExpandedCourses] = useState<Set<string>>(new Set());
   const [selectedVideo, setSelectedVideo] = useState<{ title: string; video_url: string } | null>(null);
   const [selectedCourseForVideos, setSelectedCourseForVideos] = useState<string>("");
@@ -339,6 +341,55 @@ export default function AdminDashboard() {
       });
     } finally {
       setTelegramGrantLoading(false);
+    }
+  };
+
+  const loadWebhookInfo = async () => {
+    if (!token) return;
+    setWebhookLoading(true);
+    setWebhookInfo(null);
+    try {
+      const res = await fetch("/api/telegram/webhook-info", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setWebhookInfo(data.error || "Erreur lecture webhook");
+        return;
+      }
+      const lines = [
+        data.expected_webhook_url ? `Attendu: ${data.expected_webhook_url}` : null,
+        data.telegram_webhook?.url ? `Telegram: ${data.telegram_webhook.url}` : "Telegram: (aucun webhook)",
+        data.telegram_webhook?.last_error_message
+          ? `Erreur: ${data.telegram_webhook.last_error_message}`
+          : null,
+        ...(Array.isArray(data.hints) ? data.hints : []),
+      ].filter(Boolean);
+      setWebhookInfo(lines.join("\n"));
+    } finally {
+      setWebhookLoading(false);
+    }
+  };
+
+  const repairTelegramWebhook = async () => {
+    if (!token) return;
+    setWebhookLoading(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/telegram/set-webhook", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        setError(data.error || data.hint || "Échec enregistrement webhook");
+        return;
+      }
+      setMessage(`Webhook enregistré: ${data.webhook_url ?? "OK"}`);
+      await loadWebhookInfo();
+    } finally {
+      setWebhookLoading(false);
     }
   };
 
@@ -920,6 +971,38 @@ export default function AdminDashboard() {
                   </button>
                 )}
               </div>
+            </div>
+            <div className="border-t border-amber-200 pt-4 space-y-2">
+              <p className="text-sm font-semibold text-neutral-900">Bot ne répond pas à Démarrer ?</p>
+              <p className="text-xs text-neutral-600">
+                Le test GET dans le navigateur ne suffit pas. Il faut enregistrer le webhook POST chez Telegram.
+                Sur Vercel, définissez{" "}
+                <code className="text-xs">TELEGRAM_WEBHOOK_URL=https://www.vbsniperacademie.com</code> (URL exacte,
+                sans redirection).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  className="button-secondary text-sm"
+                  onClick={loadWebhookInfo}
+                  disabled={webhookLoading}
+                >
+                  {webhookLoading ? "..." : "Vérifier webhook"}
+                </button>
+                <button
+                  type="button"
+                  className="button-primary text-sm"
+                  onClick={repairTelegramWebhook}
+                  disabled={webhookLoading}
+                >
+                  {webhookLoading ? "..." : "Réparer le webhook"}
+                </button>
+              </div>
+              {webhookInfo && (
+                <pre className="text-xs bg-white border border-amber-200 rounded-lg p-3 whitespace-pre-wrap">
+                  {webhookInfo}
+                </pre>
+              )}
             </div>
           </section>
           </div>
