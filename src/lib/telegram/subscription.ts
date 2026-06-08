@@ -32,8 +32,41 @@ export async function getSubscriptionByUserId(userId: string): Promise<TelegramS
     .eq("user_id", userId)
     .maybeSingle();
 
-  if (error || !data) return null;
+  if (error) {
+    console.error("getSubscriptionByUserId error:", error.message, error.code);
+    return null;
+  }
+  if (!data) return null;
   return data as TelegramSubscription;
+}
+
+async function ensureUserProfileExists(userId: string): Promise<string | null> {
+  if (!supabaseAdmin) return "Client admin Supabase non initialisé";
+
+  const { data: profile } = await supabaseAdmin
+    .from("users_profile")
+    .select("id")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (profile?.id) return null;
+
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.getUserById(userId);
+  if (authError || !authData.user) {
+    return "Compte utilisateur introuvable dans l'authentification";
+  }
+
+  const { error: insertError } = await supabaseAdmin.from("users_profile").insert({
+    id: userId,
+    email: authData.user.email ?? null,
+    role: "client",
+  });
+
+  if (insertError && insertError.code !== "23505") {
+    return `Profil utilisateur manquant: ${insertError.message}`;
+  }
+
+  return null;
 }
 
 export async function getSubscriptionByTelegramUserId(telegramUserId: number): Promise<TelegramSubscription | null> {
@@ -49,8 +82,18 @@ export async function getSubscriptionByTelegramUserId(telegramUserId: number): P
   return data as TelegramSubscription;
 }
 
-export async function grantOrExtendSubscription(userId: string, months = 1): Promise<TelegramSubscription | null> {
-  if (!supabaseAdmin) return null;
+export async function grantOrExtendSubscription(
+  userId: string,
+  months = 1,
+): Promise<{ subscription: TelegramSubscription | null; error?: string }> {
+  if (!supabaseAdmin) {
+    return { subscription: null, error: "Client admin Supabase non initialisé" };
+  }
+
+  const profileError = await ensureUserProfileExists(userId);
+  if (profileError) {
+    return { subscription: null, error: profileError };
+  }
 
   const existing = await getSubscriptionByUserId(userId);
   const now = new Date();
@@ -69,8 +112,14 @@ export async function grantOrExtendSubscription(userId: string, months = 1): Pro
       .select("*")
       .single();
 
-    if (error || !data) return null;
-    return data as TelegramSubscription;
+    if (error || !data) {
+      console.error("grantOrExtendSubscription update error:", error?.message, error?.code);
+      return {
+        subscription: null,
+        error: error?.message ?? "Échec mise à jour abonnement Telegram",
+      };
+    }
+    return { subscription: data as TelegramSubscription };
   }
 
   const { data, error } = await supabaseAdmin
@@ -83,8 +132,17 @@ export async function grantOrExtendSubscription(userId: string, months = 1): Pro
     .select("*")
     .single();
 
-  if (error || !data) return null;
-  return data as TelegramSubscription;
+  if (error || !data) {
+    console.error("grantOrExtendSubscription insert error:", error?.message, error?.code);
+    return {
+      subscription: null,
+      error:
+        error?.code === "42P01"
+          ? "Table telegram_subscriptions absente — exécutez la migration Supabase"
+          : (error?.message ?? "Échec création abonnement Telegram"),
+    };
+  }
+  return { subscription: data as TelegramSubscription };
 }
 
 export async function revokeSubscription(userId: string): Promise<boolean> {

@@ -13,12 +13,40 @@ function generateToken() {
   return randomBytes(16).toString("hex");
 }
 
-export async function createTelegramLinkToken(userId: string): Promise<{ token: string; botUrl: string } | null> {
+export type CreateLinkTokenResult =
+  | { ok: true; token: string; botUrl: string }
+  | { ok: false; code: string; error: string; hint?: string };
+
+export async function createTelegramLinkToken(
+  userId: string,
+  accountEmail?: string | null,
+): Promise<CreateLinkTokenResult> {
   const config = getTelegramConfig();
-  if (!config || !supabaseAdmin) return null;
+  if (!config || !supabaseAdmin) {
+    return { ok: false, code: "config", error: "Telegram non configuré sur le serveur." };
+  }
 
   const sub = await getSubscriptionByUserId(userId);
-  if (!sub || !isSubscriptionActive(sub)) return null;
+  if (!sub) {
+    const hint = accountEmail
+      ? `Aucun abonnement pour le compte connecté (${accountEmail}). L'admin doit valider avec exactement cet email.`
+      : "Demandez à l'admin de valider votre abonnement VIP avec l'email de votre compte site.";
+    return {
+      ok: false,
+      code: "no_subscription",
+      error: "Abonnement Telegram non trouvé pour votre compte.",
+      hint,
+    };
+  }
+
+  if (!isSubscriptionActive(sub)) {
+    return {
+      ok: false,
+      code: "inactive",
+      error: "Abonnement Telegram inactif ou expiré.",
+      hint: `Statut: ${sub.status}, expire le ${new Date(sub.subscription_expires_at).toLocaleDateString("fr-FR")}. Demandez une nouvelle validation admin.`,
+    };
+  }
 
   const token = generateToken();
   const expiresAt = new Date(Date.now() + config.linkTokenTtlMinutes * 60 * 1000).toISOString();
@@ -29,9 +57,21 @@ export async function createTelegramLinkToken(userId: string): Promise<{ token: 
     expires_at: expiresAt,
   });
 
-  if (error) return null;
+  if (error) {
+    console.error("createTelegramLinkToken insert error:", error.message, error.code);
+    return {
+      ok: false,
+      code: "token_table",
+      error: "Impossible de générer le lien d'accès.",
+      hint:
+        error.code === "42P01"
+          ? "Table telegram_link_tokens absente — exécutez supabase/migrations/add_telegram_link_tokens.sql"
+          : error.message,
+    };
+  }
 
   return {
+    ok: true,
     token,
     botUrl: `https://t.me/${config.botUsername}?start=${token}`,
   };

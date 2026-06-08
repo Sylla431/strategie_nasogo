@@ -1,25 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { resolveUserFromEmailOrId } from "@/lib/telegram/resolveUser";
 import {
   getSubscriptionByUserId,
   grantOrExtendSubscription,
   isSubscriptionActive,
   revokeSubscription,
 } from "@/lib/telegram/subscription";
-
-async function resolveUserId(body: { user_id?: string; email?: string }): Promise<string | null> {
-  if (body.user_id) return body.user_id;
-
-  if (!body.email || !supabaseAdmin) return null;
-
-  const { data: userIdData, error } = await supabaseAdmin.rpc("find_user_by_email", {
-    user_email: body.email.toLowerCase().trim(),
-  });
-
-  if (error || !userIdData) return null;
-  return userIdData as string;
-}
 
 export async function GET(req: NextRequest) {
   const adminCheck = await requireAdmin(req);
@@ -28,20 +16,41 @@ export async function GET(req: NextRequest) {
 
   const userId = req.nextUrl.searchParams.get("user_id")?.trim();
   const email = req.nextUrl.searchParams.get("email")?.trim();
-  const resolvedUserId = userId ?? (email ? await resolveUserId({ email }) : null);
 
-  if (!resolvedUserId) {
-    return NextResponse.json({ error: "user_id ou email requis" }, { status: 400 });
+  const resolved = await resolveUserFromEmailOrId({
+    user_id: userId || undefined,
+    email: email || undefined,
+  });
+
+  if (!resolved) {
+    return NextResponse.json(
+      {
+        error:
+          "Utilisateur introuvable. Vérifiez que le client a créé un compte sur le site avec cet email, ou liez la fiche étudiant.",
+        subscription: null,
+        active: false,
+      },
+      { status: 404 },
+    );
   }
 
-  const sub = await getSubscriptionByUserId(resolvedUserId);
+  const sub = await getSubscriptionByUserId(resolved.userId);
   if (!sub) {
-    return NextResponse.json({ subscription: null, active: false });
+    return NextResponse.json({
+      subscription: null,
+      active: false,
+      resolved_user_id: resolved.userId,
+      resolved_via: resolved.resolvedVia,
+      email_hint: resolved.emailHint,
+    });
   }
 
   return NextResponse.json({
     subscription: sub,
     active: isSubscriptionActive(sub),
+    resolved_user_id: resolved.userId,
+    resolved_via: resolved.resolvedVia,
+    email_hint: resolved.emailHint,
   });
 }
 
@@ -50,9 +59,16 @@ export async function POST(req: NextRequest) {
   if (adminCheck.error) return adminCheck.error;
 
   const body = (await req.json()) as { user_id?: string; email?: string; months?: number };
-  const userId = await resolveUserId(body);
-  if (!userId) {
-    return NextResponse.json({ error: "Utilisateur introuvable (user_id ou email requis)" }, { status: 404 });
+  const resolved = await resolveUserFromEmailOrId(body);
+
+  if (!resolved) {
+    return NextResponse.json(
+      {
+        error:
+          "Utilisateur introuvable. Le client doit d'abord créer un compte sur le site avec cet email (ou lier la fiche étudiant).",
+      },
+      { status: 404 },
+    );
   }
 
   const months = Number(body.months ?? 1);
@@ -60,12 +76,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "months doit être entre 1 et 24" }, { status: 400 });
   }
 
-  const sub = await grantOrExtendSubscription(userId, months);
+  const { subscription: sub, error: grantError } = await grantOrExtendSubscription(resolved.userId, months);
   if (!sub) {
-    return NextResponse.json({ error: "Impossible de créer ou prolonger l'abonnement" }, { status: 500 });
+    return NextResponse.json(
+      { error: grantError ?? "Impossible de créer ou prolonger l'abonnement" },
+      { status: 500 },
+    );
   }
 
-  return NextResponse.json({ subscription: sub, active: isSubscriptionActive(sub) }, { status: 201 });
+  return NextResponse.json(
+    {
+      subscription: sub,
+      active: isSubscriptionActive(sub),
+      resolved_user_id: resolved.userId,
+      resolved_via: resolved.resolvedVia,
+      email_hint: resolved.emailHint,
+    },
+    { status: 201 },
+  );
 }
 
 export async function PATCH(req: NextRequest) {
@@ -79,17 +107,17 @@ export async function PATCH(req: NextRequest) {
     months?: number;
   };
 
-  const userId = await resolveUserId(body);
-  if (!userId) {
+  const resolved = await resolveUserFromEmailOrId(body);
+  if (!resolved) {
     return NextResponse.json({ error: "Utilisateur introuvable (user_id ou email requis)" }, { status: 404 });
   }
 
   if (body.action === "revoke") {
-    const ok = await revokeSubscription(userId);
+    const ok = await revokeSubscription(resolved.userId);
     if (!ok) {
       return NextResponse.json({ error: "Aucun abonnement à révoquer" }, { status: 404 });
     }
-    return NextResponse.json({ ok: true, action: "revoke" });
+    return NextResponse.json({ ok: true, action: "revoke", resolved_user_id: resolved.userId });
   }
 
   if (body.action === "extend") {
@@ -98,12 +126,17 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "months doit être entre 1 et 24" }, { status: 400 });
     }
 
-    const sub = await grantOrExtendSubscription(userId, months);
+    const { subscription: sub, error: grantError } = await grantOrExtendSubscription(resolved.userId, months);
     if (!sub) {
-      return NextResponse.json({ error: "Impossible de prolonger l'abonnement" }, { status: 500 });
+      return NextResponse.json({ error: grantError ?? "Impossible de prolonger l'abonnement" }, { status: 500 });
     }
 
-    return NextResponse.json({ subscription: sub, active: isSubscriptionActive(sub), action: "extend" });
+    return NextResponse.json({
+      subscription: sub,
+      active: isSubscriptionActive(sub),
+      action: "extend",
+      resolved_user_id: resolved.userId,
+    });
   }
 
   return NextResponse.json({ error: "action invalide (extend ou revoke)" }, { status: 400 });

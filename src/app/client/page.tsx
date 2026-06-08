@@ -60,6 +60,7 @@ export default function ClientSpace() {
   const [telegramExpiresAt, setTelegramExpiresAt] = useState<string | null>(null);
   const [telegramLinked, setTelegramLinked] = useState(false);
   const [telegramOpening, setTelegramOpening] = useState(false);
+  const [accountEmail, setAccountEmail] = useState<string | null>(null);
 
   const fetchOrders = useCallback(async (token: string) => {
       try {
@@ -118,6 +119,7 @@ export default function ClientSpace() {
       setTelegramActive(Boolean(data.active));
       setTelegramExpiresAt(data.subscription?.subscription_expires_at ?? null);
       setTelegramLinked(Boolean(data.subscription?.telegram_linked));
+      setAccountEmail(data.account_email ?? null);
     } catch (err) {
       console.error("Erreur chargement abonnement Telegram:", err);
     }
@@ -274,7 +276,14 @@ export default function ClientSpace() {
       });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) {
-        setError(data.error || "Impossible d'ouvrir l'accès Telegram.");
+        const hint = typeof data.hint === "string" ? ` ${data.hint}` : "";
+        const emailNote =
+          typeof data.account_email === "string"
+            ? ` (compte connecté : ${data.account_email})`
+            : accountEmail
+              ? ` (compte connecté : ${accountEmail})`
+              : "";
+        setError((data.error || "Impossible d'ouvrir l'accès Telegram.") + emailNote + hint);
         return;
       }
       if (typeof data.bot_url === "string") {
@@ -509,6 +518,12 @@ export default function ClientSpace() {
                   : ""}
                 . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel vers le canal VIP.
               </p>
+              {accountEmail && (
+                <p className="text-xs text-neutral-500 mt-1">
+                  Compte site : <span className="font-medium">{accountEmail}</span> — l&apos;admin doit valider avec cet
+                  email exact.
+                </p>
+              )}
               {telegramLinked && (
                 <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
               )}

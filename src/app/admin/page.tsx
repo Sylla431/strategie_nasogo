@@ -379,10 +379,12 @@ export default function AdminDashboard() {
         setTelegramSubInfo({ active: false, status: "revoked" });
       } else {
         const months = telegramGrantMonths;
+        const resolvedId = typeof data.resolved_user_id === "string" ? data.resolved_user_id : "";
+        const resolvedVia = typeof data.resolved_via === "string" ? data.resolved_via : "";
         setMessage(
           action === "grant"
-            ? `Abonnement Telegram VIP activé (${months} mois) pour ${email}. L'utilisateur peut cliquer « Accès canal VIP » dans son espace client.`
-            : `Abonnement Telegram prolongé de ${months} mois pour ${email}.`,
+            ? `Abonnement VIP activé (${months} mois) pour ${email}. Compte cible: ${resolvedId || "?"} (${resolvedVia}). Le client doit se connecter avec le même email puis cliquer « Accès canal VIP ».`
+            : `Abonnement prolongé de ${months} mois pour ${email} (compte ${resolvedId || "?"}).`,
         );
         if (data.subscription) {
           setTelegramSubInfo({

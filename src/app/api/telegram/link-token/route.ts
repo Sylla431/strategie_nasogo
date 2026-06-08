@@ -22,10 +22,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const link = await createTelegramLinkToken(authData.user.id);
-  if (!link) {
+  const link = await createTelegramLinkToken(authData.user.id, authData.user.email);
+  if (!link.ok) {
     return NextResponse.json(
-      { error: "Abonnement Telegram inactif ou indisponible. Contactez le support après validation de votre paiement." },
+      {
+        error: link.error,
+        code: link.code,
+        hint: link.hint,
+        account_email: authData.user.email ?? null,
+      },
       { status: 403 },
     );
   }

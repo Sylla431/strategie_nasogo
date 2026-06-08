@@ -13,12 +13,14 @@ export async function GET(req: NextRequest) {
   if (!sub) {
     return NextResponse.json({
       active: false,
+      account_email: authData.user.email ?? null,
       subscription: null,
     });
   }
 
   return NextResponse.json({
     active: isSubscriptionActive(sub),
+    account_email: authData.user.email ?? null,
     subscription: {
       status: sub.status,
       subscription_expires_at: sub.subscription_expires_at,
