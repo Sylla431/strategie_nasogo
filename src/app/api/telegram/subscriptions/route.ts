@@ -76,7 +76,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "months doit être entre 1 et 24" }, { status: 400 });
   }
 
-  const { subscription: sub, error: grantError } = await grantOrExtendSubscription(resolved.userId, months);
+  const grantEmail = body.email?.toLowerCase().trim() ?? resolved.emailHint;
+  const { subscription: sub, error: grantError } = await grantOrExtendSubscription(
+    resolved.userId,
+    months,
+    grantEmail,
+  );
   if (!sub) {
     return NextResponse.json(
       { error: grantError ?? "Impossible de créer ou prolonger l'abonnement" },
@@ -126,7 +131,12 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "months doit être entre 1 et 24" }, { status: 400 });
     }
 
-    const { subscription: sub, error: grantError } = await grantOrExtendSubscription(resolved.userId, months);
+    const grantEmail = body.email?.toLowerCase().trim() ?? resolved.emailHint;
+  const { subscription: sub, error: grantError } = await grantOrExtendSubscription(
+    resolved.userId,
+    months,
+    grantEmail,
+  );
     if (!sub) {
       return NextResponse.json({ error: grantError ?? "Impossible de prolonger l'abonnement" }, { status: 500 });
     }

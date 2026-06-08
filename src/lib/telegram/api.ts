@@ -25,10 +25,18 @@ export async function callTelegramApi<T = unknown>(
 }
 
 export async function sendTelegramMessage(chatId: number | string, text: string) {
-  return callTelegramApi("sendMessage", {
+  const withHtml = await callTelegramApi("sendMessage", {
     chat_id: chatId,
     text,
     parse_mode: "HTML",
+  });
+
+  if (withHtml.ok) return withHtml;
+
+  console.error("sendTelegramMessage HTML failed:", withHtml.description);
+  return callTelegramApi("sendMessage", {
+    chat_id: chatId,
+    text: text.replace(/<[^>]+>/g, ""),
   });
 }
 

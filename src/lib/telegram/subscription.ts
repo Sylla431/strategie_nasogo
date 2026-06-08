@@ -1,5 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { kickFromChannel, unbanFromChannel } from "@/lib/telegram/api";
+import { resolveUserFromEmailOrId } from "@/lib/telegram/resolveUser";
 
 export type TelegramSubscription = {
   id: string;
@@ -8,6 +9,7 @@ export type TelegramSubscription = {
   telegram_username: string | null;
   subscription_expires_at: string;
   status: "active" | "expired" | "revoked";
+  granted_email: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -82,9 +84,56 @@ export async function getSubscriptionByTelegramUserId(telegramUserId: number): P
   return data as TelegramSubscription;
 }
 
+async function migrateSubscriptionToUser(subscriptionId: string, userId: string) {
+  if (!supabaseAdmin) return;
+  await supabaseAdmin.from("telegram_subscriptions").update({ user_id: userId }).eq("id", subscriptionId);
+}
+
+export async function findSubscriptionForAccount(
+  userId: string,
+  email?: string | null,
+): Promise<{ subscription: TelegramSubscription | null; lookupUserId: string }> {
+  const lookupIds = new Set<string>([userId]);
+
+  if (email) {
+    const resolved = await resolveUserFromEmailOrId({ user_id: userId, email });
+    if (resolved?.userId) lookupIds.add(resolved.userId);
+  }
+
+  for (const id of lookupIds) {
+    const sub = await getSubscriptionByUserId(id);
+    if (sub && isSubscriptionActive(sub)) {
+      if (id !== userId) {
+        await migrateSubscriptionToUser(sub.id, userId);
+        return { subscription: (await getSubscriptionByUserId(userId)) ?? sub, lookupUserId: userId };
+      }
+      return { subscription: sub, lookupUserId: id };
+    }
+  }
+
+  if (email && supabaseAdmin) {
+    const normalized = email.toLowerCase().trim();
+    const { data: byGrantedEmail, error: grantedEmailError } = await supabaseAdmin
+      .from("telegram_subscriptions")
+      .select("*")
+      .ilike("granted_email", normalized)
+      .maybeSingle();
+
+    if (!grantedEmailError && byGrantedEmail && isSubscriptionActive(byGrantedEmail as TelegramSubscription)) {
+      await migrateSubscriptionToUser(byGrantedEmail.id, userId);
+      const migrated = await getSubscriptionByUserId(userId);
+      return { subscription: migrated, lookupUserId: userId };
+    }
+  }
+
+  const direct = await getSubscriptionByUserId(userId);
+  return { subscription: direct, lookupUserId: userId };
+}
+
 export async function grantOrExtendSubscription(
   userId: string,
   months = 1,
+  grantedEmail?: string | null,
 ): Promise<{ subscription: TelegramSubscription | null; error?: string }> {
   if (!supabaseAdmin) {
     return { subscription: null, error: "Client admin Supabase non initialisé" };
@@ -119,16 +168,29 @@ export async function grantOrExtendSubscription(
         error: error?.message ?? "Échec mise à jour abonnement Telegram",
       };
     }
+
+    if (grantedEmail) {
+      await supabaseAdmin
+        .from("telegram_subscriptions")
+        .update({ granted_email: grantedEmail.toLowerCase().trim() })
+        .eq("user_id", userId);
+    }
+
     return { subscription: data as TelegramSubscription };
+  }
+
+  const insertPayload: Record<string, unknown> = {
+    user_id: userId,
+    subscription_expires_at: expiresAt,
+    status: "active",
+  };
+  if (grantedEmail) {
+    insertPayload.granted_email = grantedEmail.toLowerCase().trim();
   }
 
   const { data, error } = await supabaseAdmin
     .from("telegram_subscriptions")
-    .insert({
-      user_id: userId,
-      subscription_expires_at: expiresAt,
-      status: "active",
-    })
+    .insert(insertPayload)
     .select("*")
     .single();
 

@@ -37,7 +37,10 @@ export function getTelegramConfig(): TelegramConfig | null {
     botToken,
     botUsername,
     channelId,
-    webhookSecret: process.env.TELEGRAM_WEBHOOK_SECRET?.trim() ?? "",
+    webhookSecret:
+      process.env.TELEGRAM_WEBHOOK_SECRET?.trim() ??
+      process.env.TELEGRAM_LINK_SECRET?.trim() ??
+      "",
     cronSecret:
       process.env.TELEGRAM_CRON_SECRET?.trim() ??
       process.env.CRON_SECRET?.trim() ??

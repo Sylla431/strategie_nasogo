@@ -2,7 +2,7 @@ import { randomBytes } from "crypto";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { getTelegramConfig } from "@/lib/telegram/config";
 import {
-  getSubscriptionByUserId,
+  findSubscriptionForAccount,
   isSubscriptionActive,
   linkTelegramAccount,
   prepareTelegramAccess,
@@ -26,10 +26,10 @@ export async function createTelegramLinkToken(
     return { ok: false, code: "config", error: "Telegram non configuré sur le serveur." };
   }
 
-  const sub = await getSubscriptionByUserId(userId);
+  const { subscription: sub } = await findSubscriptionForAccount(userId, accountEmail);
   if (!sub) {
     const hint = accountEmail
-      ? `Aucun abonnement pour le compte connecté (${accountEmail}). L'admin doit valider avec exactement cet email.`
+      ? `Aucun abonnement pour le compte connecté (${accountEmail}, id ${userId.slice(0, 8)}…). Demandez à l'admin de cliquer « Valider / activer » avec cet email, puis rechargez la page.`
       : "Demandez à l'admin de valider votre abonnement VIP avec l'email de votre compte site.";
     return {
       ok: false,
@@ -106,7 +106,7 @@ export async function handleStartWithToken(
   }
 
   const userId = linkRow.user_id as string;
-  const sub = await getSubscriptionByUserId(userId);
+  const { subscription: sub } = await findSubscriptionForAccount(userId);
   if (!sub || !isSubscriptionActive(sub)) {
     return { ok: false, message: "Votre abonnement Telegram n'est pas actif. Contactez le support." };
   }

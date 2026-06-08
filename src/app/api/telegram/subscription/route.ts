@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createSupabaseFromRequest } from "@/lib/supabaseServer";
-import { getSubscriptionByUserId, isSubscriptionActive } from "@/lib/telegram/subscription";
+import { findSubscriptionForAccount, isSubscriptionActive } from "@/lib/telegram/subscription";
 
 export async function GET(req: NextRequest) {
   const { supabase } = createSupabaseFromRequest(req);
@@ -9,7 +9,10 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
   }
 
-  const sub = await getSubscriptionByUserId(authData.user.id);
+  const { subscription: sub } = await findSubscriptionForAccount(
+    authData.user.id,
+    authData.user.email,
+  );
   if (!sub) {
     return NextResponse.json({
       active: false,
