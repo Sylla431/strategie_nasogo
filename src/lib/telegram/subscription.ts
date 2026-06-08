@@ -251,6 +251,51 @@ export async function linkTelegramAccount(
   return data as TelegramSubscription;
 }
 
+/** Pour les tests : expire immédiatement et retire du canal Telegram si lié. */
+export async function expireSubscriptionNow(userId: string): Promise<{
+  ok: boolean;
+  kicked: boolean;
+  error?: string;
+}> {
+  if (!supabaseAdmin) {
+    return { ok: false, kicked: false, error: "Client admin Supabase non initialisé" };
+  }
+
+  const existing = await getSubscriptionByUserId(userId);
+  if (!existing) {
+    return { ok: false, kicked: false, error: "Aucun abonnement trouvé" };
+  }
+
+  let kicked = false;
+  if (existing.telegram_user_id) {
+    const kickResult = await kickFromChannel(existing.telegram_user_id);
+    kicked = kickResult.ok;
+    if (!kickResult.ok) {
+      const errMsg =
+        "description" in kickResult && kickResult.description
+          ? kickResult.description
+          : "error" in kickResult && kickResult.error
+            ? kickResult.error
+            : "erreur kick";
+      return { ok: false, kicked: false, error: errMsg };
+    }
+  }
+
+  const { error } = await supabaseAdmin
+    .from("telegram_subscriptions")
+    .update({
+      status: "expired",
+      subscription_expires_at: new Date().toISOString(),
+    })
+    .eq("user_id", userId);
+
+  if (error) {
+    return { ok: false, kicked, error: error.message };
+  }
+
+  return { ok: true, kicked };
+}
+
 export async function processExpiredSubscriptions(): Promise<{ processed: number; errors: string[] }> {
   if (!supabaseAdmin) return { processed: 0, errors: ["Client admin Supabase non initialisé"] };
 

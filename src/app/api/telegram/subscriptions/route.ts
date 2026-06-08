@@ -3,9 +3,11 @@ import { requireAdmin } from "@/lib/requireAdmin";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { resolveUserFromEmailOrId } from "@/lib/telegram/resolveUser";
 import {
+  expireSubscriptionNow,
   getSubscriptionByUserId,
   grantOrExtendSubscription,
   isSubscriptionActive,
+  processExpiredSubscriptions,
   revokeSubscription,
 } from "@/lib/telegram/subscription";
 
@@ -108,9 +110,14 @@ export async function PATCH(req: NextRequest) {
   const body = (await req.json()) as {
     user_id?: string;
     email?: string;
-    action?: "extend" | "revoke";
+    action?: "extend" | "revoke" | "expire_now" | "run_cron";
     months?: number;
   };
+
+  if (body.action === "run_cron") {
+    const cronResult = await processExpiredSubscriptions();
+    return NextResponse.json({ ok: true, action: "run_cron", ...cronResult });
+  }
 
   const resolved = await resolveUserFromEmailOrId(body);
   if (!resolved) {
@@ -123,6 +130,22 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Aucun abonnement à révoquer" }, { status: 404 });
     }
     return NextResponse.json({ ok: true, action: "revoke", resolved_user_id: resolved.userId });
+  }
+
+  if (body.action === "expire_now") {
+    const result = await expireSubscriptionNow(resolved.userId);
+    if (!result.ok) {
+      return NextResponse.json({ error: result.error ?? "Échec expiration test" }, { status: 400 });
+    }
+    return NextResponse.json({
+      ok: true,
+      action: "expire_now",
+      kicked_from_channel: result.kicked,
+      resolved_user_id: resolved.userId,
+      message: result.kicked
+        ? "Abonnement expiré et utilisateur retiré du canal."
+        : "Abonnement expiré (Telegram non lié — pas de kick possible).",
+    });
   }
 
   if (body.action === "extend") {

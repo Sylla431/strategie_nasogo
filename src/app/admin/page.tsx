@@ -393,8 +393,9 @@ export default function AdminDashboard() {
     }
   };
 
-  const grantTelegramSubscription = async (action: "grant" | "extend" | "revoke") => {
-    if (!token || !telegramGrantEmail.trim()) {
+  const grantTelegramSubscription = async (action: "grant" | "extend" | "revoke" | "expire_now" | "run_cron") => {
+    if (!token) return;
+    if (action !== "run_cron" && !telegramGrantEmail.trim()) {
       setError("Email requis");
       return;
     }
@@ -404,7 +405,7 @@ export default function AdminDashboard() {
     try {
       const email = telegramGrantEmail.trim().toLowerCase();
       const res = await fetch("/api/telegram/subscriptions", {
-        method: action === "revoke" ? "PATCH" : action === "grant" ? "POST" : "PATCH",
+        method: action === "grant" ? "POST" : "PATCH",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
@@ -414,7 +415,11 @@ export default function AdminDashboard() {
             ? { email, months: telegramGrantMonths }
             : action === "extend"
               ? { email, action: "extend", months: telegramGrantMonths }
-              : { email, action: "revoke" },
+              : action === "run_cron"
+                ? { action: "run_cron" }
+                : action === "expire_now"
+                  ? { email, action: "expire_now" }
+                  : { email, action: "revoke" },
         ),
       });
       const data = await res.json().catch(() => ({}));
@@ -428,6 +433,18 @@ export default function AdminDashboard() {
       if (action === "revoke") {
         setMessage(`Abonnement Telegram révoqué pour ${email}`);
         setTelegramSubInfo({ active: false, status: "revoked" });
+      } else if (action === "expire_now") {
+        setMessage(
+          data.message ||
+            (data.kicked_from_channel
+              ? "Test expiration OK — utilisateur retiré du canal."
+              : "Test expiration OK — abonnement marqué expiré."),
+        );
+        setTelegramSubInfo({ active: false, status: "expired" });
+      } else if (action === "run_cron") {
+        setMessage(
+          `Cron exécuté: ${data.processed ?? 0} abonnement(s) expiré(s) traité(s).${data.errors?.length ? ` Erreurs: ${data.errors.join("; ")}` : ""}`,
+        );
       } else {
         const months = telegramGrantMonths;
         const resolvedId = typeof data.resolved_user_id === "string" ? data.resolved_user_id : "";
@@ -970,6 +987,32 @@ export default function AdminDashboard() {
                     Révoquer
                   </button>
                 )}
+                {telegramSubInfo?.active && (
+                  <button
+                    type="button"
+                    className="pill-neutral text-sm text-amber-900 border-amber-300"
+                    onClick={() => {
+                      if (
+                        window.confirm(
+                          "Simuler l'expiration maintenant ? L'utilisateur sera retiré du canal s'il est lié à Telegram.",
+                        )
+                      ) {
+                        void grantTelegramSubscription("expire_now");
+                      }
+                    }}
+                    disabled={telegramGrantLoading}
+                  >
+                    Tester expiration
+                  </button>
+                )}
+                <button
+                  type="button"
+                  className="button-secondary text-sm"
+                  onClick={() => grantTelegramSubscription("run_cron")}
+                  disabled={telegramGrantLoading}
+                >
+                  Lancer cron expiration
+                </button>
               </div>
             </div>
             <div className="border-t border-amber-200 pt-4 space-y-2">
