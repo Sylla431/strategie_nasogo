@@ -98,6 +98,16 @@ const services = [
     available: true,
     externalUrl: `${store.support.whatsapp}`,
   },
+  // VIP telegram signaux
+  {
+    id:"vip-telegram-signaux",
+    name:"VIP Telegram Signaux",
+    slug:"vip-telegram-signaux",
+    description:"Accès exclusif au canal privé de VB Sniper Académie. Recevez les signaux de trading directement dans votre télégram. Vous pouvez également ouvrir le bot pour recevoir votre lien personnel vers le canal VIP.",
+    cover: "/images/telegram.jpeg",
+    externalUrl: "/auth",
+    price: 10000,
+  },
   
 ];
 

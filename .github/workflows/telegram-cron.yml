@@ -1,0 +1,34 @@
+name: Telegram VIP expiry cron
+
+on:
+  schedule:
+    # Toutes les heures à :00 UTC (GitHub Actions — compatible plan Vercel Hobby)
+    - cron: "0 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: telegram-expiry-cron
+  cancel-in-progress: false
+
+jobs:
+  expire-subscriptions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Trigger /api/telegram/cron
+        env:
+          APP_URL: ${{ vars.APP_URL }}
+          TELEGRAM_CRON_SECRET: ${{ secrets.TELEGRAM_CRON_SECRET }}
+        run: |
+          BASE_URL="${APP_URL:-https://www.vbsniperacademie.com}"
+          BASE_URL="${BASE_URL%/}"
+
+          if [ -z "$TELEGRAM_CRON_SECRET" ]; then
+            echo "Missing GitHub secret TELEGRAM_CRON_SECRET (same value as on Vercel)."
+            exit 1
+          fi
+
+          echo "Calling ${BASE_URL}/api/telegram/cron"
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${TELEGRAM_CRON_SECRET}" \
+            "${BASE_URL}/api/telegram/cron"
