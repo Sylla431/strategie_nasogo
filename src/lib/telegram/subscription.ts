@@ -14,6 +14,15 @@ export type TelegramSubscription = {
   updated_at: string;
 };
 
+export type TelegramSubscriptionWithProfile = TelegramSubscription & {
+  users_profile?: {
+    id: string;
+    email: string | null;
+    full_name: string | null;
+    phone: string | null;
+  } | null;
+};
+
 export function isSubscriptionActive(sub: Pick<TelegramSubscription, "status" | "subscription_expires_at">) {
   if (sub.status !== "active") return false;
   return new Date(sub.subscription_expires_at).getTime() > Date.now();
@@ -23,6 +32,28 @@ function addMonths(date: Date, months: number) {
   const result = new Date(date);
   result.setMonth(result.getMonth() + months);
   return result;
+}
+
+export async function listChannelAccessSubscriptions(): Promise<TelegramSubscriptionWithProfile[]> {
+  if (!supabaseAdmin) return [];
+
+  const { data, error } = await supabaseAdmin
+    .from("telegram_subscriptions")
+    .select(
+      `
+      *,
+      users_profile ( id, email, full_name, phone )
+    `,
+    )
+    .not("telegram_user_id", "is", null)
+    .order("updated_at", { ascending: false });
+
+  if (error) {
+    console.error("listChannelAccessSubscriptions error:", error.message, error.code);
+    return [];
+  }
+
+  return (data ?? []) as TelegramSubscriptionWithProfile[];
 }
 
 export async function getSubscriptionByUserId(userId: string): Promise<TelegramSubscription | null> {

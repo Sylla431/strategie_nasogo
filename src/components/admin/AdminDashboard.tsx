@@ -49,6 +49,19 @@ type CourseAccess = {
   users_profile?: UserProfile;
 };
 
+type TelegramVipUser = {
+  id: string;
+  user_id: string;
+  telegram_user_id: number | null;
+  telegram_username: string | null;
+  subscription_expires_at: string;
+  status: string;
+  granted_email: string | null;
+  created_at: string;
+  updated_at: string;
+  users_profile?: UserProfile | null;
+};
+
 export type AdminSection = "courses" | "access" | "telegram";
 
 const SECTION_META: Record<AdminSection, { title: string; description: string }> = {
@@ -80,6 +93,8 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
   const [telegramGrantEmail, setTelegramGrantEmail] = useState("");
   const [telegramGrantMonths, setTelegramGrantMonths] = useState(1);
   const [telegramGrantLoading, setTelegramGrantLoading] = useState(false);
+  const [telegramVipUsers, setTelegramVipUsers] = useState<TelegramVipUser[]>([]);
+  const [telegramVipSearchQuery, setTelegramVipSearchQuery] = useState("");
   const [telegramSubInfo, setTelegramSubInfo] = useState<{
     active: boolean;
     status?: string;
@@ -142,6 +157,23 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
     }
   };
 
+  const loadTelegramVipUsers = async (tok: string) => {
+    try {
+      const res = await fetch("/api/telegram/subscriptions?list=channel_access", {
+        headers: { Authorization: `Bearer ${tok}` },
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Erreur inconnue" }));
+        console.error("Erreur chargement accès canal VIP:", res.status, errorData);
+        return;
+      }
+      const data = await res.json();
+      setTelegramVipUsers(data.subscriptions || []);
+    } catch (err) {
+      console.error("Erreur réseau lors du chargement des accès canal VIP:", err);
+    }
+  };
+
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase.auth.getSession();
@@ -191,7 +223,7 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
         setLoading(false);
         return;
       }
-      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok)]);
+      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok), loadTelegramVipUsers(tok)]);
       setLoading(false);
     };
     load();
@@ -444,6 +476,7 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
       }
     } finally {
       setTelegramGrantLoading(false);
+      if (token) await loadTelegramVipUsers(token);
     }
   };
 
@@ -1101,6 +1134,7 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
           )}
 
           {section === "telegram" && (
+          <>
           <section className="card p-4 md:p-6 space-y-4 border-2 border-amber-200 bg-gradient-to-br from-amber-50/80 to-orange-50/50">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP Signaux</p>
@@ -1251,6 +1285,110 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
               )}
             </div>
           </section>
+
+          <section className="card p-4 sm:p-5 md:p-6 space-y-4">
+            <div>
+              <h2 className="text-xl font-semibold text-neutral-900">Utilisateurs ayant accédé au canal VIP</h2>
+              <p className="text-sm text-neutral-600 mt-1">
+                Comptes Telegram liés et ayant rejoint le canal ({telegramVipUsers.length}).
+              </p>
+            </div>
+            {telegramVipUsers.length > 0 && (
+              <input
+                type="text"
+                placeholder="Rechercher par nom, email, téléphone ou @telegram..."
+                value={telegramVipSearchQuery}
+                onChange={(e) => setTelegramVipSearchQuery(e.target.value)}
+                className="form-control w-full"
+              />
+            )}
+            {(() => {
+              const query = telegramVipSearchQuery.toLowerCase().trim();
+              const filteredUsers = telegramVipUsers.filter((sub) => {
+                if (!query) return true;
+                const user = sub.users_profile;
+                const fullName = user?.full_name?.toLowerCase() || "";
+                const email = (user?.email || sub.granted_email || "").toLowerCase();
+                const phone = user?.phone?.toLowerCase() || "";
+                const username = sub.telegram_username?.toLowerCase() || "";
+                return (
+                  fullName.includes(query) ||
+                  email.includes(query) ||
+                  phone.includes(query) ||
+                  username.includes(query)
+                );
+              });
+
+              if (filteredUsers.length === 0) {
+                return (
+                  <p className="text-sm text-neutral-600">
+                    {telegramVipUsers.length === 0
+                      ? "Aucun utilisateur n'a encore accédé au canal VIP."
+                      : "Aucun résultat trouvé pour votre recherche."}
+                  </p>
+                );
+              }
+
+              return (
+                <div className="max-h-[600px] overflow-y-auto pr-2 space-y-3 custom-scrollbar">
+                  {filteredUsers.map((sub) => {
+                    const user = sub.users_profile;
+                    const isActive =
+                      sub.status === "active" && new Date(sub.subscription_expires_at).getTime() > Date.now();
+                    return (
+                      <div
+                        key={sub.id}
+                        className="border border-neutral-200 rounded-lg p-3 sm:p-4 bg-white hover:border-brand/50 transition-colors"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm sm:text-base text-neutral-900 truncate">
+                              {user?.full_name || user?.email || sub.granted_email || "Utilisateur"}
+                            </p>
+                            <p className="text-xs sm:text-sm text-neutral-600 break-all mt-1">
+                              {user?.email || sub.granted_email || "Email non disponible"}
+                            </p>
+                            {user?.phone && (
+                              <p className="text-xs text-neutral-500 mt-1">{user.phone}</p>
+                            )}
+                            {sub.telegram_username && (
+                              <p className="text-xs text-neutral-500 mt-1">@{sub.telegram_username}</p>
+                            )}
+                          </div>
+                          <span
+                            className={`self-start text-xs font-semibold px-2 py-1 rounded-full ${
+                              isActive
+                                ? "bg-green-100 text-green-800"
+                                : sub.status === "revoked"
+                                  ? "bg-red-100 text-red-800"
+                                  : "bg-neutral-100 text-neutral-700"
+                            }`}
+                          >
+                            {isActive ? "Actif" : sub.status === "revoked" ? "Révoqué" : "Expiré"}
+                          </span>
+                        </div>
+                        <div className="mt-2 sm:mt-3 pt-2 sm:pt-3 border-t border-neutral-100 text-xs text-neutral-600 space-y-1">
+                          <p>
+                            Expire le :{" "}
+                            <span className="font-medium text-neutral-800">
+                              {new Date(sub.subscription_expires_at).toLocaleDateString("fr-FR")}
+                            </span>
+                          </p>
+                          <p>
+                            Accès canal :{" "}
+                            <span className="font-medium text-neutral-800">
+                              {new Date(sub.updated_at).toLocaleDateString("fr-FR")}
+                            </span>
+                          </p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            })()}
+          </section>
+          </>
           )}
         </div>
       )}

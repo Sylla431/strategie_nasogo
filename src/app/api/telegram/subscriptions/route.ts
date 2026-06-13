@@ -7,6 +7,7 @@ import {
   getSubscriptionByUserId,
   grantOrExtendSubscription,
   isSubscriptionActive,
+  listChannelAccessSubscriptions,
   processExpiredSubscriptions,
   revokeSubscription,
 } from "@/lib/telegram/subscription";
@@ -15,6 +16,12 @@ export async function GET(req: NextRequest) {
   const adminCheck = await requireAdmin(req);
   if (adminCheck.error) return adminCheck.error;
   if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
+
+  const list = req.nextUrl.searchParams.get("list")?.trim();
+  if (list === "channel_access") {
+    const subscriptions = await listChannelAccessSubscriptions();
+    return NextResponse.json({ subscriptions });
+  }
 
   const userId = req.nextUrl.searchParams.get("user_id")?.trim();
   const email = req.nextUrl.searchParams.get("email")?.trim();
