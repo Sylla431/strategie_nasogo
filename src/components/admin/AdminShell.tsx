@@ -35,6 +35,11 @@ const NAV_GROUPS: NavGroup[] = [
         label: "Telegram VIP",
         description: "Abonnements canal signaux",
       },
+      {
+        href: "/admin/payments",
+        label: "Paiements",
+        description: "Tester Moneroo / providers",
+      },
     ],
   },
   {

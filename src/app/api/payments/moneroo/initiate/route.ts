@@ -60,15 +60,8 @@ export async function POST(req: NextRequest) {
       userEmail = emailData || undefined;
     }
 
-    // Récupérer l'URL de base de l'application
-    // Si Moneroo a configuré PayTech comme passerelle, utiliser le webhook_url fourni par Moneroo
+    // URL de retour après paiement (webhooks configurés dans le dashboard Moneroo)
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vbsniperacademie.com";
-    const monerooWebhookUrl = process.env.MONEROO_WEBHOOK_URL; // URL configurée dans Moneroo pour PayTech
-    
-    // En développement local, gérer HTTPS comme pour PayTech
-    const isLocalDev = process.env.NODE_ENV === "development" && appUrl.startsWith("http://");
-    const webhookBaseUrl = monerooWebhookUrl || appUrl;
-    const hasHttpsWebhook = webhookBaseUrl.startsWith("https://");
 
     type Course = {
       title?: string;
@@ -91,18 +84,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Le montant doit être supérieur à 0" }, { status: 400 });
     }
 
-    // Construire les URLs
+    // return_url : Moneroo y redirige avec paymentId & paymentStatus
     const returnUrl = `${appUrl}/payment/success?order_id=${orderId}`;
-    const cancelUrl = `${appUrl}/payment/cancel?order_id=${orderId}`;
-    
-    // Utiliser le webhook_url configuré dans Moneroo si disponible, sinon construire l'URL
-    // Si PayTech est utilisé comme passerelle, Moneroo peut avoir son propre webhook_url
-    const webhookUrl = monerooWebhookUrl || (hasHttpsWebhook ? `${webhookBaseUrl}/api/payments/moneroo/webhook` : undefined);
-    
-    if (isLocalDev && !hasHttpsWebhook && !monerooWebhookUrl) {
-      console.warn("⚠️ Mode développement local détecté sans HTTPS. Le webhook ne sera pas configuré.");
-      console.warn("💡 Pour tester les webhooks en local, utilisez un tunnel HTTPS (ngrok) et définissez MONEROO_WEBHOOK_URL");
-    }
 
     // Récupérer le nom complet de l'utilisateur
     const { data: authUser } = await supabase.auth.getUser();
@@ -116,6 +99,8 @@ export async function POST(req: NextRequest) {
 
     // Initier le paiement Moneroo selon la documentation officielle
     // Format: https://docs.moneroo.io/payments/standard-integration
+    // Note: les webhooks se configurent dans le dashboard Moneroo (Developers > Webhooks),
+    // pas via webhook_url à l'init.
     const paymentParams = {
       amount: amount,
       currency: "XOF",
@@ -130,10 +115,8 @@ export async function POST(req: NextRequest) {
       metadata: {
         order_id: orderId,
         user_id: userId,
-        course_id: order.course_id,
+        course_id: String(order.course_id),
       },
-      // Ajouter webhook_url seulement si disponible (HTTPS requis)
-      ...(webhookUrl && { webhook_url: webhookUrl }),
     };
 
     console.log("Paramètres de paiement Moneroo:", {

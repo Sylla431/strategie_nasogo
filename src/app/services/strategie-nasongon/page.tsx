@@ -70,6 +70,21 @@ const product = {
   ],
 };
 
+/** Trouve le cours Nasongon en DB (pas courses[0] = dernier créé = mauvais prix). */
+function findNasongonCourse(
+  courses: Array<{ id: string; title?: string; price?: number }>
+): { id: string; title?: string; price?: number } | undefined {
+  const byTitle = courses.find((c) =>
+    (c.title || "").toLowerCase().includes("nasongon")
+  );
+  if (byTitle) return byTitle;
+
+  const byPrice = courses.find((c) => Number(c.price) === product.price);
+  if (byPrice) return byPrice;
+
+  return undefined;
+}
+
 const otherProducts = [
   {
     id: "prd_kcloen",
@@ -306,7 +321,13 @@ export default function Home() {
           return;
         }
 
-        const courseId = courses[0].id;
+        const nasongonCourse = findNasongonCourse(courses);
+        if (!nasongonCourse) {
+          setHasPaidAccess(false);
+          setIsCheckingAccess(false);
+          return;
+        }
+        const courseId = nasongonCourse.id;
 
         // Vérifier les commandes payées
         const ordersRes = await fetch("/api/orders", {
@@ -423,9 +444,13 @@ export default function Home() {
         if (!courses || courses.length === 0) {
           throw new Error("Aucun cours disponible");
         }
-        
-        // Utiliser le premier cours disponible
-        const courseId = courses[0].id;
+
+        // Ne pas prendre courses[0] (ordre created_at desc → Objectif rentabilité 500000)
+        const nasongonCourse = findNasongonCourse(courses);
+        if (!nasongonCourse) {
+          throw new Error("Cours Stratégie Nasongon introuvable");
+        }
+        const courseId = nasongonCourse.id;
         
         // Créer la commande avec le moyen de paiement sélectionné
         const orderRes = await fetch("/api/orders", {
@@ -812,25 +837,31 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
                   Choisissez votre moyen de paiement
                 </span>
               </div>
-              <p className="text-xs sm:text-sm text-neutral-500 italic">
-                Bientôt disponible
-              </p>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
-                  "Mobile Money (Orange money)",
-                  "PayTech",
-                  "Moneroo",
+                  { label: "Mobile Money (Orange money)", enabled: false },
+                  { label: "PayTech", enabled: false },
+                  { label: "Moneroo", enabled: true },
                   // "Carte bancaire (Visa / MasterCard)", // Pas encore intégrée
                 ].map((method) => (
                   <button
-                    key={method}
+                    key={method.label}
                     type="button"
-                    disabled
-                    className="pill-neutral text-xs sm:text-sm px-3 sm:px-4 py-2 transition-all opacity-60 cursor-not-allowed bg-neutral-100 text-neutral-500 border-neutral-200"
-                    onClick={() => {}}
-                    title="Bientôt disponible"
+                    disabled={!method.enabled}
+                    className={`pill-neutral text-xs sm:text-sm px-3 sm:px-4 py-2 transition-all ${
+                      !method.enabled
+                        ? "opacity-60 cursor-not-allowed bg-neutral-100 text-neutral-500 border-neutral-200"
+                        : paymentInfo === method.label
+                          ? "bg-brand text-white border-brand shadow-md scale-105"
+                          : "hover:bg-brand/10 hover:border-brand/40 cursor-pointer"
+                    }`}
+                    onClick={() => method.enabled && setPaymentInfo(method.label)}
+                    title={method.enabled ? undefined : "Bientôt disponible"}
                   >
-                    {method}
+                    {method.label}
+                    {!method.enabled && (
+                      <span className="ml-1 text-[10px] opacity-70">(bientôt)</span>
+                    )}
                   </button>
                 ))}
               </div>

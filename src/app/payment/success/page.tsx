@@ -28,17 +28,32 @@ function PaymentSuccessContent() {
           return;
         }
 
-        // Si paymentStatus est fourni dans l'URL (Moneroo), l'utiliser en priorité
-        // Note: Le webhook Moneroo devrait déjà avoir mis à jour le statut en base
-        if (paymentStatus) {
-          if (paymentStatus === "failed" || paymentStatus === "cancelled") {
-            // Afficher immédiatement l'échec si indiqué dans l'URL
-            setOrderStatus("failed");
-            // Continuer à vérifier en base pour confirmer
-          } else if (paymentStatus === "success") {
-            // Pour Moneroo, vérifier le statut réel en base de données
-            // car le webhook peut avoir déjà mis à jour le statut
+        // Confirmer auprès de Moneroo si on a un paymentId (return_url)
+        if (paymentId || paymentStatus === "success") {
+          try {
+            const confirmRes = await fetch("/api/payments/moneroo/confirm", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ orderId, paymentId }),
+            });
+            if (confirmRes.ok) {
+              const confirmData = await confirmRes.json();
+              if (confirmData.status === "paid" || confirmData.status === "failed") {
+                setOrderStatus(confirmData.status);
+                setLoading(false);
+                return;
+              }
+            }
+          } catch (confirmError) {
+            console.error("Error confirming Moneroo payment:", confirmError);
           }
+        }
+
+        if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+          setOrderStatus("failed");
         }
 
         // Vérifier le statut réel de la commande en base de données
@@ -55,11 +70,8 @@ function PaymentSuccessContent() {
           const order = orders.find((o: Order) => o.id === orderId);
           if (order) {
             setOrderStatus(order.status as "paid" | "pending" | "failed");
-          } else {
-            // Si la commande n'est pas trouvée et paymentStatus indique un échec
-            if (paymentStatus === "failed" || paymentStatus === "cancelled") {
-              setOrderStatus("failed");
-            }
+          } else if (paymentStatus === "failed" || paymentStatus === "cancelled") {
+            setOrderStatus("failed");
           }
         }
       } catch (error) {

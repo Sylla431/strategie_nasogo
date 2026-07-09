@@ -62,7 +62,7 @@ type TelegramVipUser = {
   users_profile?: UserProfile | null;
 };
 
-export type AdminSection = "courses" | "access" | "telegram";
+export type AdminSection = "courses" | "access" | "telegram" | "payments";
 
 const SECTION_META: Record<AdminSection, { title: string; description: string }> = {
   courses: {
@@ -76,6 +76,10 @@ const SECTION_META: Record<AdminSection, { title: string; description: string }>
   telegram: {
     title: "Telegram VIP",
     description: "Valider les abonnements au canal signaux et gérer le bot.",
+  },
+  payments: {
+    title: "Paiements",
+    description: "Lancer un paiement test (Moneroo) et vérifier le flux checkout → webhook.",
   },
 };
 
@@ -124,6 +128,11 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
   const [exportingEmails, setExportingEmails] = useState(false);
   const [emailTemplate, setEmailTemplate] = useState<string>("");
   const [loadingTemplate, setLoadingTemplate] = useState(false);
+  const [paymentTestCourseId, setPaymentTestCourseId] = useState("");
+  const [paymentTestMethod, setPaymentTestMethod] = useState<"moneroo" | "paytech">("moneroo");
+  const [paymentTestLoading, setPaymentTestLoading] = useState(false);
+  const [paymentTestResult, setPaymentTestResult] = useState<string | null>(null);
+  const [recentPaymentOrders, setRecentPaymentOrders] = useState<Order[]>([]);
 
   const loadOrders = async (tok: string) => {
     const res = await fetch("/api/orders", { headers: { Authorization: `Bearer ${tok}` } });
@@ -171,6 +180,65 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
       setTelegramVipUsers(data.subscriptions || []);
     } catch (err) {
       console.error("Erreur réseau lors du chargement des accès canal VIP:", err);
+    }
+  };
+
+  const loadRecentPaymentOrders = async (tok: string) => {
+    try {
+      const res = await fetch("/api/orders", { headers: { Authorization: `Bearer ${tok}` } });
+      if (!res.ok) return;
+      const data = (await res.json()) as Order[];
+      const online = (data || [])
+        .filter((o) => o.payment_method === "moneroo" || o.payment_method === "paytech")
+        .slice(0, 15);
+      setRecentPaymentOrders(online);
+    } catch (err) {
+      console.error("Erreur chargement commandes paiement:", err);
+    }
+  };
+
+  const startPaymentTest = async () => {
+    if (!token) return;
+    if (!paymentTestCourseId) {
+      setError("Choisis un cours pour le test.");
+      return;
+    }
+    setPaymentTestLoading(true);
+    setPaymentTestResult(null);
+    setError(null);
+    setMessage(null);
+    try {
+      const orderRes = await fetch("/api/orders", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          courseId: paymentTestCourseId,
+          payment_method: paymentTestMethod,
+        }),
+      });
+      const orderData = await orderRes.json().catch(() => ({}));
+      if (!orderRes.ok) {
+        throw new Error(orderData.error || "Erreur création commande");
+      }
+      if (orderData.payment_initiation_error) {
+        throw new Error(orderData.payment_initiation_error);
+      }
+      if (!orderData.payment_url) {
+        throw new Error("Pas d'URL de paiement retournée");
+      }
+      const course = courses.find((c) => c.id === paymentTestCourseId);
+      setPaymentTestResult(
+        `OK — commande ${String(orderData.id).slice(0, 8)}… · ${course?.price?.toLocaleString("fr-FR") ?? "?"} F CFA · ${paymentTestMethod}`
+      );
+      setMessage("Redirection vers le checkout…");
+      await loadRecentPaymentOrders(token);
+      window.location.href = orderData.payment_url;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Erreur test paiement");
+      setPaymentTestLoading(false);
     }
   };
 
@@ -223,7 +291,7 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
         setLoading(false);
         return;
       }
-      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok), loadTelegramVipUsers(tok)]);
+      await Promise.all([loadOrders(tok), loadCourses(tok), loadCourseAccesses(tok), loadTelegramVipUsers(tok), loadRecentPaymentOrders(tok)]);
       setLoading(false);
     };
     load();
@@ -1387,6 +1455,140 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
                 </div>
               );
             })()}
+          </section>
+          </>
+          )}
+
+          {section === "payments" && (
+          <>
+          <section className="card p-4 md:p-6 space-y-4 border-2 border-emerald-200 bg-gradient-to-br from-emerald-50/80 to-teal-50/40">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">Sandbox / Live</p>
+              <h2 className="text-xl font-semibold">Tester un paiement</h2>
+              <p className="text-sm text-neutral-600 mt-1">
+                Crée une commande avec ton compte admin, initie le provider, puis redirige vers le checkout.
+                Vérifie ensuite le webhook et la page succès.
+              </p>
+            </div>
+
+            <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-neutral-600">Cours (montant = prix DB)</label>
+                <select
+                  className="form-control"
+                  value={paymentTestCourseId}
+                  onChange={(e) => setPaymentTestCourseId(e.target.value)}
+                >
+                  <option value="">— Choisir un cours —</option>
+                  {courses.map((c) => (
+                    <option key={c.id} value={c.id}>
+                      {c.title} — {Number(c.price).toLocaleString("fr-FR")} F CFA
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-neutral-600">Provider</label>
+                <select
+                  className="form-control"
+                  value={paymentTestMethod}
+                  onChange={(e) => setPaymentTestMethod(e.target.value as "moneroo" | "paytech")}
+                >
+                  <option value="moneroo">Moneroo</option>
+                  <option value="paytech">PayTech</option>
+                </select>
+              </div>
+            </div>
+
+            {paymentTestCourseId && (
+              <div className="rounded-lg border border-emerald-200 bg-white p-3 text-sm space-y-1">
+                <p>
+                  Montant envoyé :{" "}
+                  <span className="font-semibold text-emerald-800">
+                    {Number(courses.find((c) => c.id === paymentTestCourseId)?.price ?? 0).toLocaleString("fr-FR")} F CFA
+                  </span>
+                </p>
+                <p className="text-xs text-neutral-500">
+                  Webhook Moneroo :{" "}
+                  <code className="text-[11px] bg-neutral-100 px-1 rounded">
+                    /api/payments/moneroo/webhook
+                  </code>
+                  {" · "}Confirm return :{" "}
+                  <code className="text-[11px] bg-neutral-100 px-1 rounded">
+                    /api/payments/moneroo/confirm
+                  </code>
+                </p>
+              </div>
+            )}
+
+            {paymentTestResult && (
+              <p className="text-sm text-emerald-800 font-medium">{paymentTestResult}</p>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                className="button-primary text-sm"
+                onClick={startPaymentTest}
+                disabled={paymentTestLoading || !paymentTestCourseId}
+              >
+                {paymentTestLoading ? "Initiation…" : "Lancer le checkout"}
+              </button>
+              <button
+                type="button"
+                className="button-secondary text-sm"
+                onClick={() => token && loadRecentPaymentOrders(token)}
+                disabled={!token}
+              >
+                Rafraîchir commandes
+              </button>
+            </div>
+          </section>
+
+          <section className="card p-4 md:p-6 space-y-4">
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <h2 className="text-xl font-semibold">Dernières commandes online</h2>
+              <p className="text-xs text-neutral-500">Moneroo / PayTech (tes commandes)</p>
+            </div>
+            {recentPaymentOrders.length === 0 ? (
+              <p className="text-sm text-neutral-500">Aucune commande online récente.</p>
+            ) : (
+              <div className="space-y-2">
+                {recentPaymentOrders.map((order) => (
+                  <div
+                    key={order.id}
+                    className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 text-sm"
+                  >
+                    <div className="min-w-0 space-y-0.5">
+                      <p className="font-semibold truncate">
+                        {order.courses?.title || "Cours"}{" "}
+                        <span className="font-normal text-neutral-500">
+                          · {order.courses?.price != null
+                            ? `${Number(order.courses.price).toLocaleString("fr-FR")} F CFA`
+                            : "—"}
+                        </span>
+                      </p>
+                      <p className="text-xs text-neutral-500 font-mono">
+                        {order.id.slice(0, 8)}… · {order.payment_method} ·{" "}
+                        {new Date(order.created_at).toLocaleString("fr-FR")}
+                      </p>
+                    </div>
+                    <span
+                      className={[
+                        "shrink-0 rounded-full px-2.5 py-0.5 text-xs font-semibold",
+                        order.status === "paid"
+                          ? "bg-emerald-100 text-emerald-800"
+                          : order.status === "failed"
+                            ? "bg-red-100 text-red-800"
+                            : "bg-amber-100 text-amber-800",
+                      ].join(" ")}
+                    >
+                      {order.status}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
           </>
           )}

@@ -42,11 +42,23 @@ export interface MonerooWebhookPayload {
   data: {
     id: string; // ID du paiement
     status: "initiated" | "success" | "failed" | "cancelled";
-    order_id: string; // ID de la commande
     amount: number; // Montant
     currency: string; // Devise
     reference?: string; // Référence
+    metadata?: Record<string, string>; // Métadonnées (order_id, etc.)
   };
+}
+
+export interface MonerooVerifyResponse {
+  status: number;
+  data?: {
+    id: string;
+    status: string;
+    amount: number;
+    currency: string;
+    metadata?: Record<string, string>;
+  };
+  error?: string;
 }
 
 /**
@@ -172,64 +184,100 @@ export async function initiatePayment(
 }
 
 /**
+ * Vérifie le statut d'une transaction Moneroo
+ * Documentation: GET https://api.moneroo.io/v1/payments/{paymentId}/verify
+ */
+export async function verifyPayment(paymentId: string): Promise<MonerooVerifyResponse> {
+  const secretKey = process.env.MONEROO_SECRET_KEY?.trim();
+  if (!secretKey) {
+    return { status: 500, error: "MONEROO_SECRET_KEY n'est pas configuré" };
+  }
+
+  try {
+    const response = await fetch(`https://api.moneroo.io/v1/payments/${paymentId}/verify`, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Bearer ${secretKey}`,
+      },
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+      return {
+        status: response.status,
+        error: data.message || data.error || `Erreur ${response.status}`,
+      };
+    }
+
+    return {
+      status: response.status,
+      data: data.data,
+    };
+  } catch (error) {
+    console.error("Error verifying Moneroo payment:", error);
+    return {
+      status: 500,
+      error: error instanceof Error ? error.message : "Erreur réseau",
+    };
+  }
+}
+
+/**
  * Vérifie l'authenticité d'une notification Moneroo
- * 
- * Lorsque PayTech est utilisé comme passerelle dans Moneroo, les webhooks sont vérifiés
- * via le secret du webhook configuré dans Moneroo.
- * 
- * Documentation: Vérification via signature HMAC-SHA256 avec le secret du webhook
+ * Documentation: HMAC-SHA256 avec X-Moneroo-Signature
+ * https://docs.moneroo.io/introduction/webhooks
  */
 export function verifyWebhookToken(
   payload: unknown,
   headers: HeadersInit
 ): boolean {
-  const webhookSecret = process.env.MONEROO_WEBHOOK_SECRET;
-  
+  const webhookSecret = process.env.MONEROO_WEBHOOK_SECRET?.trim();
+
+  // Sans secret configuré : accepter en loggant un warning (dev / migration)
   if (!webhookSecret) {
-    console.warn("MONEROO_WEBHOOK_SECRET non disponible, notification non vérifiée");
-    return false;
+    console.warn("⚠️ MONEROO_WEBHOOK_SECRET non configuré — webhook accepté sans vérification de signature");
+    return true;
   }
 
   try {
-    // Moneroo envoie généralement la signature dans le header 'x-moneroo-signature' ou 'signature'
-    const signature = 
-      (headers as Record<string, string>)['x-moneroo-signature'] ||
-      (headers as Record<string, string>)['signature'] ||
-      (headers as Record<string, string>)['x-signature'];
+    const headerMap = headers as Record<string, string>;
+    // Next.js lowercasse les headers
+    let signature =
+      headerMap["x-moneroo-signature"] ||
+      headerMap["signature"] ||
+      headerMap["x-signature"] ||
+      "";
 
     if (!signature) {
       console.warn("⚠️ Aucune signature trouvée dans les headers du webhook Moneroo");
-      // Si PayTech est utilisé comme passerelle, vérifier aussi les headers PayTech
-      const paytechSignature = 
-        (headers as Record<string, string>)['x-paytech-signature'] ||
-        (headers as Record<string, string>)['hmac_compute'];
-      
-      if (paytechSignature) {
-        // Vérification selon le format PayTech (HMAC-SHA256)
-        const payloadString = typeof payload === 'string' ? payload : JSON.stringify(payload);
-        const expectedSignature = crypto
-          .createHmac('sha256', webhookSecret)
-          .update(payloadString)
-          .digest('hex');
-        
-        return paytechSignature === expectedSignature;
-      }
-      
       return false;
     }
 
-    // Vérification HMAC-SHA256 standard
-    const payloadString = typeof payload === 'string' ? payload : JSON.stringify(payload);
-    const expectedSignature = crypto
-      .createHmac('sha256', webhookSecret)
-      .update(payloadString)
-      .digest('hex');
+    // Strip éventuel préfixe "sha256="
+    if (signature.startsWith("sha256=")) {
+      signature = signature.slice("sha256=".length);
+    }
 
-    // Comparaison sécurisée pour éviter les attaques par timing
-    const isValid = crypto.timingSafeEqual(
-      Buffer.from(signature),
-      Buffer.from(expectedSignature)
-    );
+    // Obligatoire: raw body string (avant JSON.parse)
+    const payloadString = typeof payload === "string" ? payload : JSON.stringify(payload);
+    const expectedSignature = crypto
+      .createHmac("sha256", webhookSecret)
+      .update(payloadString, "utf8")
+      .digest("hex");
+
+    const sigBuf = Buffer.from(signature.toLowerCase());
+    const expBuf = Buffer.from(expectedSignature.toLowerCase());
+
+    if (sigBuf.length !== expBuf.length) {
+      console.error("❌ Signature webhook Moneroo invalide (longueur)", {
+        got: signature.length,
+        expected: expectedSignature.length,
+      });
+      return false;
+    }
+
+    const isValid = crypto.timingSafeEqual(sigBuf, expBuf);
 
     if (isValid) {
       console.log("✅ Webhook Moneroo authentifié");

@@ -1,0 +1,857 @@
+{
+  "eslint.config.mjs": {
+    "mtime": 1765611849.9271798,
+    "ast_hash": "dfa1f5f6a7037bf39dc510f30b180002",
+    "semantic_hash": "dfa1f5f6a7037bf39dc510f30b180002"
+  },
+  "next.config.ts": {
+    "mtime": 1766075941.640519,
+    "ast_hash": "41857185ffe53f9a5ede85ccfb92ec4a",
+    "semantic_hash": "41857185ffe53f9a5ede85ccfb92ec4a"
+  },
+  "package.json": {
+    "mtime": 1778842505.5508285,
+    "ast_hash": "1c36f415bb0577e8d8d217de08a5f561",
+    "semantic_hash": "1c36f415bb0577e8d8d217de08a5f561"
+  },
+  "postcss.config.mjs": {
+    "mtime": 1765611849.9296927,
+    "ast_hash": "239f3ebf717465dc636818a1a619398d",
+    "semantic_hash": "239f3ebf717465dc636818a1a619398d"
+  },
+  "src/app/admin/access/page.tsx": {
+    "mtime": 1780930396.9731936,
+    "ast_hash": "fd77e65199517994dd526be4ab10277c",
+    "semantic_hash": "fd77e65199517994dd526be4ab10277c"
+  },
+  "src/app/admin/courses/page.tsx": {
+    "mtime": 1780930396.973128,
+    "ast_hash": "1778ff071b5f2839de38dad3cb3f2748",
+    "semantic_hash": "1778ff071b5f2839de38dad3cb3f2748"
+  },
+  "src/app/admin/layout.tsx": {
+    "mtime": 1780927557.5589156,
+    "ast_hash": "e81b7a16a6fa7940d111c4eb9df354fd",
+    "semantic_hash": "e81b7a16a6fa7940d111c4eb9df354fd"
+  },
+  "src/app/admin/page.tsx": {
+    "mtime": 1780930396.932135,
+    "ast_hash": "82c37937f201c93606db28866defaad5",
+    "semantic_hash": "82c37937f201c93606db28866defaad5"
+  },
+  "src/app/admin/payments/page.tsx": {
+    "mtime": 1783612192.019094,
+    "ast_hash": "877d550eb4bea146c00d4856daa91c6c",
+    "semantic_hash": "877d550eb4bea146c00d4856daa91c6c"
+  },
+  "src/app/admin/students/page.tsx": {
+    "mtime": 1780931119.3777423,
+    "ast_hash": "f940fbcbb6348c41cd072fcf56c60e46",
+    "semantic_hash": "f940fbcbb6348c41cd072fcf56c60e46"
+  },
+  "src/app/admin/telegram/page.tsx": {
+    "mtime": 1780930396.973103,
+    "ast_hash": "b27767bd54e9a3515859942d837ecf5c",
+    "semantic_hash": "b27767bd54e9a3515859942d837ecf5c"
+  },
+  "src/app/api/access/route.ts": {
+    "mtime": 1779691992.8830261,
+    "ast_hash": "58632aca6db5a9a85d43ec9d5b2f9068",
+    "semantic_hash": "58632aca6db5a9a85d43ec9d5b2f9068"
+  },
+  "src/app/api/courses/[id]/video/[videoId]/url/route.ts": {
+    "mtime": 1767621669.4489646,
+    "ast_hash": "c2182853bb3f1dde15cc54d4a446de6e",
+    "semantic_hash": "c2182853bb3f1dde15cc54d4a446de6e"
+  },
+  "src/app/api/courses/[id]/videos/route.ts": {
+    "mtime": 1766321721.9782555,
+    "ast_hash": "1d0e21361610dae62ab20d086c7fa359",
+    "semantic_hash": "1d0e21361610dae62ab20d086c7fa359"
+  },
+  "src/app/api/courses/route.ts": {
+    "mtime": 1766661554.0093122,
+    "ast_hash": "86a6be1d627c6392a37bfa0cf51cfd7d",
+    "semantic_hash": "86a6be1d627c6392a37bfa0cf51cfd7d"
+  },
+  "src/app/api/email/get-template/route.ts": {
+    "mtime": 1767027286.4920633,
+    "ast_hash": "617b474c3a04122a6ff940a853782bb7",
+    "semantic_hash": "617b474c3a04122a6ff940a853782bb7"
+  },
+  "src/app/api/email/send-promo/route.ts": {
+    "mtime": 1767025868.5906942,
+    "ast_hash": "5d7314c7622a81bec3e023ba95c4669e",
+    "semantic_hash": "5d7314c7622a81bec3e023ba95c4669e"
+  },
+  "src/app/api/orders/[id]/pay/route.ts": {
+    "mtime": 1780833435.2432969,
+    "ast_hash": "ec7d9aae6069d274177904278e99f1c4",
+    "semantic_hash": "ec7d9aae6069d274177904278e99f1c4"
+  },
+  "src/app/api/orders/[id]/payment-codes/route.ts": {
+    "mtime": 1766853185.8000762,
+    "ast_hash": "cf5f69f035fd0a497e24e1eb37bd5942",
+    "semantic_hash": "cf5f69f035fd0a497e24e1eb37bd5942"
+  },
+  "src/app/api/orders/route.ts": {
+    "mtime": 1771498575.2660582,
+    "ast_hash": "3801a768388a4890507d69095494e7fe",
+    "semantic_hash": "3801a768388a4890507d69095494e7fe"
+  },
+  "src/app/api/payments/moneroo/confirm/route.ts": {
+    "mtime": 1783603027.588217,
+    "ast_hash": "1c2bd0732901a68c600ac759d1e1e49c",
+    "semantic_hash": "1c2bd0732901a68c600ac759d1e1e49c"
+  },
+  "src/app/api/payments/moneroo/initiate/route.ts": {
+    "mtime": 1783602958.5542338,
+    "ast_hash": "ec52472025d72e34edc3e88e7f2189aa",
+    "semantic_hash": "ec52472025d72e34edc3e88e7f2189aa"
+  },
+  "src/app/api/payments/moneroo/webhook/route.ts": {
+    "mtime": 1783610066.5942326,
+    "ast_hash": "5e2449e77e74b12ffd1187eb74ffdd61",
+    "semantic_hash": "5e2449e77e74b12ffd1187eb74ffdd61"
+  },
+  "src/app/api/payments/orange-money/initiate/route.ts": {
+    "mtime": 1766848336.6250472,
+    "ast_hash": "68d56fe0d84a775302cdbb8d0f553ec1",
+    "semantic_hash": "68d56fe0d84a775302cdbb8d0f553ec1"
+  },
+  "src/app/api/payments/paytech/initiate/route.ts": {
+    "mtime": 1771498575.267712,
+    "ast_hash": "bf0ceed095e3c81fbf4326e6b2807449",
+    "semantic_hash": "bf0ceed095e3c81fbf4326e6b2807449"
+  },
+  "src/app/api/payments/paytech/webhook/route.ts": {
+    "mtime": 1771498575.266473,
+    "ast_hash": "6fce4c6a979c5b3da163d2daf73ca651",
+    "semantic_hash": "6fce4c6a979c5b3da163d2daf73ca651"
+  },
+  "src/app/api/payments/webhook/route.ts": {
+    "mtime": 1767004534.7520003,
+    "ast_hash": "3ae9b0a5c653ab30c2825c5f9b837101",
+    "semantic_hash": "3ae9b0a5c653ab30c2825c5f9b837101"
+  },
+  "src/app/api/resend/add-contact/route.ts": {
+    "mtime": 1767028024.1057093,
+    "ast_hash": "b03b86c82d5012ca4d7068d08b84afa4",
+    "semantic_hash": "b03b86c82d5012ca4d7068d08b84afa4"
+  },
+  "src/app/api/students/[id]/payment-history/route.ts": {
+    "mtime": 1778857024.6389756,
+    "ast_hash": "ed0ff0f8f53f6694e5e047d8b79f23de",
+    "semantic_hash": "ed0ff0f8f53f6694e5e047d8b79f23de"
+  },
+  "src/app/api/students/[id]/record-payment/route.ts": {
+    "mtime": 1778857032.8768094,
+    "ast_hash": "81a637d9025249e9dbf6e10dd81952c4",
+    "semantic_hash": "81a637d9025249e9dbf6e10dd81952c4"
+  },
+  "src/app/api/students/[id]/route.ts": {
+    "mtime": 1780833723.6452932,
+    "ast_hash": "f7794f39f1771495c3e9eb7049b65e3b",
+    "semantic_hash": "f7794f39f1771495c3e9eb7049b65e3b"
+  },
+  "src/app/api/students/route.ts": {
+    "mtime": 1783602333.4370186,
+    "ast_hash": "d5f425a6770a19251a95e8922ceb3cb2",
+    "semantic_hash": "d5f425a6770a19251a95e8922ceb3cb2"
+  },
+  "src/app/api/students/sync-profiles/route.ts": {
+    "mtime": 1778858731.9556015,
+    "ast_hash": "210a2fbfd13390244cbbc730ec792581",
+    "semantic_hash": "210a2fbfd13390244cbbc730ec792581"
+  },
+  "src/app/api/students/upload-card/route.ts": {
+    "mtime": 1778855817.8052824,
+    "ast_hash": "160b051fda04020b7bf68b1bd1cf27ad",
+    "semantic_hash": "160b051fda04020b7bf68b1bd1cf27ad"
+  },
+  "src/app/api/telegram/cron/route.ts": {
+    "mtime": 1780833709.204566,
+    "ast_hash": "4de8539d6aa0f5955e43ab86749b7e52",
+    "semantic_hash": "4de8539d6aa0f5955e43ab86749b7e52"
+  },
+  "src/app/api/telegram/diagnose/route.ts": {
+    "mtime": 1780922572.5703092,
+    "ast_hash": "744560d82a47ba0baeddfbb661753600",
+    "semantic_hash": "744560d82a47ba0baeddfbb661753600"
+  },
+  "src/app/api/telegram/link-token/route.ts": {
+    "mtime": 1780921244.835765,
+    "ast_hash": "6bb557d22ba9b97c9fb0fb6398411f38",
+    "semantic_hash": "6bb557d22ba9b97c9fb0fb6398411f38"
+  },
+  "src/app/api/telegram/set-webhook/route.ts": {
+    "mtime": 1780924519.7318246,
+    "ast_hash": "2904f29dd3eae9d5a6d9a10cb83543b3",
+    "semantic_hash": "2904f29dd3eae9d5a6d9a10cb83543b3"
+  },
+  "src/app/api/telegram/subscription/route.ts": {
+    "mtime": 1780922566.7254388,
+    "ast_hash": "0fa67de175efd7937cfae9ad9f6614fe",
+    "semantic_hash": "0fa67de175efd7937cfae9ad9f6614fe"
+  },
+  "src/app/api/telegram/subscriptions/route.ts": {
+    "mtime": 1781348459.1275942,
+    "ast_hash": "d75b8f90b848dcd739d71f1ea38f0329",
+    "semantic_hash": "d75b8f90b848dcd739d71f1ea38f0329"
+  },
+  "src/app/api/telegram/webhook-info/route.ts": {
+    "mtime": 1780924524.3198736,
+    "ast_hash": "f22603ef2778ee03de0d27d8aa05e0dc",
+    "semantic_hash": "f22603ef2778ee03de0d27d8aa05e0dc"
+  },
+  "src/app/api/telegram/webhook/route.ts": {
+    "mtime": 1780924516.2580154,
+    "ast_hash": "f5bab66fb40b510e38607dcd48792a1a",
+    "semantic_hash": "f5bab66fb40b510e38607dcd48792a1a"
+  },
+  "src/app/api/users/export-emails/route.ts": {
+    "mtime": 1767026262.4931085,
+    "ast_hash": "cff2961d36be42933a7a004ac83063a5",
+    "semantic_hash": "cff2961d36be42933a7a004ac83063a5"
+  },
+  "src/app/auth/callback/route.ts": {
+    "mtime": 1767455478.2781105,
+    "ast_hash": "0855eb2950891b808d6bdd5d82ba10ba",
+    "semantic_hash": "0855eb2950891b808d6bdd5d82ba10ba"
+  },
+  "src/app/auth/page.tsx": {
+    "mtime": 1767028024.1060624,
+    "ast_hash": "2e07956b72d7ad73eddb0c87e9096071",
+    "semantic_hash": "2e07956b72d7ad73eddb0c87e9096071"
+  },
+  "src/app/auth/reset-password/page.tsx": {
+    "mtime": 1766848336.6274333,
+    "ast_hash": "defeb7402f38ae53216655317c8e01b9",
+    "semantic_hash": "defeb7402f38ae53216655317c8e01b9"
+  },
+  "src/app/client/page.tsx": {
+    "mtime": 1780921252.9850805,
+    "ast_hash": "a0547e7fa317d37c4f4796e565ef5950",
+    "semantic_hash": "a0547e7fa317d37c4f4796e565ef5950"
+  },
+  "src/app/course/[courseId]/video/[videoId]/page.tsx": {
+    "mtime": 1766848336.639971,
+    "ast_hash": "5c51de0a202a1ca955e3650a9af64bbc",
+    "semantic_hash": "5c51de0a202a1ca955e3650a9af64bbc"
+  },
+  "src/app/layout.tsx": {
+    "mtime": 1767025575.7189884,
+    "ast_hash": "67b4e5cc92d0867abd6c66b7defa9c93",
+    "semantic_hash": "67b4e5cc92d0867abd6c66b7defa9c93"
+  },
+  "src/app/page.tsx": {
+    "mtime": 1782648317.5913126,
+    "ast_hash": "40083e539cb6b55999bed5500f9fe8dd",
+    "semantic_hash": "40083e539cb6b55999bed5500f9fe8dd"
+  },
+  "src/app/payment/cancel/page.tsx": {
+    "mtime": 1766748925.3770401,
+    "ast_hash": "60a4622f8c3c26e39aacdf8f2f7cf252",
+    "semantic_hash": "60a4622f8c3c26e39aacdf8f2f7cf252"
+  },
+  "src/app/payment/success/page.tsx": {
+    "mtime": 1783603027.6503053,
+    "ast_hash": "cc790fa4149c05917e93cc9959978f53",
+    "semantic_hash": "cc790fa4149c05917e93cc9959978f53"
+  },
+  "src/app/robots.txt/route.ts": {
+    "mtime": 1766077470.6562297,
+    "ast_hash": "f81c5d8db3310ca081aa64d8894d64cf",
+    "semantic_hash": "f81c5d8db3310ca081aa64d8894d64cf"
+  },
+  "src/app/services/strategie-nasongon/layout.tsx": {
+    "mtime": 1767025575.7190847,
+    "ast_hash": "c4dc82e3989991c5dd68b69b8de40042",
+    "semantic_hash": "c4dc82e3989991c5dd68b69b8de40042"
+  },
+  "src/app/services/strategie-nasongon/page.tsx": {
+    "mtime": 1783609362.3337886,
+    "ast_hash": "6a5cc924a08d456ac4d942edbdfa6afe",
+    "semantic_hash": "6a5cc924a08d456ac4d942edbdfa6afe"
+  },
+  "src/app/sitemap.ts": {
+    "mtime": 1766075941.6660194,
+    "ast_hash": "50168941c1e1321f959fc425fbcfaac6",
+    "semantic_hash": "50168941c1e1321f959fc425fbcfaac6"
+  },
+  "src/components/ServiceCard.tsx": {
+    "mtime": 1776084126.2035692,
+    "ast_hash": "f5f9c06bcfc6f345669212b077ed73d5",
+    "semantic_hash": "f5f9c06bcfc6f345669212b077ed73d5"
+  },
+  "src/components/admin/AdminDashboard.tsx": {
+    "mtime": 1783612220.2517974,
+    "ast_hash": "ff4a645906cf5342f558086e353433a6",
+    "semantic_hash": "ff4a645906cf5342f558086e353433a6"
+  },
+  "src/components/admin/AdminOverlays.tsx": {
+    "mtime": 1780931092.4353228,
+    "ast_hash": "a4fa70f1e35cf7c9f5201e1770de32f7",
+    "semantic_hash": "a4fa70f1e35cf7c9f5201e1770de32f7"
+  },
+  "src/components/admin/AdminShell.tsx": {
+    "mtime": 1783612192.0107338,
+    "ast_hash": "5cb731b83ada888b3d2bf9923a212f6d",
+    "semantic_hash": "5cb731b83ada888b3d2bf9923a212f6d"
+  },
+  "src/lib/emailTemplates.ts": {
+    "mtime": 1767025757.8885522,
+    "ast_hash": "99eb86b3cb3feb812b04b666abe9b9c4",
+    "semantic_hash": "99eb86b3cb3feb812b04b666abe9b9c4"
+  },
+  "src/lib/moneroo.ts": {
+    "mtime": 1783610066.594058,
+    "ast_hash": "4918c03267efe7615c7e5bbe07e0c24d",
+    "semantic_hash": "4918c03267efe7615c7e5bbe07e0c24d"
+  },
+  "src/lib/orangeMoney.ts": {
+    "mtime": 1766841118.7053297,
+    "ast_hash": "8da35cb35ea85405ade586b00314c9eb",
+    "semantic_hash": "8da35cb35ea85405ade586b00314c9eb"
+  },
+  "src/lib/paytech.ts": {
+    "mtime": 1771498575.2677836,
+    "ast_hash": "60aec3b7649d369560e19f5eac59276d",
+    "semantic_hash": "60aec3b7649d369560e19f5eac59276d"
+  },
+  "src/lib/requireAdmin.ts": {
+    "mtime": 1778855765.119114,
+    "ast_hash": "366a8e0f3e0f6d369760b204707c80c3",
+    "semantic_hash": "366a8e0f3e0f6d369760b204707c80c3"
+  },
+  "src/lib/resendContacts.ts": {
+    "mtime": 1776433658.3287926,
+    "ast_hash": "922ee0b70004283f7d0de219e6171be0",
+    "semantic_hash": "922ee0b70004283f7d0de219e6171be0"
+  },
+  "src/lib/studentInstallments.ts": {
+    "mtime": 1778857021.608648,
+    "ast_hash": "610b70f1d8186ddfb9a1c26681af77a6",
+    "semantic_hash": "610b70f1d8186ddfb9a1c26681af77a6"
+  },
+  "src/lib/studentSecurity.ts": {
+    "mtime": 1778856736.4876933,
+    "ast_hash": "1264f62fd4169027e745290692a5edea",
+    "semantic_hash": "1264f62fd4169027e745290692a5edea"
+  },
+  "src/lib/supabaseAdmin.ts": {
+    "mtime": 1778855765.1191714,
+    "ast_hash": "8ac8226a7e758ad78e166e0a10586f7a",
+    "semantic_hash": "8ac8226a7e758ad78e166e0a10586f7a"
+  },
+  "src/lib/supabaseClient.ts": {
+    "mtime": 1766661554.009345,
+    "ast_hash": "6ac516b0a37af25500808408c08faf66",
+    "semantic_hash": "6ac516b0a37af25500808408c08faf66"
+  },
+  "src/lib/supabaseServer.ts": {
+    "mtime": 1766077470.7015705,
+    "ast_hash": "f8f74372ae1d2abef244619e802fa05d",
+    "semantic_hash": "f8f74372ae1d2abef244619e802fa05d"
+  },
+  "src/lib/telegram/api.ts": {
+    "mtime": 1780923326.0549529,
+    "ast_hash": "6e663d04652134900e8a4c4cb98bc093",
+    "semantic_hash": "6e663d04652134900e8a4c4cb98bc093"
+  },
+  "src/lib/telegram/config.ts": {
+    "mtime": 1780924511.80261,
+    "ast_hash": "2166ca2c42862f96cd17e941c8b0f19b",
+    "semantic_hash": "2166ca2c42862f96cd17e941c8b0f19b"
+  },
+  "src/lib/telegram/linkToken.ts": {
+    "mtime": 1780923328.7793832,
+    "ast_hash": "1ade6f1220e95ddfc1f099c9bc5d979a",
+    "semantic_hash": "1ade6f1220e95ddfc1f099c9bc5d979a"
+  },
+  "src/lib/telegram/resolveUser.ts": {
+    "mtime": 1780921220.168651,
+    "ast_hash": "83ab5c1d956a577bc52db0d42d297b8d",
+    "semantic_hash": "83ab5c1d956a577bc52db0d42d297b8d"
+  },
+  "src/lib/telegram/subscription.ts": {
+    "mtime": 1781348459.1265514,
+    "ast_hash": "995c2dc0388a3a1e292676dc3a0a9fb8",
+    "semantic_hash": "995c2dc0388a3a1e292676dc3a0a9fb8"
+  },
+  "src/lib/telegram/webhookHandler.ts": {
+    "mtime": 1780923321.0647762,
+    "ast_hash": "fa3102ff591ef8adf44fba9ddecbbc66",
+    "semantic_hash": "fa3102ff591ef8adf44fba9ddecbbc66"
+  },
+  "supabase/migrations/add_failed_status_to_orders.sql": {
+    "mtime": 1766750702.3716424,
+    "ast_hash": "a24b298b873ab7602d2a3f1cc3602a7d",
+    "semantic_hash": "a24b298b873ab7602d2a3f1cc3602a7d"
+  },
+  "supabase/migrations/add_grant_course_access_automatic.sql": {
+    "mtime": 1766750702.495799,
+    "ast_hash": "d8334f6f4ea34a5f9d31667efeb0d27f",
+    "semantic_hash": "d8334f6f4ea34a5f9d31667efeb0d27f"
+  },
+  "supabase/migrations/add_payment_reference_to_orders.sql": {
+    "mtime": 1766750702.4956455,
+    "ast_hash": "88d93cf7658021ca182dcf5d9d60115d",
+    "semantic_hash": "88d93cf7658021ca182dcf5d9d60115d"
+  },
+  "supabase/migrations/add_paytech_moneroo_payment_methods.sql": {
+    "mtime": 1771498575.2657416,
+    "ast_hash": "a7cf39e8cf9ca00f7b8cf6ae8dadff1c",
+    "semantic_hash": "a7cf39e8cf9ca00f7b8cf6ae8dadff1c"
+  },
+  "supabase/migrations/add_student_card_photo_to_users_profile.sql": {
+    "mtime": 1776432107.0617275,
+    "ast_hash": "3c343961d24598bcd1b4ce09f1fd0575",
+    "semantic_hash": "3c343961d24598bcd1b4ce09f1fd0575"
+  },
+  "supabase/migrations/add_students_linked_user_unique_index.sql": {
+    "mtime": 1776449608.2114868,
+    "ast_hash": "bbbc81d16d7f2c6d06c1b7e5659cf421",
+    "semantic_hash": "bbbc81d16d7f2c6d06c1b7e5659cf421"
+  },
+  "supabase/migrations/add_telegram_granted_email.sql": {
+    "mtime": 1780922550.6664867,
+    "ast_hash": "a684cc3da00f14a3979c8637b484da8a",
+    "semantic_hash": "a684cc3da00f14a3979c8637b484da8a"
+  },
+  "supabase/migrations/add_telegram_link_tokens.sql": {
+    "mtime": 1780833690.085689,
+    "ast_hash": "d0f2bdc85c9dc10db4176f1480cf930b",
+    "semantic_hash": "d0f2bdc85c9dc10db4176f1480cf930b"
+  },
+  "supabase/migrations/create_student_payment_installments.sql": {
+    "mtime": 1778857021.6086476,
+    "ast_hash": "4cb21fa308fcd75c7bcb32b8adf77682",
+    "semantic_hash": "4cb21fa308fcd75c7bcb32b8adf77682"
+  },
+  "supabase/migrations/create_students_registry_tables.sql": {
+    "mtime": 1776445200.3168292,
+    "ast_hash": "1ad73748219913a83269fd693b74ea79",
+    "semantic_hash": "1ad73748219913a83269fd693b74ea79"
+  },
+  "supabase/migrations/create_telegram_subscriptions.sql": {
+    "mtime": 1780833435.2432787,
+    "ast_hash": "d61a17bbdd4695cc28c300283f056d3f",
+    "semantic_hash": "d61a17bbdd4695cc28c300283f056d3f"
+  },
+  "supabase/migrations/secure_students_rls_and_role.sql": {
+    "mtime": 1778855773.2370803,
+    "ast_hash": "ef1ec9e323b78d3968107440e54cf0a2",
+    "semantic_hash": "ef1ec9e323b78d3968107440e54cf0a2"
+  },
+  "supabase/schema.sql": {
+    "mtime": 1766750702.4056664,
+    "ast_hash": "ea9a48e33a70a034ca6ce1ee16956a01",
+    "semantic_hash": "ea9a48e33a70a034ca6ce1ee16956a01"
+  },
+  "tsconfig.json": {
+    "mtime": 1765611849.9359233,
+    "ast_hash": "ee17fd1c97c735e9f3564e3f5251f125",
+    "semantic_hash": "ee17fd1c97c735e9f3564e3f5251f125"
+  },
+  ".cursor/plans/int-gration-orange-money-6ca8dea5.plan.md": {
+    "mtime": 1769418038.331639,
+    "ast_hash": "9eb9a01f9e3a73c0f7bef70703d41796",
+    "semantic_hash": "9eb9a01f9e3a73c0f7bef70703d41796"
+  },
+  ".github/workflows/telegram-cron.yml": {
+    "mtime": 1781008468.7927444,
+    "ast_hash": "c7992d6f4b52abae8008fed091845122",
+    "semantic_hash": "c7992d6f4b52abae8008fed091845122"
+  },
+  "AJOUTER_COLONNE_PAYMENT_REFERENCE.md": {
+    "mtime": 1766750702.495617,
+    "ast_hash": "75e611d659a7fa3b7f138c12a9febfe6",
+    "semantic_hash": "75e611d659a7fa3b7f138c12a9febfe6"
+  },
+  "AJOUTER_FONCTION_ACCES_AUTOMATIQUE.md": {
+    "mtime": 1766750702.495957,
+    "ast_hash": "c9e8ab9d83ca3f806c5fe9a3b7bd474a",
+    "semantic_hash": "c9e8ab9d83ca3f806c5fe9a3b7bd474a"
+  },
+  "AUTOMATISER_AJOUT_CONTACTS_RESEND.md": {
+    "mtime": 1767028024.1056545,
+    "ast_hash": "9b1254976192d76d382fe46d98c441d8",
+    "semantic_hash": "9b1254976192d76d382fe46d98c441d8"
+  },
+  "COMMENT_OBTENIR_CODES_PAIEMENT.md": {
+    "mtime": 1766750702.4826565,
+    "ast_hash": "d1ed908f612ac45f8d43574526ef1769",
+    "semantic_hash": "d1ed908f612ac45f8d43574526ef1769"
+  },
+  "COMMENT_OBTENIR_OTP_REQUESTOR.md": {
+    "mtime": 1766750702.4955366,
+    "ast_hash": "f183052bc47b6252fc8853214e7cde9a",
+    "semantic_hash": "f183052bc47b6252fc8853214e7cde9a"
+  },
+  "CONFIGURER_SERVICE_ROLE.md": {
+    "mtime": 1766750702.4956725,
+    "ast_hash": "c3d80bab69a907d626ef155ec0bbad97",
+    "semantic_hash": "c3d80bab69a907d626ef155ec0bbad97"
+  },
+  "CONFIGURER_SMTP_SUPABASE.md": {
+    "mtime": 1766846165.029402,
+    "ast_hash": "81bdc348cf89490cf5403780bbc2b261",
+    "semantic_hash": "81bdc348cf89490cf5403780bbc2b261"
+  },
+  "CONFIGURER_URLS_REDIRECTION_SUPABASE.md": {
+    "mtime": 1766846392.2740219,
+    "ast_hash": "644ab15591467fa6ab8f5b2126e8c4d7",
+    "semantic_hash": "644ab15591467fa6ab8f5b2126e8c4d7"
+  },
+  "CONFIGURER_VERCEL_ENV.md": {
+    "mtime": 1766852826.0444815,
+    "ast_hash": "58fd2c06d3be55a0ee868a1a4d5fd483",
+    "semantic_hash": "58fd2c06d3be55a0ee868a1a4d5fd483"
+  },
+  "CONFIRMATION_PAIEMENT_ORANGE_MONEY.md": {
+    "mtime": 1766750702.4930773,
+    "ast_hash": "1f2e8a1820c6a85a9d6642b5339b7a7d",
+    "semantic_hash": "1f2e8a1820c6a85a9d6642b5339b7a7d"
+  },
+  "CORRIGER_ERREUR_CONFIRMATION_EMAIL.md": {
+    "mtime": 1766854588.584979,
+    "ast_hash": "c031644cb1dc6f0bc9e81fa30a85a28f",
+    "semantic_hash": "c031644cb1dc6f0bc9e81fa30a85a28f"
+  },
+  "CORRIGER_PROBLEME_EMAIL_SPAM.md": {
+    "mtime": 1766842746.2524958,
+    "ast_hash": "2846db80df5992099a38572d6fd10680",
+    "semantic_hash": "2846db80df5992099a38572d6fd10680"
+  },
+  "DEPANNAGE_DNS_DOMAINE.md": {
+    "mtime": 1767346252.9993854,
+    "ast_hash": "19e2f18c042e1581d804b49fd3f95916",
+    "semantic_hash": "19e2f18c042e1581d804b49fd3f95916"
+  },
+  "DEPANNAGE_EMAIL_NON_VERIFIE.md": {
+    "mtime": 1766855954.294751,
+    "ast_hash": "dcb050ddcb97394aaf77e8f06d5cfe6d",
+    "semantic_hash": "dcb050ddcb97394aaf77e8f06d5cfe6d"
+  },
+  "DEPANNAGE_UNDEFINED_ORANGE_MONEY.md": {
+    "mtime": 1766750702.4954782,
+    "ast_hash": "7919a1921f68d462f3cdbdef22fd5f21",
+    "semantic_hash": "7919a1921f68d462f3cdbdef22fd5f21"
+  },
+  "ENVOYER_EMAILS_PROMOTIONNELS.md": {
+    "mtime": 1767026262.508258,
+    "ast_hash": "c40106f2af937687250829fca23f213a",
+    "semantic_hash": "c40106f2af937687250829fca23f213a"
+  },
+  "GESTION_ECHECS_PAIEMENT.md": {
+    "mtime": 1766750702.4958405,
+    "ast_hash": "47a574196f27bef6dd864f1c355822e8",
+    "semantic_hash": "47a574196f27bef6dd864f1c355822e8"
+  },
+  "INTEGRATION_PAYTECH_MONEROO.md": {
+    "mtime": 1771498575.2678497,
+    "ast_hash": "7a47f9e48e56e91707cf1b58c4dad341",
+    "semantic_hash": "7a47f9e48e56e91707cf1b58c4dad341"
+  },
+  "ORANGE_MONEY_ADAPTATION.md": {
+    "mtime": 1766661554.0952458,
+    "ast_hash": "a8c438b6b5ffbb098407d3728ba1f3ff",
+    "semantic_hash": "a8c438b6b5ffbb098407d3728ba1f3ff"
+  },
+  "ORANGE_MONEY_NEXT_STEPS.md": {
+    "mtime": 1766665709.8037481,
+    "ast_hash": "6eaa5abc9f0c6f27b810cff1ab2cc22e",
+    "semantic_hash": "6eaa5abc9f0c6f27b810cff1ab2cc22e"
+  },
+  "ORANGE_MONEY_SETUP.md": {
+    "mtime": 1766841118.7116425,
+    "ast_hash": "21dfe3cdcddb0840cb6efe2bf8236ba9",
+    "semantic_hash": "21dfe3cdcddb0840cb6efe2bf8236ba9"
+  },
+  "PAYTECH_OFFICIAL_INTEGRATION.md": {
+    "mtime": 1771498575.267498,
+    "ast_hash": "37a74a2aa955db87c5ea704c18adadec",
+    "semantic_hash": "37a74a2aa955db87c5ea704c18adadec"
+  },
+  "REACTIVER_CONFIRMATION_EMAIL.md": {
+    "mtime": 1767004534.7528572,
+    "ast_hash": "88aced1cd819535ba372d60282dfbda8",
+    "semantic_hash": "88aced1cd819535ba372d60282dfbda8"
+  },
+  "README.md": {
+    "mtime": 1765611849.9260113,
+    "ast_hash": "f15aaa42d5d299d091b1171097ea56ad",
+    "semantic_hash": "f15aaa42d5d299d091b1171097ea56ad"
+  },
+  "SOLUTION_DOMAINE_TEMPORAIRE.md": {
+    "mtime": 1767350889.6811843,
+    "ast_hash": "9540ed988e09105aff53dbb185140d58",
+    "semantic_hash": "9540ed988e09105aff53dbb185140d58"
+  },
+  "TEMPLATE_CONFIRMATION_EMAIL.md": {
+    "mtime": 1766852026.6044798,
+    "ast_hash": "44fc1f053dfcc8923bb7bc8b3566d7fd",
+    "semantic_hash": "44fc1f053dfcc8923bb7bc8b3566d7fd"
+  },
+  "email-templates/README.md": {
+    "mtime": 1766661554.0951517,
+    "ast_hash": "3912c085313467b514925618b1eea6a4",
+    "semantic_hash": "3912c085313467b514925618b1eea6a4"
+  },
+  "email-templates/reset-password-simple.html": {
+    "mtime": 1766661554.0951536,
+    "ast_hash": "3b9a8dc7421b0f2a93b85249a153a555",
+    "semantic_hash": "3b9a8dc7421b0f2a93b85249a153a555"
+  },
+  "email-templates/reset-password-subject.txt": {
+    "mtime": 1766661554.095035,
+    "ast_hash": "35d5fead44db9714d167b15255d8b1f0",
+    "semantic_hash": "35d5fead44db9714d167b15255d8b1f0"
+  },
+  "public/file.svg": {
+    "mtime": 1765611849.9259331,
+    "ast_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71",
+    "semantic_hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "public/globe.svg": {
+    "mtime": 1765611849.9308975,
+    "ast_hash": "2aaafa6a49b6563925fe440891e32717",
+    "semantic_hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "public/images/3.jpg": {
+    "mtime": 1765616165.1092615,
+    "ast_hash": "54972a1103f8bf6940273127ea0d1978",
+    "semantic_hash": "54972a1103f8bf6940273127ea0d1978"
+  },
+  "public/images/Instructeur.jpg": {
+    "mtime": 1765612872.7033637,
+    "ast_hash": "2149e019483ec191b71cae4f6935e92b",
+    "semantic_hash": "2149e019483ec191b71cae4f6935e92b"
+  },
+  "public/images/SERVICES 01.jpg": {
+    "mtime": 1767458456.1606352,
+    "ast_hash": "762545320215fc36549457643f4dde8a",
+    "semantic_hash": "762545320215fc36549457643f4dde8a"
+  },
+  "public/images/SERVICES 02.jpg": {
+    "mtime": 1767461531.71639,
+    "ast_hash": "01c4f9e7b6accc8f2b31a0de5144dbc5",
+    "semantic_hash": "01c4f9e7b6accc8f2b31a0de5144dbc5"
+  },
+  "public/images/SERVICES 04.jpg": {
+    "mtime": 1767462418.4939902,
+    "ast_hash": "46733c0f4111a38c05a58f3ef99d47b5",
+    "semantic_hash": "46733c0f4111a38c05a58f3ef99d47b5"
+  },
+  "public/images/bientot.jpg": {
+    "mtime": 1765726548.7443736,
+    "ast_hash": "dd2665896739a434d059bc4a7efe3f99",
+    "semantic_hash": "dd2665896739a434d059bc4a7efe3f99"
+  },
+  "public/images/bientot.png": {
+    "mtime": 1767024839.7470317,
+    "ast_hash": "beabb9d344492920dc572e69fec2344b",
+    "semantic_hash": "beabb9d344492920dc572e69fec2344b"
+  },
+  "public/images/coaching.jpeg": {
+    "mtime": 1767367701.0365434,
+    "ast_hash": "6e43c6c5e8378297285ab84c7cd2ed51",
+    "semantic_hash": "6e43c6c5e8378297285ab84c7cd2ed51"
+  },
+  "public/images/image.png": {
+    "mtime": 1767006538.1903021,
+    "ast_hash": "8952974ee2b708a635305d0349459a6c",
+    "semantic_hash": "8952974ee2b708a635305d0349459a6c"
+  },
+  "public/images/instr2.jpg": {
+    "mtime": 1765616003.3824399,
+    "ast_hash": "75cf115d3a7658a04f61597fe498c96c",
+    "semantic_hash": "75cf115d3a7658a04f61597fe498c96c"
+  },
+  "public/images/instructeur2.jpg": {
+    "mtime": 1767354195.8631537,
+    "ast_hash": "f4f291128c4219dd76126356609f993a",
+    "semantic_hash": "f4f291128c4219dd76126356609f993a"
+  },
+  "public/images/livre.officiel.jpg": {
+    "mtime": 1769418489.217191,
+    "ast_hash": "58c692c8c35e9df390c3b9b5bf3c10ca",
+    "semantic_hash": "58c692c8c35e9df390c3b9b5bf3c10ca"
+  },
+  "public/images/livre_cover.jpg": {
+    "mtime": 1767354195.7973716,
+    "ast_hash": "829cc475aaa8f02b35df9c9189718c01",
+    "semantic_hash": "829cc475aaa8f02b35df9c9189718c01"
+  },
+  "public/images/photo_5958333749957168016_y.jpg": {
+    "mtime": 1767354195.812612,
+    "ast_hash": "60b3f00b2a06532f4c3cdb6a3094c613",
+    "semantic_hash": "60b3f00b2a06532f4c3cdb6a3094c613"
+  },
+  "public/images/photo_5962929562532383503_y.jpg": {
+    "mtime": 1767354195.827093,
+    "ast_hash": "9f986e0615d5bed420940e863ddef220",
+    "semantic_hash": "9f986e0615d5bed420940e863ddef220"
+  },
+  "public/images/photo_5962929562532383504_y.jpg": {
+    "mtime": 1767354195.8336167,
+    "ast_hash": "6d0212d78f0a891222408595815596f5",
+    "semantic_hash": "6d0212d78f0a891222408595815596f5"
+  },
+  "public/images/presentiel.jpeg": {
+    "mtime": 1767367257.0510182,
+    "ast_hash": "eb9d3faa6da13becb0c4f60f6a5fd5a7",
+    "semantic_hash": "eb9d3faa6da13becb0c4f60f6a5fd5a7"
+  },
+  "public/images/presentiel.jpg": {
+    "mtime": 1776676058.2215483,
+    "ast_hash": "11a0c43ce10f2da0c24855bd770fa615",
+    "semantic_hash": "11a0c43ce10f2da0c24855bd770fa615"
+  },
+  "public/images/rentabilite.jpg": {
+    "mtime": 1776083278.6001523,
+    "ast_hash": "6a6f3b705566f64e00197822569431b1",
+    "semantic_hash": "6a6f3b705566f64e00197822569431b1"
+  },
+  "public/images/rentabilitev2.jpg": {
+    "mtime": 1776676058.2286568,
+    "ast_hash": "e40cd82ce52b7af46bec10711b43bd2c",
+    "semantic_hash": "e40cd82ce52b7af46bec10711b43bd2c"
+  },
+  "public/images/telegram.jpeg": {
+    "mtime": 1781104328.3906453,
+    "ast_hash": "e60bfa0c80fd8ab4cf7759e1cd366683",
+    "semantic_hash": "e60bfa0c80fd8ab4cf7759e1cd366683"
+  },
+  "public/images/trading_journal.png": {
+    "mtime": 1767355204.6625452,
+    "ast_hash": "2ac68f7ea676f98cd0f16ae7f26a112e",
+    "semantic_hash": "2ac68f7ea676f98cd0f16ae7f26a112e"
+  },
+  "public/logo/logo.png": {
+    "mtime": 1765612796.0886664,
+    "ast_hash": "26e8d0220c87590607d9c2ee2c2af1fe",
+    "semantic_hash": "26e8d0220c87590607d9c2ee2c2af1fe"
+  },
+  "public/next.svg": {
+    "mtime": 1765611849.9314303,
+    "ast_hash": "8e061864f388b47f33a1c3780831193e",
+    "semantic_hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "public/testimonial/IMG-20251213-WA0002.jpg": {
+    "mtime": 1765724697.2229164,
+    "ast_hash": "c8ca213dfede14cfb50d012d3c244e86",
+    "semantic_hash": "c8ca213dfede14cfb50d012d3c244e86"
+  },
+  "public/testimonial/IMG-20251213-WA0003.jpg": {
+    "mtime": 1765724697.2293131,
+    "ast_hash": "bfd339ab7cd0a46de4783bb32026d2f3",
+    "semantic_hash": "bfd339ab7cd0a46de4783bb32026d2f3"
+  },
+  "public/testimonial/IMG-20251213-WA0004.jpg": {
+    "mtime": 1765724697.2402399,
+    "ast_hash": "6c8e5a7e1f995f7b6563e26ece00aae4",
+    "semantic_hash": "6c8e5a7e1f995f7b6563e26ece00aae4"
+  },
+  "public/testimonial/IMG-20251213-WA0005.jpg": {
+    "mtime": 1765724697.2460735,
+    "ast_hash": "eaef10204d10c37a0d6cfeb0df019a6e",
+    "semantic_hash": "eaef10204d10c37a0d6cfeb0df019a6e"
+  },
+  "public/testimonial/IMG-20251213-WA0006.jpg": {
+    "mtime": 1765724697.257786,
+    "ast_hash": "302ffef5b395cc4aff8cb5abc711c61d",
+    "semantic_hash": "302ffef5b395cc4aff8cb5abc711c61d"
+  },
+  "public/testimonial/IMG-20251213-WA0007.jpg": {
+    "mtime": 1765724697.26345,
+    "ast_hash": "32204508e7e67a92ddf0cb223087813e",
+    "semantic_hash": "32204508e7e67a92ddf0cb223087813e"
+  },
+  "public/testimonial/IMG-20251213-WA0008.jpg": {
+    "mtime": 1765724697.273508,
+    "ast_hash": "c09cc65fea88de3d86a2f7eec101e9d1",
+    "semantic_hash": "c09cc65fea88de3d86a2f7eec101e9d1"
+  },
+  "public/testimonial/IMG-20251213-WA0009.jpg": {
+    "mtime": 1765724697.279845,
+    "ast_hash": "2bea48e530dbc1f3849fc42adf37e177",
+    "semantic_hash": "2bea48e530dbc1f3849fc42adf37e177"
+  },
+  "public/testimonial/IMG-20251213-WA0011.jpg": {
+    "mtime": 1765724697.2925625,
+    "ast_hash": "241f5b44a1a118682b73cad637e90730",
+    "semantic_hash": "241f5b44a1a118682b73cad637e90730"
+  },
+  "public/testimonial/IMG-20251213-WA0012.jpg": {
+    "mtime": 1765724697.2988956,
+    "ast_hash": "04a80b1683e7da69f10461f437b5a653",
+    "semantic_hash": "04a80b1683e7da69f10461f437b5a653"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.18 (1).jpeg": {
+    "mtime": 1767367758.9340296,
+    "ast_hash": "27a18752b6ed72feaa900d6e3403f875",
+    "semantic_hash": "27a18752b6ed72feaa900d6e3403f875"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.18 (2).jpeg": {
+    "mtime": 1767367758.9476225,
+    "ast_hash": "db25d7e4c184a7ec9116d8b58fca825f",
+    "semantic_hash": "db25d7e4c184a7ec9116d8b58fca825f"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.18 (3).jpeg": {
+    "mtime": 1767367758.9547648,
+    "ast_hash": "c97829f4b5f1ba6546d70b218be06ded",
+    "semantic_hash": "c97829f4b5f1ba6546d70b218be06ded"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.18.jpeg": {
+    "mtime": 1767367758.969586,
+    "ast_hash": "ecd231791775085c8942e5560e2e217a",
+    "semantic_hash": "ecd231791775085c8942e5560e2e217a"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.19 (1).jpeg": {
+    "mtime": 1767367758.9828498,
+    "ast_hash": "32ddedaeebf74476771c4b852505bc22",
+    "semantic_hash": "32ddedaeebf74476771c4b852505bc22"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.19 (2).jpeg": {
+    "mtime": 1767367758.996036,
+    "ast_hash": "9c09d95b3bce0d8f16fa3f0307036781",
+    "semantic_hash": "9c09d95b3bce0d8f16fa3f0307036781"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.19 (3).jpeg": {
+    "mtime": 1767367759.0037866,
+    "ast_hash": "8a7927ccae97a5705a91cff3f57032b8",
+    "semantic_hash": "8a7927ccae97a5705a91cff3f57032b8"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.19 (4).jpeg": {
+    "mtime": 1767367759.0184216,
+    "ast_hash": "f6fb5f0ef82ba9afbb59441fc4a773ea",
+    "semantic_hash": "f6fb5f0ef82ba9afbb59441fc4a773ea"
+  },
+  "public/testimonial/WhatsApp Image 2025-07-13 at 16.25.19.jpeg": {
+    "mtime": 1767367758.9261398,
+    "ast_hash": "ab9e4b7d67a95b731ca03e4485543edf",
+    "semantic_hash": "ab9e4b7d67a95b731ca03e4485543edf"
+  },
+  "public/vercel.svg": {
+    "mtime": 1765611849.9314988,
+    "ast_hash": "c0af2f507b369b085b35ef4bbe3bcf1e",
+    "semantic_hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "public/window.svg": {
+    "mtime": 1765611849.9313476,
+    "ast_hash": "a2760511c65806022ad20adf74370ff3",
+    "semantic_hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "public/images/document_5962929562072389781.mp4": {
+    "mtime": 1767354195.769781,
+    "ast_hash": "d18b174e28744ebc9363be68c840ea67",
+    "semantic_hash": "d18b174e28744ebc9363be68c840ea67"
+  },
+  "public/video/Pr\u00e9sentation .mp4": {
+    "mtime": 1765989399.688659,
+    "ast_hash": "f1a5a305889b7f6764cfd4299caf0e77",
+    "semantic_hash": "f1a5a305889b7f6764cfd4299caf0e77"
+  }
+}

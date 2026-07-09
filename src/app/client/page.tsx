@@ -27,8 +27,34 @@ type Order = {
   payment_method: string;
   course_id: string;
   created_at: string;
+  paid_at?: string | null;
+  payment_reference?: string | null;
   courses?: Course;
 };
+
+const PAYMENT_METHOD_LABELS: Record<string, string> = {
+  moneroo: "Moneroo",
+  paytech: "PayTech",
+  orange_money: "Orange Money",
+  cash: "Espèces",
+};
+
+function paymentMethodLabel(method: string) {
+  return PAYMENT_METHOD_LABELS[method] || method;
+}
+
+function orderStatusLabel(status: string) {
+  if (status === "paid") return "Payé";
+  if (status === "failed") return "Échoué";
+  if (status === "pending") return "En attente";
+  return status;
+}
+
+function orderStatusClass(status: string) {
+  if (status === "paid") return "bg-emerald-100 text-emerald-800";
+  if (status === "failed") return "bg-red-100 text-red-800";
+  return "bg-amber-100 text-amber-800";
+}
 
 type CourseAccess = {
   id: string;
@@ -61,6 +87,7 @@ export default function ClientSpace() {
   const [telegramLinked, setTelegramLinked] = useState(false);
   const [telegramOpening, setTelegramOpening] = useState(false);
   const [accountEmail, setAccountEmail] = useState<string | null>(null);
+  const [paymentsSidebarOpen, setPaymentsSidebarOpen] = useState(false);
 
   const fetchOrders = useCallback(async (token: string) => {
       try {
@@ -330,11 +357,67 @@ export default function ClientSpace() {
     course.title.toLowerCase().includes("nasongon"),
   );
 
+  const paidOrdersCount = orders.filter((o) => o.status === "paid").length;
+
+  const paymentsList = (
+    <div className="flex flex-col gap-2.5">
+      {orders.length === 0 && (
+        <p className="text-sm text-neutral-500 px-1">Aucun paiement pour le moment.</p>
+      )}
+      {orders.map((order) => {
+        const course = order.courses;
+        const amount = course?.price;
+        const dateSource = order.paid_at || order.created_at;
+        return (
+          <div
+            key={order.id}
+            className="rounded-xl border border-neutral-200 bg-white p-3 space-y-1.5"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <p className="font-semibold text-sm text-neutral-900 leading-snug line-clamp-2">
+                {course?.title ?? "Cours"}
+              </p>
+              <span
+                className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold ${orderStatusClass(order.status)}`}
+              >
+                {orderStatusLabel(order.status)}
+              </span>
+            </div>
+            <p className="text-xs text-neutral-500">
+              {new Date(dateSource).toLocaleDateString("fr-FR", {
+                day: "2-digit",
+                month: "short",
+                year: "numeric",
+              })}
+              {" · "}
+              {paymentMethodLabel(order.payment_method)}
+            </p>
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-neutral-800">
+                {amount != null ? `${Number(amount).toLocaleString("fr-FR")} F CFA` : "—"}
+              </p>
+              <p className="text-[10px] text-neutral-400 font-mono">
+                {order.id.slice(0, 8)}…
+              </p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
-    <div className="layout-shell py-10 space-y-8">
+    <div className="layout-shell py-10 space-y-6">
       <div className="flex flex-wrap items-center justify-between gap-3 sm:gap-4">
         <h1 className="text-2xl sm:text-3xl font-semibold text-neutral-900">Espace client</h1>
         <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+          <button
+            type="button"
+            className="pill-neutral text-sm lg:hidden"
+            onClick={() => setPaymentsSidebarOpen(true)}
+          >
+            Paiements{orders.length > 0 ? ` (${orders.length})` : ""}
+          </button>
           <Link href="/services/strategie-nasongon" className="pill-neutral text-sm sm:text-base">
             Accueil
           </Link>
@@ -351,222 +434,220 @@ export default function ClientSpace() {
       {error && <p className="text-sm sm:text-base text-red-600 font-medium px-4 py-3 bg-red-50 border border-red-200 rounded-lg">{error}</p>}
       {message && <p className="text-sm sm:text-base text-green-700 font-medium px-4 py-3 bg-green-50 border border-green-200 rounded-lg">{message}</p>}
 
-      {/* <section className="card p-4 md:p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Nouvelle commande (paiement en espèces)</h2>
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto] items-end">
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">Cours</label>
-            <select
-              className="form-control"
-              value={selectedCourse}
-              onChange={(e) => setSelectedCourse(e.target.value)}
-            >
-              {courses.map((course) => (
-                <option key={course.id} value={course.id}>
-                  {course.title} — {course.price.toLocaleString("fr-FR")} F CFA
-                </option>
-              ))}
-            </select>
-          </div>
-          <button className="button-primary cta-pulse w-full sm:w-auto" onClick={createOrder}>
-            Créer la commande
-          </button>
-        </div>
-        <p className="text-sm text-neutral-600">
-          Une fois la commande validée par l&apos;admin, tu verras le cours dans la liste ci-dessous.
-        </p>
-      </section> */}
-
-      {/* Communauté formation Nasongon — acheteurs du cours */}
-      {hasNasongonCourseAccess && (
-        <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <TelegramIcon className="w-6 h-6 text-blue-600" />
-            </div>
-            <div className="flex-1">
-              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté formation</h2>
-              <p className="text-sm sm:text-base text-neutral-600 mt-1">
-                Rejoins le groupe Telegram réservé aux élèves de la Stratégie Nasongon pour échanger avec les autres
-                traders et bénéficier du coaching collectif.
-              </p>
-            </div>
-          </div>
-          <a
-            href={NASONGON_COURSE_COMMUNITY_TELEGRAM_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center"
-          >
-            <TelegramIcon className="w-5 h-5" />
-            Rejoindre le groupe Telegram
-          </a>
-        </section>
-      )}
-
-      <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
-        <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Mes cours</h2>
-        <div className="grid gap-4">
-          {allAccessibleCourses.length === 0 && (
-            <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">Aucun cours accessible. Si vous avez payez veuillez patientez qu&apos;un admin t&apos;accorde l&apos;accès.</p>
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8 items-start">
+        {/* Contenu principal */}
+        <div className="min-w-0 flex-1 space-y-6 w-full">
+          {hasNasongonCourseAccess && (
+            <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <TelegramIcon className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="flex-1">
+                  <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Communauté formation</h2>
+                  <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                    Rejoins le groupe Telegram réservé aux élèves de la Stratégie Nasongon pour échanger avec les autres
+                    traders et bénéficier du coaching collectif.
+                  </p>
+                </div>
+              </div>
+              <a
+                href={NASONGON_COURSE_COMMUNITY_TELEGRAM_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center"
+              >
+                <TelegramIcon className="w-5 h-5" />
+                Rejoindre le groupe Telegram
+              </a>
+            </section>
           )}
-          {allAccessibleCourses.map((course) => {
-            // Utiliser video_url (JSONB) en priorité, sinon course_videos (table séparée)
-            // video_url peut être un tableau JSONB, une string JSON, null ou undefined
-            let videosFromJson: Array<{ title: string; video_url: string; position: number }> = [];
-            
-            if (course.video_url) {
-              if (Array.isArray(course.video_url)) {
-                videosFromJson = course.video_url;
-              } else if (typeof course.video_url === "string") {
-                // Si c'est une string JSON, la parser
-                try {
-                  const parsed = JSON.parse(course.video_url);
-                  videosFromJson = Array.isArray(parsed) ? parsed : [];
-                } catch {
-                  // Ignore les erreurs de parsing
-                }
-              }
-            }
-            
-            const videosFromTable = course.course_videos || [];
-            
-            // Combiner les deux sources et créer un format unifié
-            // Utiliser des IDs uniques pour éviter les doublons
-            const allVideos = [
-              ...videosFromJson.map((v, index) => ({
-                id: `json-${course.id}-vid-${index}`,
-                title: v.title || `Vidéo ${index + 1}`,
-                video_url: v.video_url,
-                position: v.position ?? index,
-              })),
-              ...videosFromTable.map((v, index) => ({
-                id: `table-${course.id}-${v.id}-${index}`,
-                title: v.title,
-                video_url: v.video_url,
-                position: v.position,
-              })),
-            ];
-            
-            // Supprimer les doublons basés sur l'ID ou le titre (pas sur video_url car elle peut être vide)
-            const uniqueVideos = allVideos.filter((video, index, self) => 
-              index === self.findIndex((v) => {
-                // Si les IDs correspondent, c'est un doublon
-                if (v.id === video.id) return true;
-                // Si les titres correspondent et les positions aussi, c'est probablement un doublon
-                if (v.title === video.title && v.position === video.position) return true;
-                return false;
-              })
-            );
-            
-            // S'assurer que les IDs sont vraiment uniques en ajoutant un index final
-            const videosWithUniqueIds = uniqueVideos.map((video, finalIndex) => ({
-              ...video,
-              id: `${video.id}-idx${finalIndex}`,
-            }));
-            
-            const sortedVideos = [...videosWithUniqueIds].sort((a, b) => a.position - b.position);
-            
-            return (
-              <div
-                key={course.id}
-                className="rounded-2xl border border-neutral-200 p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4"
-              >
-                <div className="flex items-center justify-between">
-                  <h3 className="font-semibold text-base sm:text-lg text-neutral-900 leading-tight">{course.title}</h3>
-                </div>
-                {sortedVideos.length > 0 ? (
-                  <div className="space-y-3">
-                    <p className="text-sm sm:text-base font-semibold text-neutral-800">
-                      {sortedVideos.length} vidéo{sortedVideos.length > 1 ? "s" : ""} disponible{sortedVideos.length > 1 ? "s" : ""}:
-                    </p>
-                    <div className="grid gap-2.5 sm:gap-3">
-                      {sortedVideos.map((video) => (
-                        <Link
-                          key={video.id}
-                          href={`/course/${course.id}/video/${video.id}`}
-                          className="button-secondary w-full text-left px-4 py-3 sm:px-5 sm:py-3.5"
-                        >
-                          <span className="font-semibold text-base sm:text-sm text-brand block leading-snug">{video.title}</span>
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm sm:text-base text-neutral-600">Aucune vidéo disponible pour ce cours.</p>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
-      {/* Canal VIP signaux — abonnement mensuel validé par admin */}
-      {telegramActive && (
-        <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <TelegramIcon className="w-6 h-6 text-amber-700" />
+          <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5">
+            <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Mes cours</h2>
+            <div className="grid gap-4">
+              {allAccessibleCourses.length === 0 && (
+                <p className="text-sm sm:text-base text-neutral-600 leading-relaxed">Aucun cours accessible. Si vous avez payez veuillez patientez qu&apos;un admin t&apos;accorde l&apos;accès.</p>
+              )}
+              {allAccessibleCourses.map((course) => {
+                let videosFromJson: Array<{ title: string; video_url: string; position: number }> = [];
+
+                if (course.video_url) {
+                  if (Array.isArray(course.video_url)) {
+                    videosFromJson = course.video_url;
+                  } else if (typeof course.video_url === "string") {
+                    try {
+                      const parsed = JSON.parse(course.video_url);
+                      videosFromJson = Array.isArray(parsed) ? parsed : [];
+                    } catch {
+                      // Ignore
+                    }
+                  }
+                }
+
+                const videosFromTable = course.course_videos || [];
+                const allVideos = [
+                  ...videosFromJson.map((v, index) => ({
+                    id: `json-${course.id}-vid-${index}`,
+                    title: v.title || `Vidéo ${index + 1}`,
+                    video_url: v.video_url,
+                    position: v.position ?? index,
+                  })),
+                  ...videosFromTable.map((v, index) => ({
+                    id: `table-${course.id}-${v.id}-${index}`,
+                    title: v.title,
+                    video_url: v.video_url,
+                    position: v.position,
+                  })),
+                ];
+
+                const uniqueVideos = allVideos.filter((video, index, self) =>
+                  index === self.findIndex((v) => {
+                    if (v.id === video.id) return true;
+                    if (v.title === video.title && v.position === video.position) return true;
+                    return false;
+                  })
+                );
+
+                const videosWithUniqueIds = uniqueVideos.map((video, finalIndex) => ({
+                  ...video,
+                  id: `${video.id}-idx${finalIndex}`,
+                }));
+
+                const sortedVideos = [...videosWithUniqueIds].sort((a, b) => a.position - b.position);
+
+                return (
+                  <div
+                    key={course.id}
+                    className="rounded-2xl border border-neutral-200 p-4 sm:p-5 md:p-6 flex flex-col gap-3 sm:gap-4"
+                  >
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-base sm:text-lg text-neutral-900 leading-tight">{course.title}</h3>
+                    </div>
+                    {sortedVideos.length > 0 ? (
+                      <div className="space-y-3">
+                        <p className="text-sm sm:text-base font-semibold text-neutral-800">
+                          {sortedVideos.length} vidéo{sortedVideos.length > 1 ? "s" : ""} disponible{sortedVideos.length > 1 ? "s" : ""}:
+                        </p>
+                        <div className="grid gap-2.5 sm:gap-3">
+                          {sortedVideos.map((video) => (
+                            <Link
+                              key={video.id}
+                              href={`/course/${course.id}/video/${video.id}`}
+                              className="button-secondary w-full text-left px-4 py-3 sm:px-5 sm:py-3.5"
+                            >
+                              <span className="font-semibold text-base sm:text-sm text-brand block leading-snug">{video.title}</span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
+                    ) : (
+                      <p className="text-sm sm:text-base text-neutral-600">Aucune vidéo disponible pour ce cours.</p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-            <div className="flex-1">
-              <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP</p>
-              <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Canal privé — signaux</h2>
-              <p className="text-sm sm:text-base text-neutral-600 mt-1">
-                Accès actif
-                {telegramExpiresAt
-                  ? ` jusqu'au ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
-                  : ""}
-                . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel vers le canal VIP.
-              </p>
-              {accountEmail && (
+          </section>
+
+          {telegramActive && (
+            <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <TelegramIcon className="w-6 h-6 text-amber-700" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP</p>
+                  <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Canal privé — signaux</h2>
+                  <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                    Accès actif
+                    {telegramExpiresAt
+                      ? ` jusqu'au ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
+                      : ""}
+                    . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel vers le canal VIP.
+                  </p>
+                  {accountEmail && (
+                    <p className="text-xs text-neutral-500 mt-1">
+                      Compte site : <span className="font-medium">{accountEmail}</span> — l&apos;admin doit valider avec cet
+                      email exact.
+                    </p>
+                  )}
+                  {telegramLinked && (
+                    <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
+                  )}
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleTelegramAccess}
+                disabled={telegramOpening}
+                className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
+              >
+                <TelegramIcon className="w-5 h-5" />
+                {telegramOpening ? "Ouverture..." : "Accès canal VIP"}
+              </button>
+            </section>
+          )}
+        </div>
+
+        {/* Sidebar paiements — desktop */}
+        <aside className="hidden lg:block w-[300px] xl:w-[320px] shrink-0">
+          <div className="sticky top-6 card overflow-hidden flex flex-col max-h-[calc(100vh-3rem)]">
+            <div className="border-b border-neutral-200 px-4 py-4 shrink-0">
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand">Historique</p>
+              <h2 className="text-lg font-semibold text-neutral-900 mt-0.5">Mes paiements</h2>
+              {orders.length > 0 && (
                 <p className="text-xs text-neutral-500 mt-1">
-                  Compte site : <span className="font-medium">{accountEmail}</span> — l&apos;admin doit valider avec cet
-                  email exact.
+                  {paidOrdersCount} payé{paidOrdersCount > 1 ? "s" : ""} · {orders.length} total
                 </p>
               )}
-              {telegramLinked && (
-                <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
-              )}
+            </div>
+            <div className="flex-1 overflow-y-auto p-3 space-y-0">
+              {paymentsList}
             </div>
           </div>
-          <button
-            type="button"
-            onClick={handleTelegramAccess}
-            disabled={telegramOpening}
-            className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
-          >
-            <TelegramIcon className="w-5 h-5" />
-            {telegramOpening ? "Ouverture..." : "Accès canal VIP"}
-          </button>
-        </section>
-      )}
+        </aside>
+      </div>
 
-      {/* <section className="card p-4 md:p-6 space-y-4">
-        <h2 className="text-xl font-semibold">Mes commandes</h2>
-        <div className="grid gap-4">
-          {orders.length === 0 && <p className="text-neutral-600">Aucune commande.</p>}
-          {orders.map((order) => {
-            const course = order.courses;
-            const isPaid = order.status === "paid";
-            return (
-              <div
-                key={order.id}
-                className="rounded-2xl border border-neutral-200 p-4 flex flex-col gap-2"
-              >
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">{course?.title ?? "Cours"}</p>
-                  <span className="badge-soft text-brand">
-                    {isPaid ? "Payé" : "En attente"} • {order.payment_method}
-                  </span>
-                </div>
-                <p className="text-sm text-neutral-600">
-                  Commande du {new Date(order.created_at).toLocaleDateString("fr-FR")}
+      {/* Drawer paiements — mobile */}
+      {paymentsSidebarOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/40 lg:hidden"
+          aria-label="Fermer les paiements"
+          onClick={() => setPaymentsSidebarOpen(false)}
+        />
+      )}
+      <aside
+        className={[
+          "fixed inset-y-0 right-0 z-50 w-[min(340px,92vw)] p-3 transition-transform lg:hidden",
+          paymentsSidebarOpen ? "translate-x-0" : "translate-x-full",
+        ].join(" ")}
+      >
+        <div className="card h-full flex flex-col overflow-hidden">
+          <div className="border-b border-neutral-200 px-4 py-4 flex items-start justify-between gap-2 shrink-0">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-brand">Historique</p>
+              <h2 className="text-lg font-semibold text-neutral-900 mt-0.5">Mes paiements</h2>
+              {orders.length > 0 && (
+                <p className="text-xs text-neutral-500 mt-1">
+                  {paidOrdersCount} payé{paidOrdersCount > 1 ? "s" : ""} · {orders.length} total
                 </p>
-              </div>
-            );
-          })}
+              )}
+            </div>
+            <button
+              type="button"
+              className="pill-neutral text-xs px-2.5 py-1"
+              onClick={() => setPaymentsSidebarOpen(false)}
+            >
+              Fermer
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3">
+            {paymentsList}
+          </div>
         </div>
-      </section> */}
+      </aside>
     </div>
   );
 }
