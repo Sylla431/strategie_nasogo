@@ -1,16 +1,16 @@
 # Graph Report - strategie_nasogo  (2026-07-10)
 
 ## Corpus Check
-- 122 files · ~562,378 words
+- 129 files · ~565,609 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1005 nodes · 1204 edges · 137 communities (49 shown, 88 thin omitted)
+- 1034 nodes · 1296 edges · 137 communities (49 shown, 88 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.9)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `91a47a65`
+- Built from commit: `46e6f0ac`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -45,7 +45,6 @@
 - Configurer les variables d'environnement sur Vercel
 - Corriger le problème d'emails marqués comme spam
 - Configurer les URLs de redirection dans Supabase
-- Dépannage : Email non vérifié après confirmation
 - Comment obtenir les codes de paiement Orange Money
 - Confirmation du paiement Orange Money - Numéro de téléphone
 - Guide : Envoyer des emails promotionnels via Resend
@@ -146,18 +145,19 @@
 - vbsniperacademie.com NXDOMAIN
 - Supabase Confirm signup HTML template
 - Template confirmation email Supabase
+- route.ts
 
 ## God Nodes (most connected - your core abstractions)
-1. `createSupabaseFromRequest()` - 36 edges
+1. `createSupabaseFromRequest()` - 38 edges
 2. `requireAdmin()` - 24 edges
 3. `getTelegramConfig()` - 21 edges
 4. `compilerOptions` - 16 edges
 5. `isSubscriptionActive()` - 15 edges
-6. `findSubscriptionForAccount()` - 12 edges
-7. `Configurer les variables d'environnement sur Vercel` - 12 edges
-8. `Template de confirmation d'email amélioré` - 12 edges
-9. `Comment obtenir le code OTP Requestor Orange Money` - 11 edges
-10. `Confirmation du paiement Orange Money - Numéro de téléphone` - 11 edges
+6. `notifyAdminOrderPaid()` - 12 edges
+7. `findSubscriptionForAccount()` - 12 edges
+8. `Configurer les variables d'environnement sur Vercel` - 12 edges
+9. `Template de confirmation d'email amélioré` - 12 edges
+10. `Comment obtenir le code OTP Requestor Orange Money` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `VB Sniper Academie password reset email` --shares_data_with--> `{{ .ConfirmationURL }}`  [EXTRACTED]
@@ -177,8 +177,8 @@
 ## Communities (137 total, 88 thin omitted)
 
 ### Community 0 - "Course Access APIs"
-Cohesion: 0.07
-Nodes (44): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+36 more)
+Cohesion: 0.08
+Nodes (39): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+31 more)
 
 ### Community 1 - "Orders Payment Access SQL"
 Cohesion: 0.07
@@ -189,7 +189,7 @@ Cohesion: 0.13
 Nodes (29): GET(), POST(), RecordPaymentPayload, CourseRelation, DELETE(), GET(), PUT(), StudentProfile (+21 more)
 
 ### Community 3 - "Auth Reset Pages"
-Cohesion: 0.16
+Cohesion: 0.13
 Nodes (4): Mode, Course, CourseVideo, supabase
 
 ### Community 4 - "Payment Providers Docs"
@@ -261,8 +261,8 @@ Cohesion: 0.08
 Nodes (25): 1. Vérifier l'URL dans l'email, 2. Tester la confirmation, 3. Vérifier les logs Supabase, Configuration complète recommandée, Corriger l'erreur "requested path is invalid" lors de la confirmation d'email, Dépannage, Développement local, Format des URLs (+17 more)
 
 ### Community 32 - "Template de confirmation d'email amélioré"
-Cohesion: 0.04
-Nodes (42): 1. Le code échangé n'est pas un code de confirmation d'email, 2. Le code a expiré, 3. Le code a déjà été utilisé, 4. Problème avec la configuration Supabase, Causes possibles, Dépannage : Email non vérifié après confirmation, Logs de débogage, Option 1 : Vérifier la configuration Supabase (+34 more)
+Cohesion: 0.09
+Nodes (23): 1. Le code échangé n'est pas un code de confirmation d'email, 2. Le code a expiré, 3. Le code a déjà été utilisé, 4. Problème avec la configuration Supabase, Causes possibles, Dépannage : Email non vérifié après confirmation, Logs de débogage, Option 1 : Vérifier la configuration Supabase (+15 more)
 
 ### Community 33 - "Configurer les variables d'environnement sur Vercel"
 Cohesion: 0.08
@@ -273,12 +273,8 @@ Cohesion: 0.08
 Nodes (23): 1. Vérifier la configuration actuelle Supabase, 2. Configurer Resend (Recommandé), 3. Tester l'envoi, Amélioration continue, Causes possibles, Corriger le problème d'emails marqués comme spam, DKIM (DomainKeys Identified Mail), DMARC (Domain-based Message Authentication) (+15 more)
 
 ### Community 35 - "Configurer les URLs de redirection dans Supabase"
-Cohesion: 0.09
-Nodes (23): Configuration recommandée pour la production, Configurer les URLs de redirection dans Supabase, Dépannage, Développement local, Erreur persiste après configuration, Format des URLs, L'URL change selon l'environnement, Pour la production (votre domaine) : (+15 more)
-
-### Community 36 - "Dépannage : Email non vérifié après confirmation"
-Cohesion: 0.26
-Nodes (10): getUserId(), POST(), POST(), decodeCustomField(), initiatePayment(), PayTechInitiateRequest, PayTechInitiateResponse, PayTechWebhookPayload (+2 more)
+Cohesion: 0.05
+Nodes (42): Configuration recommandée pour la production, Configurer les URLs de redirection dans Supabase, Dépannage, Développement local, Erreur persiste après configuration, Format des URLs, L'URL change selon l'environnement, Pour la production (votre domaine) : (+34 more)
 
 ### Community 37 - "Comment obtenir les codes de paiement Orange Money"
 Cohesion: 0.09
@@ -348,25 +344,29 @@ Nodes (7): Configuration dans Supabase, Fichiers, Instructions, Notes, Personnal
 Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
+### Community 137 - "route.ts"
+Cohesion: 0.09
+Nodes (36): getUserRole(), POST(), confirmOrderPayment(), confirmVipPayment(), OrderRow, POST(), ServiceSupabase, findVipPayment() (+28 more)
+
 ## Knowledge Gaps
-- **595 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+590 more)
+- **601 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+596 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **88 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createSupabaseFromRequest()` connect `Course Access APIs` to `Dépannage : Email non vérifié après confirmation`, `Telegram Bot APIs`?**
-  _High betweenness centrality (0.022) - this node is a cross-community bridge._
+- **Why does `createSupabaseFromRequest()` connect `Course Access APIs` to `route.ts`, `Telegram Bot APIs`?**
+  _High betweenness centrality (0.023) - this node is a cross-community bridge._
 - **Why does `supabase` connect `Auth Reset Pages` to `page.tsx`, `page.tsx`, `Admin Dashboard Pages`, `page.tsx`?**
+  _High betweenness centrality (0.013) - this node is a cross-community bridge._
+- **Why does `Réactiver la confirmation d'email dans Supabase` connect `Réactiver la confirmation d'email dans Supabase` to `Orders Payment Access SQL`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
-- **Why does `sanitizePhoneInput()` connect `Students Admin APIs` to `page.tsx`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _599 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _605 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Course Access APIs` be split into smaller, more focused modules?**
-  _Cohesion score 0.06775956284153005 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07811447811447811 - nodes in this community are weakly interconnected._
 - **Should `Orders Payment Access SQL` be split into smaller, more focused modules?**
-  _Cohesion score 0.07142857142857142 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._
 - **Should `Students Admin APIs` be split into smaller, more focused modules?**
   _Cohesion score 0.13225371120107962 - nodes in this community are weakly interconnected._

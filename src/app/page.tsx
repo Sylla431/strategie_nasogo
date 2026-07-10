@@ -103,12 +103,12 @@ const services = [
     id:"vip-telegram-signaux",
     name:"VIP Telegram Signaux",
     slug:"vip-telegram-signaux",
-    description:"Accès exclusif au canal privé de VB Sniper Académie. 20.000F adhesions, puis 10.000F par mois. Recevez les signaux de trading directement dans votre télégram. Vous pouvez également ouvrir le bot pour recevoir votre lien personnel vers le canal VIP.",
+    description:"Accès exclusif au canal privé de VB Sniper Académie. 30.000F adhésion (1er mois inclus), puis 10.000F par mois. Recevez les signaux de trading directement dans votre Telegram.",
     cover: "/images/telegram.jpeg",
-    externalUrl: "/auth",
+    externalUrl: "/vip/checkout",
     price: 30000,
+    available: true,
   },
-  
 ];
 
 const testimonials = [

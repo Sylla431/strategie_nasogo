@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import Link from "next/link";
+import { VIP_ADHESION_AMOUNT, VIP_RENEWAL_AMOUNT } from "@/lib/telegram/pricing";
 
 type CourseVideo = {
   id: string;
@@ -83,6 +84,7 @@ export default function ClientSpace() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [telegramActive, setTelegramActive] = useState(false);
+  const [telegramHasSubscription, setTelegramHasSubscription] = useState(false);
   const [telegramExpiresAt, setTelegramExpiresAt] = useState<string | null>(null);
   const [telegramLinked, setTelegramLinked] = useState(false);
   const [telegramOpening, setTelegramOpening] = useState(false);
@@ -144,6 +146,7 @@ export default function ClientSpace() {
       if (!res.ok) return;
       const data = await res.json();
       setTelegramActive(Boolean(data.active));
+      setTelegramHasSubscription(Boolean(data.subscription));
       setTelegramExpiresAt(data.subscription?.subscription_expires_at ?? null);
       setTelegramLinked(Boolean(data.subscription?.telegram_linked));
       setAccountEmail(data.account_email ?? null);
@@ -550,15 +553,15 @@ export default function ClientSpace() {
             </div>
           </section>
 
-          {telegramActive && (
-            <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <TelegramIcon className="w-6 h-6 text-amber-700" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP</p>
-                  <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Canal privé — signaux</h2>
+          <section className="card p-4 sm:p-5 md:p-6 space-y-4 sm:space-y-5 bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <TelegramIcon className="w-6 h-6 text-amber-700" />
+              </div>
+              <div className="flex-1">
+                <p className="text-xs font-semibold uppercase tracking-wide text-amber-800">VIP</p>
+                <h2 className="text-xl sm:text-2xl font-semibold text-neutral-900">Canal privé — signaux</h2>
+                {telegramActive ? (
                   <p className="text-sm sm:text-base text-neutral-600 mt-1">
                     Accès actif
                     {telegramExpiresAt
@@ -566,28 +569,54 @@ export default function ClientSpace() {
                       : ""}
                     . Cliquez ci-dessous pour ouvrir le bot et recevoir votre lien personnel vers le canal VIP.
                   </p>
-                  {accountEmail && (
-                    <p className="text-xs text-neutral-500 mt-1">
-                      Compte site : <span className="font-medium">{accountEmail}</span> — l&apos;admin doit valider avec cet
-                      email exact.
-                    </p>
-                  )}
-                  {telegramLinked && (
-                    <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
-                  )}
-                </div>
+                ) : telegramHasSubscription ? (
+                  <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                    Abonnement expiré
+                    {telegramExpiresAt
+                      ? ` depuis le ${new Date(telegramExpiresAt).toLocaleDateString("fr-FR")}`
+                      : ""}
+                    . Renouvelez pour {VIP_RENEWAL_AMOUNT.toLocaleString("fr-FR")} F CFA / mois.
+                  </p>
+                ) : (
+                  <p className="text-sm sm:text-base text-neutral-600 mt-1">
+                    Adhésion {VIP_ADHESION_AMOUNT.toLocaleString("fr-FR")} F CFA (1er mois inclus), puis{" "}
+                    {VIP_RENEWAL_AMOUNT.toLocaleString("fr-FR")} F CFA / mois.
+                  </p>
+                )}
+                {accountEmail && telegramActive && (
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Compte site : <span className="font-medium">{accountEmail}</span> — l&apos;admin doit valider avec cet
+                    email exact.
+                  </p>
+                )}
+                {telegramLinked && telegramActive && (
+                  <p className="text-xs text-green-700 mt-1">Compte Telegram déjà lié — vous pouvez regénérer un lien si besoin.</p>
+                )}
               </div>
-              <button
-                type="button"
-                onClick={handleTelegramAccess}
-                disabled={telegramOpening}
-                className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
+            </div>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              {telegramActive && (
+                <button
+                  type="button"
+                  onClick={handleTelegramAccess}
+                  disabled={telegramOpening}
+                  className="button-primary w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center disabled:opacity-60"
+                >
+                  <TelegramIcon className="w-5 h-5" />
+                  {telegramOpening ? "Ouverture..." : "Accès canal VIP"}
+                </button>
+              )}
+              <Link
+                href="/vip/checkout"
+                className={`${telegramActive ? "button-secondary" : "button-primary"} w-full sm:w-auto inline-flex items-center justify-center gap-2 text-center`}
               >
                 <TelegramIcon className="w-5 h-5" />
-                {telegramOpening ? "Ouverture..." : "Accès canal VIP"}
-              </button>
-            </section>
-          )}
+                {telegramHasSubscription
+                  ? `Renouveler — ${VIP_RENEWAL_AMOUNT.toLocaleString("fr-FR")} F`
+                  : `Adhérer — ${VIP_ADHESION_AMOUNT.toLocaleString("fr-FR")} F`}
+              </Link>
+            </div>
+          </section>
         </div>
 
         {/* Sidebar paiements — desktop */}

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createSupabaseFromRequest } from "@/lib/supabaseServer";
+import { notifyAdminOrderPaid } from "@/lib/payments/notifyPaymentSuccess";
+import { createClient } from "@supabase/supabase-js";
 
 async function getUserRole(supabase: ReturnType<typeof createSupabaseFromRequest>["supabase"]) {
   const { data: authUser } = await supabase.auth.getUser();
@@ -72,6 +74,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (accessError && accessError.code !== "23505") {
     console.error("Erreur création accès:", accessError);
     // On continue quand même car le paiement est validé, mais on log l'erreur
+  }
+
+  // Notif admin (service role pour lecture profil)
+  const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY) {
+    const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    void notifyAdminOrderPaid({
+      serviceClient,
+      orderId,
+      userId: order.user_id,
+      courseId: order.course_id,
+      paymentMethod: "admin_manual",
+    });
   }
 
   // Retourner les données avec confirmation de l'accès

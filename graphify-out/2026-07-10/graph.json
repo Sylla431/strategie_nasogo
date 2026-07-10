@@ -827,7 +827,7 @@
       "label": "getUserIdAndRole()",
       "file_type": "code",
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L5",
+      "source_location": "L6",
       "_origin": "ast",
       "id": "src_app_api_orders_route_getuseridandrole",
       "community": 0,
@@ -837,7 +837,7 @@
       "label": "GET()",
       "file_type": "code",
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L13",
+      "source_location": "L17",
       "_origin": "ast",
       "id": "src_app_api_orders_route_get",
       "community": 0,
@@ -860,18 +860,58 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_payments_moneroo_confirm_route",
-      "community": 0,
+      "community": 137,
       "norm_label": "route.ts"
+    },
+    {
+      "label": "ServiceSupabase",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_confirm_route_servicesupabase",
+      "community": 137,
+      "norm_label": "servicesupabase"
+    },
+    {
+      "label": "OrderRow",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L11",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_confirm_route_orderrow",
+      "community": 137,
+      "norm_label": "orderrow"
     },
     {
       "label": "POST()",
       "file_type": "code",
       "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
-      "source_location": "L12",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "src_app_api_payments_moneroo_confirm_route_post",
-      "community": 0,
+      "community": 137,
       "norm_label": "post()"
+    },
+    {
+      "label": "confirmVipPayment()",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L85",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "community": 137,
+      "norm_label": "confirmvippayment()"
+    },
+    {
+      "label": "confirmOrderPayment()",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L191",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_confirm_route_confirmorderpayment",
+      "community": 137,
+      "norm_label": "confirmorderpayment()"
     },
     {
       "label": "route.ts",
@@ -884,20 +924,10 @@
       "norm_label": "route.ts"
     },
     {
-      "label": "getUserId()",
-      "file_type": "code",
-      "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "src_app_api_payments_moneroo_initiate_route_getuserid",
-      "community": 0,
-      "norm_label": "getuserid()"
-    },
-    {
       "label": "POST()",
       "file_type": "code",
       "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L17",
+      "source_location": "L10",
       "_origin": "ast",
       "id": "src_app_api_payments_moneroo_initiate_route_post",
       "community": 0,
@@ -910,18 +940,68 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_payments_moneroo_webhook_route",
-      "community": 0,
+      "community": 137,
       "norm_label": "route.ts"
+    },
+    {
+      "label": "ServiceSupabase",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_webhook_route_servicesupabase",
+      "community": 137,
+      "norm_label": "servicesupabase"
+    },
+    {
+      "label": "OrderRow",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L10",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_webhook_route_orderrow",
+      "community": 137,
+      "norm_label": "orderrow"
     },
     {
       "label": "POST()",
       "file_type": "code",
       "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
-      "source_location": "L19",
+      "source_location": "L23",
       "_origin": "ast",
       "id": "src_app_api_payments_moneroo_webhook_route_post",
-      "community": 0,
+      "community": 137,
       "norm_label": "post()"
+    },
+    {
+      "label": "findVipPayment()",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L94",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_webhook_route_findvippayment",
+      "community": 137,
+      "norm_label": "findvippayment()"
+    },
+    {
+      "label": "handleVipWebhook()",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L128",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "community": 137,
+      "norm_label": "handlevipwebhook()"
+    },
+    {
+      "label": "handleOrderWebhook()",
+      "file_type": "code",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L175",
+      "_origin": "ast",
+      "id": "src_app_api_payments_moneroo_webhook_route_handleorderwebhook",
+      "community": 137,
+      "norm_label": "handleorderwebhook()"
     },
     {
       "label": "route.ts",
@@ -960,7 +1040,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_payments_paytech_initiate_route",
-      "community": 0,
+      "community": 36,
       "norm_label": "route.ts"
     },
     {
@@ -970,7 +1050,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "src_app_api_payments_paytech_initiate_route_getuserid",
-      "community": 0,
+      "community": 36,
       "norm_label": "getuserid()"
     },
     {
@@ -980,7 +1060,7 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "src_app_api_payments_paytech_initiate_route_post",
-      "community": 0,
+      "community": 36,
       "norm_label": "post()"
     },
     {
@@ -990,7 +1070,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_app_api_payments_paytech_webhook_route",
-      "community": 0,
+      "community": 36,
       "norm_label": "route.ts"
     },
     {
@@ -1000,7 +1080,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "src_app_api_payments_paytech_webhook_route_post",
-      "community": 0,
+      "community": 36,
       "norm_label": "post()"
     },
     {
@@ -1446,6 +1526,26 @@
     {
       "label": "route.ts",
       "file_type": "code",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_api_telegram_vip_checkout_route",
+      "community": 0,
+      "norm_label": "route.ts"
+    },
+    {
+      "label": "POST()",
+      "file_type": "code",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L13",
+      "_origin": "ast",
+      "id": "src_app_api_telegram_vip_checkout_route_post",
+      "community": 0,
+      "norm_label": "post()"
+    },
+    {
+      "label": "route.ts",
+      "file_type": "code",
       "source_file": "src/app/api/telegram/webhook-info/route.ts",
       "source_location": "L1",
       "_origin": "ast",
@@ -1567,7 +1667,7 @@
       "label": "AuthPage()",
       "file_type": "code",
       "source_file": "src/app/auth/page.tsx",
-      "source_location": "L386",
+      "source_location": "L391",
       "_origin": "ast",
       "id": "src_app_auth_page_authpage",
       "community": 3,
@@ -1617,7 +1717,7 @@
       "label": "CourseVideo",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "_origin": "ast",
       "id": "src_app_client_page_coursevideo",
       "community": 50,
@@ -1627,7 +1727,7 @@
       "label": "Course",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "_origin": "ast",
       "id": "src_app_client_page_course",
       "community": 50,
@@ -1637,7 +1737,7 @@
       "label": "Order",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "_origin": "ast",
       "id": "src_app_client_page_order",
       "community": 50,
@@ -1647,7 +1747,7 @@
       "label": "PAYMENT_METHOD_LABELS",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "_origin": "ast",
       "id": "src_app_client_page_payment_method_labels",
       "community": 50,
@@ -1657,7 +1757,7 @@
       "label": "paymentMethodLabel()",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "_origin": "ast",
       "id": "src_app_client_page_paymentmethodlabel",
       "community": 50,
@@ -1667,7 +1767,7 @@
       "label": "orderStatusLabel()",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L46",
+      "source_location": "L47",
       "_origin": "ast",
       "id": "src_app_client_page_orderstatuslabel",
       "community": 50,
@@ -1677,7 +1777,7 @@
       "label": "orderStatusClass()",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "_origin": "ast",
       "id": "src_app_client_page_orderstatusclass",
       "community": 50,
@@ -1687,7 +1787,7 @@
       "label": "CourseAccess",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L59",
+      "source_location": "L60",
       "_origin": "ast",
       "id": "src_app_client_page_courseaccess",
       "community": 50,
@@ -1697,7 +1797,7 @@
       "label": "TelegramIcon()",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L68",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "src_app_client_page_telegramicon",
       "community": 50,
@@ -1707,7 +1807,7 @@
       "label": "ClientSpace()",
       "file_type": "code",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L76",
+      "source_location": "L77",
       "_origin": "ast",
       "id": "src_app_client_page_clientspace",
       "community": 50,
@@ -1907,7 +2007,7 @@
       "label": "PaymentSuccessPage()",
       "file_type": "code",
       "source_file": "src/app/payment/success/page.tsx",
-      "source_location": "L237",
+      "source_location": "L247",
       "_origin": "ast",
       "id": "src_app_payment_success_page_paymentsuccesspage",
       "community": 3,
@@ -2092,6 +2192,36 @@
       "id": "src_app_sitemap_sitemap",
       "community": 28,
       "norm_label": "sitemap()"
+    },
+    {
+      "label": "page.tsx",
+      "file_type": "code",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_app_vip_checkout_page",
+      "community": 3,
+      "norm_label": "page.tsx"
+    },
+    {
+      "label": "VipCheckoutContent()",
+      "file_type": "code",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_app_vip_checkout_page_vipcheckoutcontent",
+      "community": 3,
+      "norm_label": "vipcheckoutcontent()"
+    },
+    {
+      "label": "VipCheckoutPage()",
+      "file_type": "code",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L110",
+      "_origin": "ast",
+      "id": "src_app_vip_checkout_page_vipcheckoutpage",
+      "community": 3,
+      "norm_label": "vipcheckoutpage()"
     },
     {
       "label": "ServiceCard.tsx",
@@ -2380,7 +2510,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_lib_moneroo",
-      "community": 0,
+      "community": 137,
       "norm_label": "moneroo.ts"
     },
     {
@@ -2390,7 +2520,7 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "src_lib_moneroo_monerooinitiaterequest",
-      "community": 0,
+      "community": 137,
       "norm_label": "monerooinitiaterequest"
     },
     {
@@ -2400,7 +2530,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "src_lib_moneroo_monerooinitiateresponse",
-      "community": 0,
+      "community": 137,
       "norm_label": "monerooinitiateresponse"
     },
     {
@@ -2410,7 +2540,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_lib_moneroo_moneroowebhookpayload",
-      "community": 0,
+      "community": 137,
       "norm_label": "moneroowebhookpayload"
     },
     {
@@ -2420,7 +2550,7 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "src_lib_moneroo_monerooverifyresponse",
-      "community": 0,
+      "community": 137,
       "norm_label": "monerooverifyresponse"
     },
     {
@@ -2440,7 +2570,7 @@
       "source_location": "L190",
       "_origin": "ast",
       "id": "src_lib_moneroo_verifypayment",
-      "community": 0,
+      "community": 137,
       "norm_label": "verifypayment()"
     },
     {
@@ -2450,7 +2580,7 @@
       "source_location": "L231",
       "_origin": "ast",
       "id": "src_lib_moneroo_verifywebhooktoken",
-      "community": 0,
+      "community": 137,
       "norm_label": "verifywebhooktoken()"
     },
     {
@@ -2544,13 +2674,123 @@
       "norm_label": "checkpaymentstatus()"
     },
     {
+      "label": "fulfillVipPayment.ts",
+      "file_type": "code",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_payments_fulfillvippayment",
+      "community": 137,
+      "norm_label": "fulfillvippayment.ts"
+    },
+    {
+      "label": "VipPaymentRow",
+      "file_type": "code",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_lib_payments_fulfillvippayment_vippaymentrow",
+      "community": 137,
+      "norm_label": "vippaymentrow"
+    },
+    {
+      "label": "fulfillVipPayment()",
+      "file_type": "code",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "community": 137,
+      "norm_label": "fulfillvippayment()"
+    },
+    {
+      "label": "failVipPayment()",
+      "file_type": "code",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L69",
+      "_origin": "ast",
+      "id": "src_lib_payments_fulfillvippayment_failvippayment",
+      "community": 137,
+      "norm_label": "failvippayment()"
+    },
+    {
+      "label": "initiateMoneroo.ts",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroo",
+      "community": 0,
+      "norm_label": "initiatemoneroo.ts"
+    },
+    {
+      "label": "Course",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L4",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroo_course",
+      "community": 0,
+      "norm_label": "course"
+    },
+    {
+      "label": "InitiateMonerooResult",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L9",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroo_initiatemonerooresult",
+      "community": 0,
+      "norm_label": "initiatemonerooresult"
+    },
+    {
+      "label": "initiateMonerooForOrder()",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L17",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
+      "community": 0,
+      "norm_label": "initiatemoneroofororder()"
+    },
+    {
+      "label": "initiateMonerooVip.ts",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroovip",
+      "community": 0,
+      "norm_label": "initiatemoneroovip.ts"
+    },
+    {
+      "label": "InitiateMonerooVipResult",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L5",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroovip_initiatemoneroovipresult",
+      "community": 0,
+      "norm_label": "initiatemoneroovipresult"
+    },
+    {
+      "label": "initiateMonerooForVipPayment()",
+      "file_type": "code",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L12",
+      "_origin": "ast",
+      "id": "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment",
+      "community": 0,
+      "norm_label": "initiatemonerooforvippayment()"
+    },
+    {
       "label": "paytech.ts",
       "file_type": "code",
       "source_file": "src/lib/paytech.ts",
       "source_location": "L1",
       "_origin": "ast",
       "id": "src_lib_paytech",
-      "community": 0,
+      "community": 36,
       "norm_label": "paytech.ts"
     },
     {
@@ -2560,7 +2800,7 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "src_lib_paytech_paytechinitiaterequest",
-      "community": 0,
+      "community": 36,
       "norm_label": "paytechinitiaterequest"
     },
     {
@@ -2570,7 +2810,7 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "src_lib_paytech_paytechinitiateresponse",
-      "community": 0,
+      "community": 36,
       "norm_label": "paytechinitiateresponse"
     },
     {
@@ -2580,7 +2820,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "src_lib_paytech_paytechwebhookpayload",
-      "community": 0,
+      "community": 36,
       "norm_label": "paytechwebhookpayload"
     },
     {
@@ -2590,7 +2830,7 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "src_lib_paytech_initiatepayment",
-      "community": 0,
+      "community": 36,
       "norm_label": "initiatepayment()"
     },
     {
@@ -2600,7 +2840,7 @@
       "source_location": "L186",
       "_origin": "ast",
       "id": "src_lib_paytech_verifywebhooksignature",
-      "community": 0,
+      "community": 36,
       "norm_label": "verifywebhooksignature()"
     },
     {
@@ -2610,7 +2850,7 @@
       "source_location": "L259",
       "_origin": "ast",
       "id": "src_lib_paytech_decodecustomfield",
-      "community": 0,
+      "community": 36,
       "norm_label": "decodecustomfield()"
     },
     {
@@ -2620,7 +2860,7 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "src_lib_paytech_rationale_10",
-      "community": 0,
+      "community": 36,
       "norm_label": "important: les cles api doivent etre envoyees dans les headers:"
     },
     {
@@ -2854,6 +3094,16 @@
       "norm_label": "createsupabasefromrequest()"
     },
     {
+      "label": "getAuthUserId()",
+      "file_type": "code",
+      "source_file": "src/lib/supabaseServer.ts",
+      "source_location": "L32",
+      "_origin": "ast",
+      "id": "src_lib_supabaseserver_getauthuserid",
+      "community": 0,
+      "norm_label": "getauthuserid()"
+    },
+    {
       "label": "api.ts",
       "file_type": "code",
       "source_file": "src/lib/telegram/api.ts",
@@ -3032,6 +3282,36 @@
       "id": "src_lib_telegram_linktoken_handlestartwithtoken",
       "community": 6,
       "norm_label": "handlestartwithtoken()"
+    },
+    {
+      "label": "pricing.ts",
+      "file_type": "code",
+      "source_file": "src/lib/telegram/pricing.ts",
+      "source_location": "L1",
+      "_origin": "ast",
+      "id": "src_lib_telegram_pricing",
+      "community": 0,
+      "norm_label": "pricing.ts"
+    },
+    {
+      "label": "VipPaymentKind",
+      "file_type": "code",
+      "source_file": "src/lib/telegram/pricing.ts",
+      "source_location": "L6",
+      "_origin": "ast",
+      "id": "src_lib_telegram_pricing_vippaymentkind",
+      "community": 0,
+      "norm_label": "vippaymentkind"
+    },
+    {
+      "label": "resolveVipCheckout()",
+      "file_type": "code",
+      "source_file": "src/lib/telegram/pricing.ts",
+      "source_location": "L8",
+      "_origin": "ast",
+      "id": "src_lib_telegram_pricing_resolvevipcheckout",
+      "community": 0,
+      "norm_label": "resolvevipcheckout()"
     },
     {
       "label": "resolveUser.ts",
@@ -6450,7 +6730,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_d\u00e9pannage_email_non_v\u00e9rifi\u00e9_apr\u00e8s_confirmation",
-      "community": 36,
+      "community": 32,
       "norm_label": "depannage : email non verifie apres confirmation"
     },
     {
@@ -6460,7 +6740,7 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_probl\u00e8me",
-      "community": 36,
+      "community": 32,
       "norm_label": "probleme"
     },
     {
@@ -6470,7 +6750,7 @@
       "source_location": "L7",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_causes_possibles",
-      "community": 36,
+      "community": 32,
       "norm_label": "causes possibles"
     },
     {
@@ -6480,7 +6760,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_1_le_code_\u00e9chang\u00e9_n_est_pas_un_code_de_confirmation_d_email",
-      "community": 36,
+      "community": 32,
       "norm_label": "1. le code echange n'est pas un code de confirmation d'email"
     },
     {
@@ -6490,7 +6770,7 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_2_le_code_a_expir\u00e9",
-      "community": 36,
+      "community": 32,
       "norm_label": "2. le code a expire"
     },
     {
@@ -6500,7 +6780,7 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_3_le_code_a_d\u00e9j\u00e0_\u00e9t\u00e9_utilis\u00e9",
-      "community": 36,
+      "community": 32,
       "norm_label": "3. le code a deja ete utilise"
     },
     {
@@ -6510,7 +6790,7 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_4_probl\u00e8me_avec_la_configuration_supabase",
-      "community": 36,
+      "community": 32,
       "norm_label": "4. probleme avec la configuration supabase"
     },
     {
@@ -6520,7 +6800,7 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solutions",
-      "community": 36,
+      "community": 32,
       "norm_label": "solutions"
     },
     {
@@ -6530,7 +6810,7 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solution_1_v\u00e9rifier_les_logs",
-      "community": 36,
+      "community": 32,
       "norm_label": "solution 1 : verifier les logs"
     },
     {
@@ -6540,7 +6820,7 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solution_2_v\u00e9rifier_manuellement_dans_supabase",
-      "community": 36,
+      "community": 32,
       "norm_label": "solution 2 : verifier manuellement dans supabase"
     },
     {
@@ -6550,7 +6830,7 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solution_3_confirmer_manuellement_l_email",
-      "community": 36,
+      "community": 32,
       "norm_label": "solution 3 : confirmer manuellement l'email"
     },
     {
@@ -6560,7 +6840,7 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solution_4_v\u00e9rifier_le_type_de_code",
-      "community": 36,
+      "community": 32,
       "norm_label": "solution 4 : verifier le type de code"
     },
     {
@@ -6570,7 +6850,7 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_solution_5_tester_avec_un_nouveau_compte",
-      "community": 36,
+      "community": 32,
       "norm_label": "solution 5 : tester avec un nouveau compte"
     },
     {
@@ -6580,7 +6860,7 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_v\u00e9rifications_dans_le_code",
-      "community": 36,
+      "community": 32,
       "norm_label": "verifications dans le code"
     },
     {
@@ -6590,7 +6870,7 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_logs_de_d\u00e9bogage",
-      "community": 36,
+      "community": 32,
       "norm_label": "logs de debogage"
     },
     {
@@ -6600,7 +6880,7 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_v\u00e9rification_apr\u00e8s_correction",
-      "community": 36,
+      "community": 32,
       "norm_label": "verification apres correction"
     },
     {
@@ -6610,7 +6890,7 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_si_le_probl\u00e8me_persiste",
-      "community": 36,
+      "community": 32,
       "norm_label": "si le probleme persiste"
     },
     {
@@ -6620,7 +6900,7 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_option_1_v\u00e9rifier_la_configuration_supabase",
-      "community": 36,
+      "community": 32,
       "norm_label": "option 1 : verifier la configuration supabase"
     },
     {
@@ -6630,7 +6910,7 @@
       "source_location": "L105",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_option_2_v\u00e9rifier_les_variables_d_environnement",
-      "community": 36,
+      "community": 32,
       "norm_label": "option 2 : verifier les variables d'environnement"
     },
     {
@@ -6640,7 +6920,7 @@
       "source_location": "L111",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_option_3_contacter_le_support_supabase",
-      "community": 36,
+      "community": 32,
       "norm_label": "option 3 : contacter le support supabase"
     },
     {
@@ -6650,7 +6930,7 @@
       "source_location": "L115",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_script_sql_pour_v\u00e9rifier_les_emails_non_confirm\u00e9s",
-      "community": 36,
+      "community": 32,
       "norm_label": "script sql pour verifier les emails non confirmes"
     },
     {
@@ -6660,7 +6940,7 @@
       "source_location": "L134",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_script_sql_pour_confirmer_manuellement_un_email",
-      "community": 36,
+      "community": 32,
       "norm_label": "script sql pour confirmer manuellement un email"
     },
     {
@@ -6670,7 +6950,7 @@
       "source_location": "L147",
       "_origin": "ast",
       "id": "depannage_email_non_verifie_ressources",
-      "community": 36,
+      "community": 32,
       "norm_label": "ressources"
     },
     {
@@ -11562,7 +11842,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L13",
+      "source_location": "L17",
       "weight": 1.0,
       "source": "src_app_api_orders_route",
       "target": "src_app_api_orders_route_get",
@@ -11572,7 +11852,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L5",
+      "source_location": "L6",
       "weight": 1.0,
       "source": "src_app_api_orders_route",
       "target": "src_app_api_orders_route_getuseridandrole",
@@ -11586,6 +11866,28 @@
       "weight": 1.0,
       "source": "src_app_api_orders_route",
       "target": "src_app_api_orders_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/orders/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_api_orders_route",
+      "target": "src_lib_payments_initiatemoneroo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/orders/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_api_orders_route",
+      "target": "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
       "confidence_score": 1.0
     },
     {
@@ -11611,14 +11913,36 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/orders/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_orders_route",
+      "target": "src_lib_supabaseserver_getauthuserid",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L15",
+      "source_location": "L19",
       "weight": 1.0,
       "source": "src_app_api_orders_route_get",
       "target": "src_app_api_orders_route_getuseridandrole",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/orders/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app_api_orders_route_getuseridandrole",
+      "target": "src_lib_supabaseserver_getauthuserid",
       "confidence_score": 1.0
     },
     {
@@ -11638,10 +11962,21 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/app/api/orders/route.ts",
-      "source_location": "L14",
+      "source_location": "L18",
       "weight": 1.0,
       "source": "src_app_api_orders_route_get",
       "target": "src_lib_supabaseserver_createsupabasefromrequest"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/orders/route.ts",
+      "source_location": "L130",
+      "weight": 1.0,
+      "source": "src_app_api_orders_route_post",
+      "target": "src_lib_payments_initiatemoneroo_initiatemoneroofororder"
     },
     {
       "relation": "calls",
@@ -11658,10 +11993,50 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
-      "source_location": "L12",
+      "source_location": "L191",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_app_api_payments_moneroo_confirm_route_confirmorderpayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L85",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L11",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_app_api_payments_moneroo_confirm_route_orderrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_confirm_route",
       "target": "src_app_api_payments_moneroo_confirm_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_app_api_payments_moneroo_confirm_route_servicesupabase",
       "confidence_score": 1.0
     },
     {
@@ -11691,6 +12066,50 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_lib_payments_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_lib_payments_fulfillvippayment_failvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_lib_payments_fulfillvippayment_vippaymentrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
       "source_location": "L3",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_confirm_route",
@@ -11709,15 +12128,37 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route",
+      "target": "src_lib_supabaseserver_getauthuserid",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
-      "confidence_score": 1.0,
       "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
-      "source_location": "L76",
+      "source_location": "L70",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_confirm_route_post",
-      "target": "src_lib_moneroo_verifypayment"
+      "target": "src_app_api_payments_moneroo_confirm_route_confirmorderpayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route_post",
+      "target": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -11725,26 +12166,71 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
-      "source_location": "L13",
+      "source_location": "L26",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_confirm_route_post",
       "target": "src_lib_supabaseserver_createsupabasefromrequest"
     },
     {
-      "relation": "contains",
+      "relation": "calls",
+      "context": "call",
       "confidence": "EXTRACTED",
-      "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L7",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L27",
       "weight": 1.0,
-      "source": "src_app_api_payments_moneroo_initiate_route",
-      "target": "src_app_api_payments_moneroo_initiate_route_getuserid",
+      "source": "src_app_api_payments_moneroo_confirm_route_post",
+      "target": "src_lib_supabaseserver_getauthuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "target": "src_lib_moneroo_verifypayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L176",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "target": "src_lib_payments_fulfillvippayment_failvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "target": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/confirm/route.ts",
+      "source_location": "L234",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_confirm_route_confirmorderpayment",
+      "target": "src_lib_moneroo_verifypayment",
       "confidence_score": 1.0
     },
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L17",
+      "source_location": "L10",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_initiate_route",
       "target": "src_app_api_payments_moneroo_initiate_route_post",
@@ -11758,7 +12244,7 @@
       "source_location": "L4",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_initiate_route",
-      "target": "src_lib_moneroo",
+      "target": "src_lib_payments_initiatemoneroo",
       "confidence_score": 1.0
     },
     {
@@ -11769,7 +12255,7 @@
       "source_location": "L4",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_initiate_route",
-      "target": "src_lib_moneroo_initiatepayment",
+      "target": "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
       "confidence_score": 1.0
     },
     {
@@ -11795,14 +12281,14 @@
       "confidence_score": 1.0
     },
     {
-      "relation": "calls",
-      "context": "call",
+      "relation": "imports",
+      "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L19",
+      "source_location": "L3",
       "weight": 1.0,
-      "source": "src_app_api_payments_moneroo_initiate_route_post",
-      "target": "src_app_api_payments_moneroo_initiate_route_getuserid",
+      "source": "src_app_api_payments_moneroo_initiate_route",
+      "target": "src_lib_supabaseserver_getauthuserid",
       "confidence_score": 1.0
     },
     {
@@ -11811,10 +12297,10 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L128",
+      "source_location": "L30",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_initiate_route_post",
-      "target": "src_lib_moneroo_initiatepayment"
+      "target": "src_lib_payments_initiatemoneroo_initiatemoneroofororder"
     },
     {
       "relation": "calls",
@@ -11822,19 +12308,80 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
-      "source_location": "L18",
+      "source_location": "L11",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_initiate_route_post",
       "target": "src_lib_supabaseserver_createsupabasefromrequest"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/payments/moneroo/initiate/route.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_initiate_route_post",
+      "target": "src_lib_supabaseserver_getauthuserid"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
-      "source_location": "L19",
+      "source_location": "L94",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_app_api_payments_moneroo_webhook_route_findvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_app_api_payments_moneroo_webhook_route_handleorderwebhook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L128",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L10",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_app_api_payments_moneroo_webhook_route_orderrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L23",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_webhook_route",
       "target": "src_app_api_payments_moneroo_webhook_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_app_api_payments_moneroo_webhook_route_servicesupabase",
       "confidence_score": 1.0
     },
     {
@@ -11882,6 +12429,72 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_lib_payments_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_lib_payments_fulfillvippayment_failvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route",
+      "target": "src_lib_payments_fulfillvippayment_vippaymentrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_post",
+      "target": "src_app_api_payments_moneroo_webhook_route_handleorderwebhook",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L80",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_post",
+      "target": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -11898,10 +12511,65 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
-      "source_location": "L25",
+      "source_location": "L28",
       "weight": 1.0,
       "source": "src_app_api_payments_moneroo_webhook_route_post",
       "target": "src_lib_moneroo_verifywebhooktoken"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L133",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "target": "src_app_api_payments_moneroo_webhook_route_findvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "target": "src_lib_moneroo_verifypayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "target": "src_lib_payments_fulfillvippayment_failvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L150",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "target": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/payments/moneroo/webhook/route.ts",
+      "source_location": "L187",
+      "weight": 1.0,
+      "source": "src_app_api_payments_moneroo_webhook_route_handleorderwebhook",
+      "target": "src_lib_moneroo_verifypayment",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -14247,6 +14915,181 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L13",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_app_api_telegram_vip_checkout_route_post",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_payments_initiatemoneroovip",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_supabaseadmin",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_supabaseserver",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_supabaseserver_createsupabasefromrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_supabaseserver_getauthuserid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_telegram_pricing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_telegram_pricing_resolvevipcheckout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_telegram_subscription",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route",
+      "target": "src_lib_telegram_subscription_getsubscriptionbyuserid",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L54",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route_post",
+      "target": "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route_post",
+      "target": "src_lib_supabaseserver_createsupabasefromrequest"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route_post",
+      "target": "src_lib_supabaseserver_getauthuserid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L27",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route_post",
+      "target": "src_lib_telegram_pricing_resolvevipcheckout"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/app/api/telegram/vip/checkout/route.ts",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "src_app_api_telegram_vip_checkout_route_post",
+      "target": "src_lib_telegram_subscription_getsubscriptionbyuserid"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "src/app/api/telegram/webhook-info/route.ts",
       "source_location": "L6",
       "weight": 1.0,
@@ -14517,7 +15360,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/auth/page.tsx",
-      "source_location": "L386",
+      "source_location": "L391",
       "weight": 1.0,
       "source": "src_app_auth_page",
       "target": "src_app_auth_page_authpage",
@@ -14601,7 +15444,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L76",
+      "source_location": "L77",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_clientspace",
@@ -14611,7 +15454,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L15",
+      "source_location": "L16",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_course",
@@ -14621,7 +15464,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L59",
+      "source_location": "L60",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_courseaccess",
@@ -14631,7 +15474,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L7",
+      "source_location": "L8",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_coursevideo",
@@ -14641,7 +15484,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_order",
@@ -14651,7 +15494,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L53",
+      "source_location": "L54",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_orderstatusclass",
@@ -14661,7 +15504,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L46",
+      "source_location": "L47",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_orderstatuslabel",
@@ -14671,7 +15514,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L35",
+      "source_location": "L36",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_payment_method_labels",
@@ -14681,7 +15524,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L42",
+      "source_location": "L43",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_paymentmethodlabel",
@@ -14691,7 +15534,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L68",
+      "source_location": "L69",
       "weight": 1.0,
       "source": "src_app_client_page",
       "target": "src_app_client_page_telegramicon",
@@ -14720,11 +15563,22 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/client/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_client_page",
+      "target": "src_lib_telegram_pricing",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L393",
+      "source_location": "L396",
       "weight": 1.0,
       "source": "src_app_client_page_clientspace",
       "target": "src_app_client_page_paymentmethodlabel",
@@ -14735,7 +15589,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L383",
+      "source_location": "L386",
       "weight": 1.0,
       "source": "src_app_client_page_clientspace",
       "target": "src_app_client_page_orderstatuslabel",
@@ -14746,7 +15600,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/app/client/page.tsx",
-      "source_location": "L381",
+      "source_location": "L384",
       "weight": 1.0,
       "source": "src_app_client_page_clientspace",
       "target": "src_app_client_page_orderstatusclass",
@@ -14929,7 +15783,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/app/payment/success/page.tsx",
-      "source_location": "L237",
+      "source_location": "L247",
       "weight": 1.0,
       "source": "src_app_payment_success_page",
       "target": "src_app_payment_success_page_paymentsuccesspage",
@@ -15150,6 +16004,59 @@
       "weight": 1.0,
       "source": "src_app_sitemap",
       "target": "src_app_sitemap_sitemap",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_app_vip_checkout_page",
+      "target": "src_app_vip_checkout_page_vipcheckoutcontent",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L110",
+      "weight": 1.0,
+      "source": "src_app_vip_checkout_page",
+      "target": "src_app_vip_checkout_page_vipcheckoutpage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_vip_checkout_page",
+      "target": "src_lib_supabaseclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_app_vip_checkout_page",
+      "target": "src_lib_supabaseclient_supabase",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/app/vip/checkout/page.tsx",
+      "source_location": "L7",
+      "weight": 1.0,
+      "source": "src_app_vip_checkout_page",
+      "target": "src_lib_telegram_pricing",
       "confidence_score": 1.0
     },
     {
@@ -15530,6 +16437,72 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo",
+      "target": "src_lib_moneroo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_moneroo",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo",
+      "target": "src_lib_moneroo_initiatepayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L81",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
+      "target": "src_lib_moneroo_initiatepayment"
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_moneroo_initiatepayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L56",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment",
+      "target": "src_lib_moneroo_initiatepayment"
+    },
+    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/lib/orangeMoney.ts",
@@ -15607,6 +16580,141 @@
       "weight": 1.0,
       "source": "src_lib_orangemoney",
       "target": "src_lib_orangemoney_verifywebhooktoken",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L69",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment",
+      "target": "src_lib_payments_fulfillvippayment_failvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment",
+      "target": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment",
+      "target": "src_lib_payments_fulfillvippayment_vippaymentrow",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment",
+      "target": "src_lib_telegram_subscription",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L2",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment",
+      "target": "src_lib_telegram_subscription_grantorextendsubscription",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/lib/payments/fulfillVipPayment.ts",
+      "source_location": "L58",
+      "weight": 1.0,
+      "source": "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "target": "src_lib_telegram_subscription_grantorextendsubscription"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L4",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo",
+      "target": "src_lib_payments_initiatemoneroo_course",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L17",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo",
+      "target": "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMoneroo.ts",
+      "source_location": "L9",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroo",
+      "target": "src_lib_payments_initiatemoneroo_initiatemonerooresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L12",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L5",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_payments_initiatemoneroovip_initiatemoneroovipresult",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_telegram_pricing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/payments/initiateMonerooVip.ts",
+      "source_location": "L3",
+      "weight": 1.0,
+      "source": "src_lib_payments_initiatemoneroovip",
+      "target": "src_lib_telegram_pricing_vippaymentkind",
       "confidence_score": 1.0
     },
     {
@@ -15892,6 +17000,16 @@
       "weight": 1.0,
       "source": "src_lib_supabaseserver",
       "target": "src_lib_supabaseserver_createsupabasefromrequest",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/supabaseServer.ts",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "src_lib_supabaseserver",
+      "target": "src_lib_supabaseserver_getauthuserid",
       "confidence_score": 1.0
     },
     {
@@ -16527,6 +17645,26 @@
       "weight": 1.0,
       "source": "src_lib_telegram_webhookhandler_processtelegramupdate",
       "target": "src_lib_telegram_linktoken_handlestartwithtoken"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/telegram/pricing.ts",
+      "source_location": "L8",
+      "weight": 1.0,
+      "source": "src_lib_telegram_pricing",
+      "target": "src_lib_telegram_pricing_resolvevipcheckout",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/lib/telegram/pricing.ts",
+      "source_location": "L6",
+      "weight": 1.0,
+      "source": "src_lib_telegram_pricing",
+      "target": "src_lib_telegram_pricing_vippaymentkind",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -22605,5 +23743,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "ea247fc453337f54049805829100fde997d12ab0"
+  "built_at_commit": "46e6f0ac152c86afeb4945355148e5045fdde482"
 }

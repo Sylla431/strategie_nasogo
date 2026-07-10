@@ -85,7 +85,12 @@ function AuthForm() {
           await ensureProfile(userId);
         }
         setMessage("Connexion réussie.");
-        router.push("/client");
+        const nextParam = searchParams.get("next");
+        const safeNext =
+          nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+            ? nextParam
+            : "/client";
+        router.push(safeNext);
       } else if (mode === "forgot-password") {
         console.log("Requesting password reset for email:", email);
         // Utiliser NEXT_PUBLIC_APP_URL si disponible, sinon window.location.origin

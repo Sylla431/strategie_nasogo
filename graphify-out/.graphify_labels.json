@@ -35,7 +35,6 @@
   "33": "Configurer les variables d'environnement sur Vercel",
   "34": "Corriger le problème d'emails marqués comme spam",
   "35": "Configurer les URLs de redirection dans Supabase",
-  "36": "Dépannage : Email non vérifié après confirmation",
   "37": "Comment obtenir les codes de paiement Orange Money",
   "38": "Confirmation du paiement Orange Money - Numéro de téléphone",
   "39": "Guide : Envoyer des emails promotionnels via Resend",
@@ -135,5 +134,6 @@
   "133": "NEXT_PUBLIC_APP_URL",
   "134": "vbsniperacademie.com NXDOMAIN",
   "135": "Supabase Confirm signup HTML template",
-  "136": "Template confirmation email Supabase"
+  "136": "Template confirmation email Supabase",
+  "137": "route.ts"
 }

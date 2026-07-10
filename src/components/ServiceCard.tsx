@@ -69,14 +69,23 @@ export default function ServiceCard({ service }: { service: Service }) {
         
         {service.available !== false ? (
           service.externalUrl ? (
-            <a
-              href={service.externalUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block w-full button-primary text-center cta-pulse"
-            >
-              Découvrir
-            </a>
+            service.externalUrl.startsWith("/") ? (
+              <Link
+                href={service.externalUrl}
+                className="block w-full button-primary text-center cta-pulse"
+              >
+                Découvrir
+              </Link>
+            ) : (
+              <a
+                href={service.externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block w-full button-primary text-center cta-pulse"
+              >
+                Découvrir
+              </a>
+            )
           ) : (
             <Link
               href={`/services/${service.slug}`}

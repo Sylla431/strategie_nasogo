@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { PayTechWebhookPayload, verifyWebhookSignature, decodeCustomField } from "@/lib/paytech";
+import { notifyAdminOrderPaid } from "@/lib/payments/notifyPaymentSuccess";
 
 /**
  * POST /api/payments/paytech/webhook
@@ -180,6 +181,15 @@ export async function POST(req: NextRequest) {
           console.log("✅ Accès au cours accordé automatiquement pour paiement PayTech");
         }
       }
+
+      void notifyAdminOrderPaid({
+        serviceClient: supabase,
+        orderId: order.id,
+        userId: order.user_id,
+        courseId: order.course_id,
+        paymentMethod: "paytech",
+        amount: finalPrice != null ? Number(finalPrice) : null,
+      });
 
       console.log(`💰 Paiement PayTech réussi pour ${payload.ref_command}`);
       if (payload.promo_enabled) {
