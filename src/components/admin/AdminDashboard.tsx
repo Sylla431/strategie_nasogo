@@ -94,6 +94,10 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
   const [tempVideo, setTempVideo] = useState({ title: "", video_url: "", position: 0 });
   const [grantAccessEmail, setGrantAccessEmail] = useState("");
   const [grantAccessCourseId, setGrantAccessCourseId] = useState<string>("");
+  const [revokeAccessEmail, setRevokeAccessEmail] = useState("");
+  const [revokeAccessCourseId, setRevokeAccessCourseId] = useState<string>("");
+  const [revokingAccessId, setRevokingAccessId] = useState<string | null>(null);
+  const [revokeFormLoading, setRevokeFormLoading] = useState(false);
   const [telegramGrantEmail, setTelegramGrantEmail] = useState("");
   const [telegramGrantMonths, setTelegramGrantMonths] = useState(1);
   const [telegramGrantLoading, setTelegramGrantLoading] = useState(false);
@@ -387,6 +391,66 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
     setGrantAccessCourseId("");
     // Recharger les accès après attribution
     if (token) await loadCourseAccesses(token);
+  };
+
+  const revokeAccess = async (payload: { access_id?: string; email?: string; course_id?: string }) => {
+    if (!token) return;
+    setError(null);
+    setMessage(null);
+    const res = await fetch("/api/access", {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      setError(body.error || "Erreur révocation accès");
+      return false;
+    }
+    const deleted = Number(body.access_deleted ?? 0);
+    const ordersRevoked = Number(body.orders_revoked ?? 0);
+    setMessage(
+      `Accès révoqué (${deleted} grant, ${ordersRevoked} commande${ordersRevoked > 1 ? "s" : ""}).`
+    );
+    await loadCourseAccesses(token);
+    return true;
+  };
+
+  const revokeAccessFromList = async (access: CourseAccess) => {
+    const label = access.users_profile?.email || access.users_profile?.full_name || "cet utilisateur";
+    const courseTitle = access.courses?.title || "ce cours";
+    if (!window.confirm(`Révoquer l'accès de ${label} à « ${courseTitle} » ?`)) return;
+    setRevokingAccessId(access.id);
+    try {
+      await revokeAccess({ access_id: access.id });
+    } finally {
+      setRevokingAccessId(null);
+    }
+  };
+
+  const revokeAccessFromForm = async () => {
+    if (!revokeAccessEmail.trim() || !revokeAccessCourseId) {
+      setError("Email et cours requis pour révoquer");
+      return;
+    }
+    const courseTitle = courses.find((c) => c.id === revokeAccessCourseId)?.title || "ce cours";
+    if (!window.confirm(`Révoquer l'accès de ${revokeAccessEmail.trim()} à « ${courseTitle} » ?`)) return;
+    setRevokeFormLoading(true);
+    try {
+      const ok = await revokeAccess({
+        email: revokeAccessEmail.trim().toLowerCase(),
+        course_id: revokeAccessCourseId,
+      });
+      if (ok) {
+        setRevokeAccessEmail("");
+        setRevokeAccessCourseId("");
+      }
+    } finally {
+      setRevokeFormLoading(false);
+    }
   };
 
   const checkTelegramSubscription = async () => {
@@ -1052,6 +1116,44 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
             </div>
           </section>
 
+          <section className="card p-4 md:p-6 space-y-4 border border-red-200 bg-red-50/40">
+            <div>
+              <h2 className="text-xl font-semibold text-neutral-900">Révoquer l&apos;accès à un cours</h2>
+              <p className="text-sm text-neutral-600 mt-1">
+                Supprime le grant et annule les commandes payées liées (sinon l&apos;accès resterait via le paiement).
+              </p>
+            </div>
+            <div className="grid gap-3">
+              <input
+                className="form-control"
+                type="email"
+                placeholder="Email de l'utilisateur"
+                value={revokeAccessEmail}
+                onChange={(e) => setRevokeAccessEmail(e.target.value)}
+              />
+              <select
+                className="form-control"
+                value={revokeAccessCourseId}
+                onChange={(e) => setRevokeAccessCourseId(e.target.value)}
+              >
+                <option value="">-- Choisir un cours --</option>
+                {courses.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.title}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                className="button-secondary w-full sm:w-auto text-red-700 border-red-200 hover:bg-red-50"
+                onClick={revokeAccessFromForm}
+                disabled={revokeFormLoading}
+              >
+                {revokeFormLoading ? "Révocation…" : "Révoquer l'accès"}
+              </button>
+            </div>
+          </section>
+
           <section className="card p-4 sm:p-5 md:p-6 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <h2 className="text-xl sm:text-xl font-semibold text-neutral-900">Utilisateurs avec accès aux cours</h2>
@@ -1188,6 +1290,16 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
                                 })}
                               </p>
                             </div>
+                          </div>
+                          <div className="shrink-0 self-start sm:self-center">
+                            <button
+                              type="button"
+                              className="pill-neutral text-xs sm:text-sm text-red-700 border-red-200 hover:bg-red-50"
+                              onClick={() => revokeAccessFromList(access)}
+                              disabled={revokingAccessId === access.id}
+                            >
+                              {revokingAccessId === access.id ? "…" : "Révoquer"}
+                            </button>
                           </div>
                         </div>
                       </div>

@@ -185,3 +185,144 @@ export async function POST(req: NextRequest) {
   return NextResponse.json(fullData, { status: 201 });
 }
 
+/**
+ * DELETE /api/access
+ * Révoque l'accès d'un utilisateur à un cours (admin only).
+ * Body: { access_id } OU { email, course_id } OU { user_id, course_id }
+ * Supprime course_access et passe les commandes paid → failed pour ce couple.
+ */
+export async function DELETE(req: NextRequest) {
+  const { supabase } = createSupabaseFromRequest(req);
+
+  const { data: authData, error: authError } = await supabase.auth.getUser();
+  if (authError || !authData.user) {
+    return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
+  }
+
+  const role = await getProfileRole(supabase);
+  if (role !== "admin") {
+    return NextResponse.json({ error: "Forbidden - Accès admin requis" }, { status: 403 });
+  }
+
+  if (!supabaseAdmin) {
+    return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
+  }
+
+  const body = await req.json().catch(() => ({}));
+  const accessId = typeof body.access_id === "string" ? body.access_id.trim() : "";
+  const courseId = typeof body.course_id === "string" ? body.course_id.trim() : "";
+  let userId = typeof body.user_id === "string" ? body.user_id.trim() : "";
+  const email = typeof body.email === "string" ? body.email.toLowerCase().trim() : "";
+
+  let targetUserId = userId;
+  let targetCourseId = courseId;
+
+  if (accessId) {
+    const { data: accessRow, error: accessLookupError } = await supabaseAdmin
+      .from("course_access")
+      .select("id, user_id, course_id")
+      .eq("id", accessId)
+      .maybeSingle();
+
+    if (accessLookupError) {
+      return NextResponse.json({ error: accessLookupError.message }, { status: 400 });
+    }
+    if (!accessRow) {
+      return NextResponse.json({ error: "Accès introuvable" }, { status: 404 });
+    }
+    targetUserId = accessRow.user_id;
+    targetCourseId = accessRow.course_id;
+  } else {
+    if (!targetCourseId) {
+      return NextResponse.json({ error: "access_id ou (course_id + email/user_id) requis" }, { status: 400 });
+    }
+    if (!targetUserId && email) {
+      const { data: foundUserId, error: findError } = await supabaseAdmin.rpc("find_user_by_email", {
+        user_email: email,
+      });
+      if (findError) {
+        return NextResponse.json({ error: `Erreur recherche utilisateur: ${findError.message}` }, { status: 400 });
+      }
+      targetUserId = (foundUserId as string | null) || "";
+      if (!targetUserId) {
+        return NextResponse.json({ error: "Utilisateur non trouvé avec cet email" }, { status: 404 });
+      }
+    }
+    if (!targetUserId) {
+      return NextResponse.json({ error: "email ou user_id requis" }, { status: 400 });
+    }
+  }
+
+  // 1) Supprimer l'accès accordé
+  const { data: deletedAccess, error: deleteError } = await supabaseAdmin
+    .from("course_access")
+    .delete()
+    .eq("user_id", targetUserId)
+    .eq("course_id", targetCourseId)
+    .select("id");
+
+  if (deleteError) {
+    console.error("Error revoking course access:", deleteError);
+    return NextResponse.json({ error: deleteError.message || "Erreur révocation accès" }, { status: 400 });
+  }
+
+  // 2) Neutraliser les commandes payées (sinon accès via order.status=paid)
+  const { data: paidOrders, error: ordersLookupError } = await supabaseAdmin
+    .from("orders")
+    .select("id, payment_reference")
+    .eq("user_id", targetUserId)
+    .eq("course_id", targetCourseId)
+    .eq("status", "paid");
+
+  if (ordersLookupError) {
+    console.error("Error looking up paid orders for revoke:", ordersLookupError);
+  }
+
+  let revokedOrders = 0;
+  if (paidOrders && paidOrders.length > 0) {
+    for (const order of paidOrders) {
+      let paymentData: Record<string, unknown> = {};
+      if (order.payment_reference) {
+        try {
+          paymentData = JSON.parse(order.payment_reference);
+        } catch {
+          paymentData = { previous_reference: order.payment_reference };
+        }
+      }
+      paymentData.revoked_at = new Date().toISOString();
+      paymentData.revoked_by = authData.user.id;
+      paymentData.revoked_reason = "admin_revoke_access";
+
+      const { error: updateOrderError } = await supabaseAdmin
+        .from("orders")
+        .update({
+          status: "failed",
+          payment_reference: JSON.stringify(paymentData),
+        })
+        .eq("id", order.id);
+
+      if (updateOrderError) {
+        console.error("Error updating order on revoke:", order.id, updateOrderError);
+      } else {
+        revokedOrders += 1;
+      }
+    }
+  }
+
+  const accessDeleted = Array.isArray(deletedAccess) ? deletedAccess.length : 0;
+  if (accessDeleted === 0 && revokedOrders === 0) {
+    return NextResponse.json(
+      { error: "Aucun accès ni commande payée trouvé pour cet utilisateur/cours" },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json({
+    message: "Accès révoqué",
+    access_deleted: accessDeleted,
+    orders_revoked: revokedOrders,
+    user_id: targetUserId,
+    course_id: targetCourseId,
+  });
+}
+

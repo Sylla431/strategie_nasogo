@@ -55,9 +55,9 @@
     "semantic_hash": "b27767bd54e9a3515859942d837ecf5c"
   },
   "src/app/api/access/route.ts": {
-    "mtime": 1779691992.8830261,
-    "ast_hash": "58632aca6db5a9a85d43ec9d5b2f9068",
-    "semantic_hash": "58632aca6db5a9a85d43ec9d5b2f9068"
+    "mtime": 1783620942.167846,
+    "ast_hash": "97d09761fa5eaf32b2e5efe5f6636c34",
+    "semantic_hash": ""
   },
   "src/app/api/courses/[id]/video/[videoId]/url/route.ts": {
     "mtime": 1767621669.4489646,
@@ -230,9 +230,9 @@
     "semantic_hash": "defeb7402f38ae53216655317c8e01b9"
   },
   "src/app/client/page.tsx": {
-    "mtime": 1780921252.9850805,
-    "ast_hash": "a0547e7fa317d37c4f4796e565ef5950",
-    "semantic_hash": "a0547e7fa317d37c4f4796e565ef5950"
+    "mtime": 1783615561.174123,
+    "ast_hash": "9709e9bead4fee3c02da01160199e0d5",
+    "semantic_hash": ""
   },
   "src/app/course/[courseId]/video/[videoId]/page.tsx": {
     "mtime": 1766848336.639971,
@@ -285,9 +285,9 @@
     "semantic_hash": "f5f9c06bcfc6f345669212b077ed73d5"
   },
   "src/components/admin/AdminDashboard.tsx": {
-    "mtime": 1783612220.2517974,
-    "ast_hash": "ff4a645906cf5342f558086e353433a6",
-    "semantic_hash": "ff4a645906cf5342f558086e353433a6"
+    "mtime": 1783620970.1218479,
+    "ast_hash": "869462389819cf4e542089db872a7930",
+    "semantic_hash": ""
   },
   "src/components/admin/AdminOverlays.tsx": {
     "mtime": 1780931092.4353228,
@@ -853,5 +853,15 @@
     "mtime": 1765989399.688659,
     "ast_hash": "f1a5a305889b7f6764cfd4299caf0e77",
     "semantic_hash": "f1a5a305889b7f6764cfd4299caf0e77"
+  },
+  ".claude/settings.json": {
+    "mtime": 1783618285.6053736,
+    "ast_hash": "378c36f3ccef61ae4b7740a5f67af8ca",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1783618285.6043212,
+    "ast_hash": "82efb97a359f5c7290bf2513d14686be",
+    "semantic_hash": ""
   }
 }
