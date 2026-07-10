@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import { createSupabaseFromRequest } from "@/lib/supabaseServer";
+import { createSupabaseFromRequest, getAuthUserId } from "@/lib/supabaseServer";
+import { initiateMonerooForOrder } from "@/lib/payments/initiateMoneroo";
 
-async function getUserIdAndRole(supabase: ReturnType<typeof createSupabaseFromRequest>["supabase"]) {
-  const { data: authUser, error: authError } = await supabase.auth.getUser();
-  if (authError || !authUser.user) return { userId: null, role: null };
-  const { data } = await supabase.from("users_profile").select("role, email, full_name, phone").eq("id", authUser.user.id).single();
-  return { userId: authUser.user.id, role: data?.role ?? null };
+async function getUserIdAndRole(
+  supabase: ReturnType<typeof createSupabaseFromRequest>["supabase"],
+  token?: string
+) {
+  const userId = await getAuthUserId(supabase, token);
+  if (!userId) return { userId: null, role: null };
+  const { data } = await supabase.from("users_profile").select("role, email, full_name, phone").eq("id", userId).single();
+  return { userId, role: data?.role ?? null };
 }
 
 // GET /api/orders -> orders for current user
 export async function GET(req: NextRequest) {
-  const { supabase } = createSupabaseFromRequest(req);
-  const { userId, role } = await getUserIdAndRole(supabase);
+  const { supabase, token } = createSupabaseFromRequest(req);
+  const { userId, role } = await getUserIdAndRole(supabase, token);
   if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const query = supabase
@@ -34,27 +38,23 @@ export async function GET(req: NextRequest) {
     const enrichedData = await Promise.all(
       data.map(async (order) => {
         if (order.users_profile && !order.users_profile.email && order.user_id) {
-          // Vérifier que user_id est valide avant d'appeler la fonction
           if (!order.user_id || typeof order.user_id !== "string") {
             console.log("Invalid user_id:", order.user_id);
             return order;
           }
-          
-          // Récupérer l'email depuis auth.users via fonction SQL
+
           try {
             const { data: emailData, error: emailError } = await supabase.rpc("get_user_email", {
               user_id: order.user_id,
             });
             if (!emailError && emailData) {
               order.users_profile.email = emailData;
-              // Mettre à jour users_profile avec l'email pour les prochaines fois
               try {
                 await supabase
                   .from("users_profile")
                   .update({ email: emailData })
                   .eq("id", order.user_id);
               } catch (updateErr) {
-                // Ignore les erreurs de mise à jour
                 console.log("Error updating user profile email:", updateErr);
               }
             }
@@ -73,20 +73,18 @@ export async function GET(req: NextRequest) {
 
 // POST /api/orders { courseId, payment_method? } -> create pending order
 export async function POST(req: NextRequest) {
-  const { supabase } = createSupabaseFromRequest(req);
-  const { userId } = await getUserIdAndRole(supabase);
+  const { supabase, token } = createSupabaseFromRequest(req);
+  const { userId } = await getUserIdAndRole(supabase, token);
   if (!userId) return NextResponse.json({ error: "Non authentifié" }, { status: 401 });
 
   const { courseId, payment_method = "cash" } = await req.json();
   if (!courseId) return NextResponse.json({ error: "courseId requis" }, { status: 400 });
 
-  // Valider le payment_method
   const validPaymentMethods = ["cash", "orange_money", "paytech", "moneroo"];
   if (!validPaymentMethods.includes(payment_method)) {
     return NextResponse.json({ error: "payment_method invalide" }, { status: 400 });
   }
 
-  // Vérifier si l'utilisateur a déjà une commande payée pour ce cours
   const { data: existingPaidOrder } = await supabase
     .from("orders")
     .select("id, status")
@@ -96,14 +94,12 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (existingPaidOrder) {
-    return NextResponse.json({ 
+    return NextResponse.json({
       error: "Vous avez déjà payé pour ce cours",
-      already_paid: true 
+      already_paid: true,
     }, { status: 400 });
   }
 
-  // Mettre en "failed" les anciennes commandes en "pending" pour ce cours et cet utilisateur
-  // Cela permet de marquer les tentatives précédentes qui ont échoué
   const { error: updateOldOrdersError } = await supabase
     .from("orders")
     .update({ status: "failed" })
@@ -113,46 +109,83 @@ export async function POST(req: NextRequest) {
 
   if (updateOldOrdersError) {
     console.error("Erreur lors de la mise à jour des anciennes commandes:", updateOldOrdersError);
-    // On continue quand même, ce n'est pas bloquant
   }
 
-  // Créer la nouvelle commande
   const { data: order, error } = await supabase
     .from("orders")
     .insert([{ user_id: userId, course_id: courseId, payment_method, status: "pending" }])
     .select("*")
     .single();
-  
+
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
 
-  // Router vers le bon provider selon le payment_method
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  
-  // Si c'est un paiement en ligne, initier le paiement et retourner l'URL de redirection
-  if (payment_method === "orange_money" || payment_method === "paytech" || payment_method === "moneroo") {
+  // Moneroo: appel in-process (évite self-fetch HTTP qui perd le Bearer en prod)
+  if (payment_method === "moneroo") {
     try {
-      // Déterminer l'endpoint selon le provider
-      let endpoint = "";
-      if (payment_method === "orange_money") {
-        endpoint = `${baseUrl}/api/payments/orange-money/initiate`;
-      } else if (payment_method === "paytech") {
-        endpoint = `${baseUrl}/api/payments/paytech/initiate`;
-      } else if (payment_method === "moneroo") {
-        endpoint = `${baseUrl}/api/payments/moneroo/initiate`;
+      const appUrl =
+        process.env.NEXT_PUBLIC_APP_URL ||
+        req.nextUrl.origin ||
+        "https://vbsniperacademie.com";
+
+      const result = await initiateMonerooForOrder({
+        supabase,
+        userId,
+        orderId: order.id,
+        appUrl,
+      });
+
+      if (!result.ok) {
+        return NextResponse.json({
+          ...order,
+          payment_initiation_error: result.error,
+        }, { status: 201 });
       }
+
+      return NextResponse.json({
+        ...order,
+        payment_url: result.payment_url,
+        payment_id: result.payment_id,
+        redirect_required: true,
+      }, { status: 201 });
+    } catch (error) {
+      console.error("Error initiating moneroo payment:", error);
+      return NextResponse.json({
+        ...order,
+        payment_initiation_error: "Erreur lors de l'initiation du paiement",
+      }, { status: 201 });
+    }
+  }
+
+  // Orange Money / PayTech: self-fetch via origin de la requête (pas localhost)
+  if (payment_method === "orange_money" || payment_method === "paytech") {
+    try {
+      const baseUrl = (
+        process.env.NEXT_PUBLIC_APP_URL ||
+        req.nextUrl.origin ||
+        "https://vbsniperacademie.com"
+      ).replace(/\/$/, "");
+
+      const endpoint =
+        payment_method === "orange_money"
+          ? `${baseUrl}/api/payments/orange-money/initiate`
+          : `${baseUrl}/api/payments/paytech/initiate`;
+
+      const authHeader =
+        req.headers.get("authorization") ||
+        req.headers.get("Authorization") ||
+        (token ? `Bearer ${token}` : "");
 
       const initiateRes = await fetch(endpoint, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": req.headers.get("Authorization") || "",
+          Authorization: authHeader,
         },
         body: JSON.stringify({ orderId: order.id, courseId }),
       });
 
       if (!initiateRes.ok) {
         const errorData = await initiateRes.json().catch(() => ({}));
-        // On retourne quand même la commande créée, mais avec une erreur
         return NextResponse.json({
           ...order,
           payment_initiation_error: errorData.error || "Erreur lors de l'initiation du paiement",
@@ -160,9 +193,8 @@ export async function POST(req: NextRequest) {
       }
 
       const responseData = await initiateRes.json();
-      // Adapter selon le format de réponse de chaque provider
       const payment_url = responseData.payment_url || responseData.redirectUrl;
-      
+
       return NextResponse.json({
         ...order,
         payment_url,
@@ -173,7 +205,6 @@ export async function POST(req: NextRequest) {
       }, { status: 201 });
     } catch (error) {
       console.error(`Error initiating ${payment_method} payment:`, error);
-      // On retourne quand même la commande créée
       return NextResponse.json({
         ...order,
         payment_initiation_error: "Erreur lors de l'initiation du paiement",
@@ -181,7 +212,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  // Pour cash, retourner simplement la commande
   return NextResponse.json(order, { status: 201 });
 }
-

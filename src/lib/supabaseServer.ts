@@ -9,17 +9,33 @@ if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
 }
 
 export function createSupabaseFromRequest(req: NextRequest) {
-  const authHeader = req.headers.get("authorization") || "";
+  const authHeader = req.headers.get("authorization") || req.headers.get("Authorization") || "";
   const token = authHeader.startsWith("Bearer ")
-    ? authHeader.slice("Bearer ".length)
+    ? authHeader.slice("Bearer ".length).trim()
     : undefined;
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     global: {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      detectSessionInUrl: false,
+    },
   });
 
   return { supabase, token };
 }
 
+/** Valide le JWT explicitement (plus fiable que getUser() sans arg côté serveur). */
+export async function getAuthUserId(
+  supabase: ReturnType<typeof createSupabaseFromRequest>["supabase"],
+  token?: string
+) {
+  const { data, error } = token
+    ? await supabase.auth.getUser(token)
+    : await supabase.auth.getUser();
+  if (error || !data.user) return null;
+  return data.user.id;
+}

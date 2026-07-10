@@ -1,16 +1,16 @@
-# Graph Report - strategie_nasogo  (2026-07-10)
+# Graph Report - strategie_nasogo  (2026-07-09)
 
 ## Corpus Check
-- 122 files · ~562,378 words
+- 121 files · ~562,424 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1005 nodes · 1204 edges · 137 communities (49 shown, 88 thin omitted)
+- 1001 nodes · 1192 edges · 137 communities (49 shown, 88 thin omitted)
 - Extraction: 100% EXTRACTED · 0% INFERRED · 0% AMBIGUOUS · INFERRED: 2 edges (avg confidence: 0.9)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `91a47a65`
+- Built from commit: `ea247fc4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -177,8 +177,8 @@
 ## Communities (137 total, 88 thin omitted)
 
 ### Community 0 - "Course Access APIs"
-Cohesion: 0.07
-Nodes (44): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+36 more)
+Cohesion: 0.06
+Nodes (51): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+43 more)
 
 ### Community 1 - "Orders Payment Access SQL"
 Cohesion: 0.07
@@ -261,8 +261,8 @@ Cohesion: 0.08
 Nodes (25): 1. Vérifier l'URL dans l'email, 2. Tester la confirmation, 3. Vérifier les logs Supabase, Configuration complète recommandée, Corriger l'erreur "requested path is invalid" lors de la confirmation d'email, Dépannage, Développement local, Format des URLs (+17 more)
 
 ### Community 32 - "Template de confirmation d'email amélioré"
-Cohesion: 0.04
-Nodes (42): 1. Le code échangé n'est pas un code de confirmation d'email, 2. Le code a expiré, 3. Le code a déjà été utilisé, 4. Problème avec la configuration Supabase, Causes possibles, Dépannage : Email non vérifié après confirmation, Logs de débogage, Option 1 : Vérifier la configuration Supabase (+34 more)
+Cohesion: 0.09
+Nodes (19): Ajouter un logo, Bonnes pratiques, Comment l'utiliser dans Supabase, Compatibilité, Dépannage, Guide d'utilisation, Le lien de confirmation ne fonctionne pas, Le template ne s'affiche pas correctement (+11 more)
 
 ### Community 33 - "Configurer les variables d'environnement sur Vercel"
 Cohesion: 0.08
@@ -277,8 +277,8 @@ Cohesion: 0.09
 Nodes (23): Configuration recommandée pour la production, Configurer les URLs de redirection dans Supabase, Dépannage, Développement local, Erreur persiste après configuration, Format des URLs, L'URL change selon l'environnement, Pour la production (votre domaine) : (+15 more)
 
 ### Community 36 - "Dépannage : Email non vérifié après confirmation"
-Cohesion: 0.26
-Nodes (10): getUserId(), POST(), POST(), decodeCustomField(), initiatePayment(), PayTechInitiateRequest, PayTechInitiateResponse, PayTechWebhookPayload (+2 more)
+Cohesion: 0.09
+Nodes (23): 1. Le code échangé n'est pas un code de confirmation d'email, 2. Le code a expiré, 3. Le code a déjà été utilisé, 4. Problème avec la configuration Supabase, Causes possibles, Dépannage : Email non vérifié après confirmation, Logs de débogage, Option 1 : Vérifier la configuration Supabase (+15 more)
 
 ### Community 37 - "Comment obtenir les codes de paiement Orange Money"
 Cohesion: 0.09
@@ -349,23 +349,23 @@ Cohesion: 0.50
 Nodes (3): Deploy on Vercel, Getting Started, Learn More
 
 ## Knowledge Gaps
-- **595 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+590 more)
+- **593 isolated node(s):** `eslintConfig`, `nextConfig`, `name`, `version`, `private` (+588 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **88 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `createSupabaseFromRequest()` connect `Course Access APIs` to `Dépannage : Email non vérifié après confirmation`, `Telegram Bot APIs`?**
+- **Why does `createSupabaseFromRequest()` connect `Course Access APIs` to `Telegram Bot APIs`?**
   _High betweenness centrality (0.022) - this node is a cross-community bridge._
 - **Why does `supabase` connect `Auth Reset Pages` to `page.tsx`, `page.tsx`, `Admin Dashboard Pages`, `page.tsx`?**
   _High betweenness centrality (0.012) - this node is a cross-community bridge._
 - **Why does `sanitizePhoneInput()` connect `Students Admin APIs` to `page.tsx`?**
   _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **What connects `eslintConfig`, `nextConfig`, `name` to the rest of the system?**
-  _599 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _597 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Course Access APIs` be split into smaller, more focused modules?**
-  _Cohesion score 0.06775956284153005 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.055900621118012424 - nodes in this community are weakly interconnected._
 - **Should `Orders Payment Access SQL` be split into smaller, more focused modules?**
   _Cohesion score 0.07142857142857142 - nodes in this community are weakly interconnected._
 - **Should `Students Admin APIs` be split into smaller, more focused modules?**
