@@ -1142,9 +1142,19 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
             <p className="text-sm font-semibold text-brand">Offre VB Sniper</p>
             <p className="text-lg font-semibold">{formatPrice(product.price)}</p>
           </div>
-          <Link href="/auth" className="button-primary text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
-            {product.customCtaText}
-          </Link>
+          {hasPaidAccess ? (
+            <Link href="/client" className="button-primary text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+              Mes cours
+            </Link>
+          ) : sessionToken ? (
+            <Link href="#checkout" className="button-primary text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+              {product.customCtaText}
+            </Link>
+          ) : (
+            <Link href="/auth" className="button-primary text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
+              {product.customCtaText}
+            </Link>
+          )}
         </div>
       </div>
     </div>
