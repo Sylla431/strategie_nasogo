@@ -83,7 +83,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const serviceClient = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    void notifyAdminOrderPaid({
+    await notifyAdminOrderPaid({
       serviceClient,
       orderId,
       userId: order.user_id,

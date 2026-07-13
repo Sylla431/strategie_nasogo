@@ -39,6 +39,14 @@ export async function notifyAdminPaymentSuccess(
     const fromEmail =
       process.env.RESEND_FROM_EMAIL ||
       "VB Sniper Académie <support@vbsniperacademie.com>";
+    const toEmail = ADMIN_PAYMENT_EMAIL;
+
+    console.log("📧 Envoi notif paiement Resend…", {
+      to: toEmail,
+      from: fromEmail,
+      product: input.product,
+      referenceId: input.referenceId,
+    });
 
     const productLabel =
       input.product === "telegram_vip" ? "VIP Telegram" : "Cours";
@@ -71,9 +79,9 @@ export async function notifyAdminPaymentSuccess(
 
     const text = rows.map(([label, value]) => `${label}: ${value}`).join("\n");
 
-    const { error } = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: fromEmail,
-      to: ADMIN_PAYMENT_EMAIL,
+      to: toEmail,
       subject,
       html: `
 <!DOCTYPE html>
@@ -108,7 +116,7 @@ export async function notifyAdminPaymentSuccess(
       return;
     }
 
-    console.log("✅ Email admin paiement envoyé à", ADMIN_PAYMENT_EMAIL);
+    console.log("✅ Email admin paiement envoyé à", toEmail, "id=", data?.id);
   } catch (err) {
     console.error("notifyAdminPaymentSuccess exception:", err);
   }

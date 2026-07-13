@@ -277,7 +277,7 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      void notifyAdminOrderPaid({
+      await notifyAdminOrderPaid({
         serviceClient: supabase,
         orderId: order.id,
         userId: order.user_id,

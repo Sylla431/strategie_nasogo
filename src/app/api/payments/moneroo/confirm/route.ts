@@ -294,7 +294,7 @@ async function confirmOrderPayment(params: {
       }
     }
 
-    void notifyAdminOrderPaid({
+    await notifyAdminOrderPaid({
       serviceClient,
       orderId: order.id,
       userId: order.user_id,

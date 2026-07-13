@@ -65,41 +65,38 @@ export async function fulfillVipPayment(params: {
 
   console.log("✅ VIP Telegram activé/prolongé pour", payment.user_id, `(${payment.kind})`);
 
-  // Notif admin (non bloquant)
-  void (async () => {
-    let userEmail: string | null = null;
-    let userName: string | null = null;
+  let userEmail: string | null = null;
+  let userName: string | null = null;
+  try {
+    const { data: profile } = await serviceClient
+      .from("users_profile")
+      .select("email, full_name")
+      .eq("id", payment.user_id)
+      .maybeSingle();
+    userEmail = profile?.email ?? null;
+    userName = profile?.full_name ?? null;
+  } catch {
+    /* ignore */
+  }
+  if (!userEmail) {
     try {
-      const { data: profile } = await serviceClient
-        .from("users_profile")
-        .select("email, full_name")
-        .eq("id", payment.user_id)
-        .maybeSingle();
-      userEmail = profile?.email ?? null;
-      userName = profile?.full_name ?? null;
+      const { data: authUser } = await serviceClient.auth.admin.getUserById(payment.user_id);
+      userEmail = authUser.user?.email ?? null;
     } catch {
       /* ignore */
     }
-    if (!userEmail) {
-      try {
-        const { data: authUser } = await serviceClient.auth.admin.getUserById(payment.user_id);
-        userEmail = authUser.user?.email ?? null;
-      } catch {
-        /* ignore */
-      }
-    }
-    await notifyAdminPaymentSuccess({
-      product: "telegram_vip",
-      paymentMethod: "moneroo",
-      amount: payment.amount,
-      referenceId: payment.id,
-      userId: payment.user_id,
-      userEmail,
-      userName,
-      detail: payment.kind === "adhesion" ? "Adhésion VIP (1er mois inclus)" : "Renouvellement VIP — 1 mois",
-      monerooPaymentId,
-    });
-  })();
+  }
+  await notifyAdminPaymentSuccess({
+    product: "telegram_vip",
+    paymentMethod: "moneroo",
+    amount: payment.amount,
+    referenceId: payment.id,
+    userId: payment.user_id,
+    userEmail,
+    userName,
+    detail: payment.kind === "adhesion" ? "Adhésion VIP (1er mois inclus)" : "Renouvellement VIP — 1 mois",
+    monerooPaymentId,
+  });
 
   return { ok: true };
 }
