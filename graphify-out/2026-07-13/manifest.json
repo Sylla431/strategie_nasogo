@@ -57,7 +57,7 @@
   "src/app/api/access/route.ts": {
     "mtime": 1783680171.4129694,
     "ast_hash": "97d09761fa5eaf32b2e5efe5f6636c34",
-    "semantic_hash": "97d09761fa5eaf32b2e5efe5f6636c34"
+    "semantic_hash": ""
   },
   "src/app/api/courses/[id]/video/[videoId]/url/route.ts": {
     "mtime": 1767621669.4489646,
@@ -85,9 +85,9 @@
     "semantic_hash": "5d7314c7622a81bec3e023ba95c4669e"
   },
   "src/app/api/orders/[id]/pay/route.ts": {
-    "mtime": 1783942838.56004,
-    "ast_hash": "5bb705c2be5ce3b415a27fe7631a5d4f",
-    "semantic_hash": "5bb705c2be5ce3b415a27fe7631a5d4f"
+    "mtime": 1783703969.0395975,
+    "ast_hash": "7ea8d259826f5d15d599a280ecf7fd06",
+    "semantic_hash": ""
   },
   "src/app/api/orders/[id]/payment-codes/route.ts": {
     "mtime": 1766853185.8000762,
@@ -97,22 +97,22 @@
   "src/app/api/orders/route.ts": {
     "mtime": 1783681764.7526908,
     "ast_hash": "00f63db9fc60da5af19b475b1ab42dc0",
-    "semantic_hash": "00f63db9fc60da5af19b475b1ab42dc0"
+    "semantic_hash": ""
   },
   "src/app/api/payments/moneroo/confirm/route.ts": {
-    "mtime": 1783942827.7984746,
-    "ast_hash": "76d3ba867dea65d2a102a91b5a03e573",
-    "semantic_hash": "76d3ba867dea65d2a102a91b5a03e573"
+    "mtime": 1783703947.6222277,
+    "ast_hash": "1cccfc25f4c08dd912750886e8577283",
+    "semantic_hash": ""
   },
   "src/app/api/payments/moneroo/initiate/route.ts": {
     "mtime": 1783681713.5045235,
     "ast_hash": "5bd9ea79d08e110e4c3e816cfdc40ca6",
-    "semantic_hash": "5bd9ea79d08e110e4c3e816cfdc40ca6"
+    "semantic_hash": ""
   },
   "src/app/api/payments/moneroo/webhook/route.ts": {
-    "mtime": 1783942826.0895722,
-    "ast_hash": "d72e2b01d9e445ba876cc2961c20a4d2",
-    "semantic_hash": "d72e2b01d9e445ba876cc2961c20a4d2"
+    "mtime": 1783703944.734795,
+    "ast_hash": "010af9e58ec94db1c73bc5c92db7bef5",
+    "semantic_hash": ""
   },
   "src/app/api/payments/orange-money/initiate/route.ts": {
     "mtime": 1766848336.6250472,
@@ -125,14 +125,14 @@
     "semantic_hash": "bf0ceed095e3c81fbf4326e6b2807449"
   },
   "src/app/api/payments/paytech/webhook/route.ts": {
-    "mtime": 1783942836.617959,
-    "ast_hash": "f4963b23ba104f072840d4d202215218",
-    "semantic_hash": "f4963b23ba104f072840d4d202215218"
+    "mtime": 1783703962.522988,
+    "ast_hash": "dea35016806ccb3e8d49fa3a0aec3c19",
+    "semantic_hash": ""
   },
   "src/app/api/payments/webhook/route.ts": {
-    "mtime": 1783942838.450029,
-    "ast_hash": "c93dad570ff5a64a928bba8256268ecd",
-    "semantic_hash": "c93dad570ff5a64a928bba8256268ecd"
+    "mtime": 1783703997.9562628,
+    "ast_hash": "d416344c347b350362ce497ca8ac6f73",
+    "semantic_hash": ""
   },
   "src/app/api/resend/add-contact/route.ts": {
     "mtime": 1767028024.1057093,
@@ -155,7 +155,7 @@
     "semantic_hash": "f7794f39f1771495c3e9eb7049b65e3b"
   },
   "src/app/api/students/route.ts": {
-    "mtime": 1783941459.0242796,
+    "mtime": 1783680171.4129617,
     "ast_hash": "d5f425a6770a19251a95e8922ceb3cb2",
     "semantic_hash": "d5f425a6770a19251a95e8922ceb3cb2"
   },
@@ -222,7 +222,7 @@
   "src/app/auth/page.tsx": {
     "mtime": 1783695831.8464303,
     "ast_hash": "1f0a6616d245e7ef0e8b9ec41a368648",
-    "semantic_hash": "1f0a6616d245e7ef0e8b9ec41a368648"
+    "semantic_hash": ""
   },
   "src/app/auth/reset-password/page.tsx": {
     "mtime": 1766848336.6274333,
@@ -232,7 +232,7 @@
   "src/app/client/page.tsx": {
     "mtime": 1783695914.1849358,
     "ast_hash": "1d0d42c55fcfb137e259e1fd1fa4c1b6",
-    "semantic_hash": "1d0d42c55fcfb137e259e1fd1fa4c1b6"
+    "semantic_hash": ""
   },
   "src/app/course/[courseId]/video/[videoId]/page.tsx": {
     "mtime": 1766848336.639971,
@@ -247,7 +247,7 @@
   "src/app/page.tsx": {
     "mtime": 1783695828.123665,
     "ast_hash": "c1bd0aaeed0a367de789bd1c7903ca3c",
-    "semantic_hash": "c1bd0aaeed0a367de789bd1c7903ca3c"
+    "semantic_hash": ""
   },
   "src/app/payment/cancel/page.tsx": {
     "mtime": 1766748925.3770401,
@@ -257,7 +257,7 @@
   "src/app/payment/success/page.tsx": {
     "mtime": 1783695914.964572,
     "ast_hash": "603b09071fbc30089351eb4ed716074a",
-    "semantic_hash": "603b09071fbc30089351eb4ed716074a"
+    "semantic_hash": ""
   },
   "src/app/robots.txt/route.ts": {
     "mtime": 1766077470.6562297,
@@ -272,7 +272,7 @@
   "src/app/services/strategie-nasongon/page.tsx": {
     "mtime": 1783690890.6535609,
     "ast_hash": "f89f7f8d1b3b39070fc5a42ae3c65cd0",
-    "semantic_hash": "f89f7f8d1b3b39070fc5a42ae3c65cd0"
+    "semantic_hash": ""
   },
   "src/app/sitemap.ts": {
     "mtime": 1766075941.6660194,
@@ -282,12 +282,12 @@
   "src/components/ServiceCard.tsx": {
     "mtime": 1783695984.8859763,
     "ast_hash": "6a8eec4328ec4082c303edf97c21fc3c",
-    "semantic_hash": "6a8eec4328ec4082c303edf97c21fc3c"
+    "semantic_hash": ""
   },
   "src/components/admin/AdminDashboard.tsx": {
     "mtime": 1783680171.417887,
     "ast_hash": "869462389819cf4e542089db872a7930",
-    "semantic_hash": "869462389819cf4e542089db872a7930"
+    "semantic_hash": ""
   },
   "src/components/admin/AdminOverlays.tsx": {
     "mtime": 1780931092.4353228,
@@ -352,7 +352,7 @@
   "src/lib/supabaseServer.ts": {
     "mtime": 1783681713.3514228,
     "ast_hash": "afdce8a92fe4e25b1c182cc61112ab1a",
-    "semantic_hash": "afdce8a92fe4e25b1c182cc61112ab1a"
+    "semantic_hash": ""
   },
   "src/lib/telegram/api.ts": {
     "mtime": 1780923326.0549529,
@@ -857,7 +857,7 @@
   ".claude/settings.json": {
     "mtime": 1783618285.6053736,
     "ast_hash": "378c36f3ccef61ae4b7740a5f67af8ca",
-    "semantic_hash": "378c36f3ccef61ae4b7740a5f67af8ca"
+    "semantic_hash": ""
   },
   "CLAUDE.md": {
     "mtime": 1783618285.6043212,
@@ -867,46 +867,41 @@
   "src/lib/payments/initiateMoneroo.ts": {
     "mtime": 1783681710.803811,
     "ast_hash": "0ae71cc23acbd6262326a28f9b58d5e8",
-    "semantic_hash": "0ae71cc23acbd6262326a28f9b58d5e8"
+    "semantic_hash": ""
   },
   "src/app/api/telegram/vip/checkout/route.ts": {
     "mtime": 1783695769.147541,
     "ast_hash": "653ca4a309ca74283a9d45168058f764",
-    "semantic_hash": "653ca4a309ca74283a9d45168058f764"
+    "semantic_hash": ""
   },
   "src/app/vip/checkout/page.tsx": {
     "mtime": 1783695831.4932575,
     "ast_hash": "2a550f63cf536b97a164379f028262bc",
-    "semantic_hash": "2a550f63cf536b97a164379f028262bc"
+    "semantic_hash": ""
   },
   "src/lib/payments/fulfillVipPayment.ts": {
-    "mtime": 1783942862.9277742,
-    "ast_hash": "4255764d405ccf4a5d1b70244cb6736a",
-    "semantic_hash": "4255764d405ccf4a5d1b70244cb6736a"
+    "mtime": 1783703934.1702561,
+    "ast_hash": "7648563068e471057fac5f9771182b95",
+    "semantic_hash": ""
   },
   "src/lib/payments/initiateMonerooVip.ts": {
     "mtime": 1783695764.3745675,
     "ast_hash": "adf7e4c5966bd7513049680a8ff1d1f4",
-    "semantic_hash": "adf7e4c5966bd7513049680a8ff1d1f4"
+    "semantic_hash": ""
   },
   "src/lib/telegram/pricing.ts": {
     "mtime": 1783695749.417437,
     "ast_hash": "2dfcd81fbad8497a99d0dce80a6fe9e3",
-    "semantic_hash": "2dfcd81fbad8497a99d0dce80a6fe9e3"
+    "semantic_hash": ""
   },
   "supabase/migrations/create_telegram_vip_payments.sql": {
     "mtime": 1783695749.4174354,
     "ast_hash": "1fb25190f7eb750279e301c851640a86",
-    "semantic_hash": "1fb25190f7eb750279e301c851640a86"
+    "semantic_hash": ""
   },
   "src/lib/payments/notifyPaymentSuccess.ts": {
-    "mtime": 1783942867.8967912,
-    "ast_hash": "0ad026229f1b2c9506e3910ca61df0cf",
-    "semantic_hash": "0ad026229f1b2c9506e3910ca61df0cf"
-  },
-  "src/app/api/payments/test-notify/route.ts": {
-    "mtime": 1783942876.7327993,
-    "ast_hash": "0655a1efcf020233ccba22dc3f1e0c38",
-    "semantic_hash": "0655a1efcf020233ccba22dc3f1e0c38"
+    "mtime": 1783703941.2040496,
+    "ast_hash": "7a5a1da06fb48218b153072763d9908a",
+    "semantic_hash": ""
   }
 }

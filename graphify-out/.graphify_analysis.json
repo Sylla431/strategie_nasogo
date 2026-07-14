@@ -2,6 +2,7 @@
   "communities": {
     "0": [
       "src_app_api_access_route",
+      "src_app_api_access_route_delete",
       "src_app_api_access_route_get",
       "src_app_api_access_route_getprofilerole",
       "src_app_api_access_route_post",
@@ -27,87 +28,170 @@
       "src_app_api_orders_route_getuseridandrole",
       "src_app_api_orders_route_post",
       "src_app_api_payments_moneroo_confirm_route",
+      "src_app_api_payments_moneroo_confirm_route_confirmorderpayment",
+      "src_app_api_payments_moneroo_confirm_route_confirmvippayment",
+      "src_app_api_payments_moneroo_confirm_route_orderrow",
       "src_app_api_payments_moneroo_confirm_route_post",
+      "src_app_api_payments_moneroo_confirm_route_servicesupabase",
       "src_app_api_payments_moneroo_initiate_route",
-      "src_app_api_payments_moneroo_initiate_route_getuserid",
       "src_app_api_payments_moneroo_initiate_route_post",
       "src_app_api_payments_moneroo_webhook_route",
+      "src_app_api_payments_moneroo_webhook_route_findvippayment",
+      "src_app_api_payments_moneroo_webhook_route_handleorderwebhook",
+      "src_app_api_payments_moneroo_webhook_route_handlevipwebhook",
+      "src_app_api_payments_moneroo_webhook_route_orderrow",
       "src_app_api_payments_moneroo_webhook_route_post",
-      "src_app_api_payments_orange_money_initiate_route",
-      "src_app_api_payments_orange_money_initiate_route_getuserid",
-      "src_app_api_payments_orange_money_initiate_route_post",
+      "src_app_api_payments_moneroo_webhook_route_servicesupabase",
+      "src_app_api_payments_paytech_webhook_route",
+      "src_app_api_payments_paytech_webhook_route_post",
+      "src_app_api_payments_test_notify_route",
+      "src_app_api_payments_test_notify_route_post",
       "src_app_api_payments_webhook_route",
       "src_app_api_payments_webhook_route_post",
-      "src_lib_moneroo",
-      "src_lib_moneroo_initiatepayment",
-      "src_lib_moneroo_monerooinitiaterequest",
-      "src_lib_moneroo_monerooinitiateresponse",
-      "src_lib_moneroo_monerooverifyresponse",
-      "src_lib_moneroo_moneroowebhookpayload",
-      "src_lib_moneroo_verifypayment",
-      "src_lib_moneroo_verifywebhooktoken",
-      "src_lib_orangemoney",
-      "src_lib_orangemoney_checkpaymentstatus",
-      "src_lib_orangemoney_initiatepayment",
-      "src_lib_orangemoney_orangemoneyinitiaterequest",
-      "src_lib_orangemoney_orangemoneyinitiateresponse",
-      "src_lib_orangemoney_orangemoneytransactionstatusrequest",
-      "src_lib_orangemoney_orangemoneytransactionstatusresponse",
-      "src_lib_orangemoney_orangemoneywebhookpayload",
-      "src_lib_orangemoney_verifywebhooktoken",
+      "src_app_api_telegram_vip_checkout_route",
+      "src_app_api_telegram_vip_checkout_route_post",
+      "src_app_vip_checkout_page",
+      "src_app_vip_checkout_page_vipcheckoutcontent",
+      "src_app_vip_checkout_page_vipcheckoutpage",
+      "src_lib_payments_fulfillvippayment",
+      "src_lib_payments_fulfillvippayment_failvippayment",
+      "src_lib_payments_fulfillvippayment_fulfillvippayment",
+      "src_lib_payments_fulfillvippayment_vippaymentrow",
+      "src_lib_payments_initiatemoneroo",
+      "src_lib_payments_initiatemoneroo_course",
+      "src_lib_payments_initiatemoneroo_initiatemoneroofororder",
+      "src_lib_payments_initiatemoneroo_initiatemonerooresult",
+      "src_lib_payments_initiatemoneroovip",
+      "src_lib_payments_initiatemoneroovip_initiatemonerooforvippayment",
+      "src_lib_payments_initiatemoneroovip_initiatemoneroovipresult",
+      "src_lib_payments_notifypaymentsuccess",
+      "src_lib_payments_notifypaymentsuccess_formatamount",
+      "src_lib_payments_notifypaymentsuccess_notifyadminorderpaid",
+      "src_lib_payments_notifypaymentsuccess_notifyadminpaymentsuccess",
+      "src_lib_payments_notifypaymentsuccess_paymentsuccessnotifyinput",
       "src_lib_supabaseserver",
-      "src_lib_supabaseserver_createsupabasefromrequest"
+      "src_lib_supabaseserver_createsupabasefromrequest",
+      "src_lib_supabaseserver_getauthuserid",
+      "src_lib_telegram_pricing",
+      "src_lib_telegram_pricing_resolvevipcheckout",
+      "src_lib_telegram_pricing_vippaymentkind"
     ],
     "1": [
-      "ajouter_colonne_payment_reference",
-      "ajouter_colonne_payment_reference_notif_token",
-      "ajouter_colonne_payment_reference_orders_table",
-      "ajouter_colonne_payment_reference_pay_token",
-      "ajouter_colonne_payment_reference_payment_reference",
-      "ajouter_colonne_payment_reference_txnid",
-      "ajouter_fonction_acces_automatique",
-      "ajouter_fonction_acces_automatique_grant_course_access",
-      "ajouter_fonction_acces_automatique_grant_course_access_automatic",
-      "ajouter_fonction_acces_automatique_orange_money_webhook",
-      "comment_obtenir_codes_paiement",
-      "comment_obtenir_codes_paiement_check_payment_status",
-      "comment_obtenir_codes_paiement_orange_money_initiate",
-      "comment_obtenir_codes_paiement_payment_codes_api",
-      "comment_obtenir_otp_requestor",
-      "comment_obtenir_otp_requestor_access_token",
-      "comment_obtenir_otp_requestor_merchant_key",
-      "comment_obtenir_otp_requestor_orange_developer",
-      "comment_obtenir_otp_requestor_otp_requestor",
-      "configurer_service_role",
-      "configurer_service_role_rls",
-      "configurer_service_role_service_role_key",
-      "configurer_urls_redirection_supabase",
-      "configurer_urls_redirection_supabase_auth_callback",
-      "configurer_urls_redirection_supabase_auth_reset_password",
-      "configurer_urls_redirection_supabase_redirect_urls",
-      "configurer_vercel_env",
-      "configurer_vercel_env_next_public_app_url",
-      "configurer_vercel_env_orange_money_env_vars",
-      "confirmation_paiement_orange_money",
-      "confirmation_paiement_orange_money_client_phone_confirmation",
-      "confirmation_paiement_orange_money_merchant_credentials",
-      "corriger_erreur_confirmation_email",
-      "corriger_erreur_confirmation_email_requested_path_invalid",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_geoffroy_boko",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_preserve_orange_money",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_service_card",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_strategie_nasongon",
-      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_vb_sniper_academie",
-      "depannage_dns_domaine",
-      "depannage_dns_domaine_nxdomain",
-      "depannage_dns_domaine_vbsniperacademie",
-      "depannage_dns_domaine_vercel_domains",
-      "depannage_email_non_verifie",
-      "depannage_email_non_verifie_auth_callback_exchange",
-      "depannage_email_non_verifie_email_confirmed_at"
+      "src_app_api_telegram_cron_route",
+      "src_app_api_telegram_cron_route_get",
+      "src_app_api_telegram_cron_route_isauthorized",
+      "src_app_api_telegram_cron_route_post",
+      "src_app_api_telegram_diagnose_route",
+      "src_app_api_telegram_diagnose_route_get",
+      "src_app_api_telegram_link_token_route",
+      "src_app_api_telegram_link_token_route_post",
+      "src_app_api_telegram_set_webhook_route",
+      "src_app_api_telegram_set_webhook_route_post",
+      "src_app_api_telegram_subscription_route",
+      "src_app_api_telegram_subscription_route_get",
+      "src_app_api_telegram_subscriptions_route",
+      "src_app_api_telegram_subscriptions_route_get",
+      "src_app_api_telegram_subscriptions_route_patch",
+      "src_app_api_telegram_subscriptions_route_post",
+      "src_app_api_telegram_webhook_info_route",
+      "src_app_api_telegram_webhook_info_route_get",
+      "src_app_api_telegram_webhook_route",
+      "src_app_api_telegram_webhook_route_get",
+      "src_app_api_telegram_webhook_route_post",
+      "src_lib_supabaseadmin",
+      "src_lib_telegram_api",
+      "src_lib_telegram_api_calltelegramapi",
+      "src_lib_telegram_api_createpersonalinvitelink",
+      "src_lib_telegram_api_kickfromchannel",
+      "src_lib_telegram_api_sendtelegrammessage",
+      "src_lib_telegram_api_telegramapiresponse",
+      "src_lib_telegram_api_unbanfromchannel",
+      "src_lib_telegram_config",
+      "src_lib_telegram_config_getbotusername",
+      "src_lib_telegram_config_gettelegramconfig",
+      "src_lib_telegram_config_gettelegramconfigmissing",
+      "src_lib_telegram_config_gettelegramwebhookbaseurl",
+      "src_lib_telegram_config_telegramconfig",
+      "src_lib_telegram_linktoken",
+      "src_lib_telegram_linktoken_createlinktokenresult",
+      "src_lib_telegram_linktoken_createtelegramlinktoken",
+      "src_lib_telegram_linktoken_generatetoken",
+      "src_lib_telegram_linktoken_handlestartwithtoken",
+      "src_lib_telegram_resolveuser",
+      "src_lib_telegram_resolveuser_resolveduser",
+      "src_lib_telegram_resolveuser_resolveuserfromemailorid",
+      "src_lib_telegram_subscription",
+      "src_lib_telegram_subscription_addmonths",
+      "src_lib_telegram_subscription_ensureuserprofileexists",
+      "src_lib_telegram_subscription_expiresubscriptionnow",
+      "src_lib_telegram_subscription_findsubscriptionforaccount",
+      "src_lib_telegram_subscription_getsubscriptionbytelegramuserid",
+      "src_lib_telegram_subscription_getsubscriptionbyuserid",
+      "src_lib_telegram_subscription_grantorextendsubscription",
+      "src_lib_telegram_subscription_issubscriptionactive",
+      "src_lib_telegram_subscription_linktelegramaccount",
+      "src_lib_telegram_subscription_listchannelaccesssubscriptions",
+      "src_lib_telegram_subscription_migratesubscriptiontouser",
+      "src_lib_telegram_subscription_preparetelegramaccess",
+      "src_lib_telegram_subscription_processexpiredsubscriptions",
+      "src_lib_telegram_subscription_revokesubscription",
+      "src_lib_telegram_subscription_telegramsubscription",
+      "src_lib_telegram_subscription_telegramsubscriptionwithprofile",
+      "src_lib_telegram_webhookhandler",
+      "src_lib_telegram_webhookhandler_parsestarttoken",
+      "src_lib_telegram_webhookhandler_processtelegramupdate",
+      "src_lib_telegram_webhookhandler_telegramupdate"
     ],
     "2": [
+      "configurer_urls_redirection_supabase",
+      "corriger_erreur_confirmation_email",
+      "depannage_email_non_verifie",
+      "depannage_email_non_verifie_1_le_code_\u00e9chang\u00e9_n_est_pas_un_code_de_confirmation_d_email",
+      "depannage_email_non_verifie_2_le_code_a_expir\u00e9",
+      "depannage_email_non_verifie_3_le_code_a_d\u00e9j\u00e0_\u00e9t\u00e9_utilis\u00e9",
+      "depannage_email_non_verifie_4_probl\u00e8me_avec_la_configuration_supabase",
+      "depannage_email_non_verifie_causes_possibles",
+      "depannage_email_non_verifie_d\u00e9pannage_email_non_v\u00e9rifi\u00e9_apr\u00e8s_confirmation",
+      "depannage_email_non_verifie_logs_de_d\u00e9bogage",
+      "depannage_email_non_verifie_option_1_v\u00e9rifier_la_configuration_supabase",
+      "depannage_email_non_verifie_option_2_v\u00e9rifier_les_variables_d_environnement",
+      "depannage_email_non_verifie_option_3_contacter_le_support_supabase",
+      "depannage_email_non_verifie_probl\u00e8me",
+      "depannage_email_non_verifie_ressources",
+      "depannage_email_non_verifie_script_sql_pour_confirmer_manuellement_un_email",
+      "depannage_email_non_verifie_script_sql_pour_v\u00e9rifier_les_emails_non_confirm\u00e9s",
+      "depannage_email_non_verifie_si_le_probl\u00e8me_persiste",
+      "depannage_email_non_verifie_solution_1_v\u00e9rifier_les_logs",
+      "depannage_email_non_verifie_solution_2_v\u00e9rifier_manuellement_dans_supabase",
+      "depannage_email_non_verifie_solution_3_confirmer_manuellement_l_email",
+      "depannage_email_non_verifie_solution_4_v\u00e9rifier_le_type_de_code",
+      "depannage_email_non_verifie_solution_5_tester_avec_un_nouveau_compte",
+      "depannage_email_non_verifie_solutions",
+      "depannage_email_non_verifie_v\u00e9rification_apr\u00e8s_correction",
+      "depannage_email_non_verifie_v\u00e9rifications_dans_le_code",
+      "reactiver_confirmation_email",
+      "template_confirmation_email",
+      "template_confirmation_email_ajouter_un_logo",
+      "template_confirmation_email_bonnes_pratiques",
+      "template_confirmation_email_comment_l_utiliser_dans_supabase",
+      "template_confirmation_email_compatibilit\u00e9",
+      "template_confirmation_email_d\u00e9pannage",
+      "template_confirmation_email_guide_d_utilisation",
+      "template_confirmation_email_le_lien_de_confirmation_ne_fonctionne_pas",
+      "template_confirmation_email_le_template_ne_s_affiche_pas_correctement",
+      "template_confirmation_email_modifier_les_couleurs",
+      "template_confirmation_email_personnalisation",
+      "template_confirmation_email_ressources",
+      "template_confirmation_email_sujet_de_l_email_subject",
+      "template_confirmation_email_template_de_confirmation_d_email_am\u00e9lior\u00e9",
+      "template_confirmation_email_template_html_complet",
+      "template_confirmation_email_template_texte_simple_alternative",
+      "template_confirmation_email_test_du_template",
+      "template_confirmation_email_tester_avec_un_compte_r\u00e9el",
+      "template_confirmation_email_tester_dans_supabase",
+      "template_confirmation_email_variables_disponibles_dans_supabase"
+    ],
+    "3": [
       "src_app_api_students_id_payment_history_route",
       "src_app_api_students_id_payment_history_route_get",
       "src_app_api_students_id_record_payment_route",
@@ -145,181 +229,224 @@
       "src_lib_studentsecurity_isvalidphone",
       "src_lib_studentsecurity_isvalidstudentcardpath",
       "src_lib_studentsecurity_sanitizephoneinput",
-      "src_lib_studentsecurity_student_field_limits",
-      "src_lib_supabaseadmin"
-    ],
-    "3": [
-      "src_app_auth_page",
-      "src_app_auth_page_authform",
-      "src_app_auth_page_authpage",
-      "src_app_auth_page_mode",
-      "src_app_auth_reset_password_page",
-      "src_app_auth_reset_password_page_resetpasswordform",
-      "src_app_auth_reset_password_page_resetpasswordpage",
-      "src_app_client_page",
-      "src_app_client_page_clientspace",
-      "src_app_client_page_course",
-      "src_app_client_page_courseaccess",
-      "src_app_client_page_coursevideo",
-      "src_app_client_page_order",
-      "src_app_client_page_telegramicon",
-      "src_app_course_courseid_video_videoid_page",
-      "src_app_course_courseid_video_videoid_page_course",
-      "src_app_course_courseid_video_videoid_page_coursevideo",
-      "src_app_course_courseid_video_videoid_page_videopage",
-      "src_app_payment_success_page",
-      "src_app_payment_success_page_paymentsuccesscontent",
-      "src_app_payment_success_page_paymentsuccesspage",
-      "src_app_services_strategie_nasongon_page",
-      "src_app_services_strategie_nasongon_page_countdown",
-      "src_app_services_strategie_nasongon_page_findnasongoncourse",
-      "src_app_services_strategie_nasongon_page_formatprice",
-      "src_app_services_strategie_nasongon_page_home",
-      "src_app_services_strategie_nasongon_page_otherproducts",
-      "src_app_services_strategie_nasongon_page_product",
-      "src_app_services_strategie_nasongon_page_stat",
-      "src_app_services_strategie_nasongon_page_store",
-      "src_app_services_strategie_nasongon_page_testimonials",
-      "src_app_services_strategie_nasongon_page_usecountdown",
-      "src_lib_supabaseclient",
-      "src_lib_supabaseclient_supabase"
+      "src_lib_studentsecurity_student_field_limits"
     ],
     "4": [
-      "depannage_undefined_orange_money_currency_ouv_xof",
-      "depannage_undefined_orange_money_doc",
-      "depannage_undefined_orange_money_frais_undefined",
-      "gestion_echecs_paiement_doc",
-      "gestion_echecs_paiement_double_payment_protection",
-      "gestion_echecs_paiement_has_paid_access",
-      "gestion_echecs_paiement_orders_failed_status",
-      "integration_paytech_moneroo_doc",
-      "integration_paytech_moneroo_grant_course_access",
-      "integration_paytech_moneroo_moneroo",
-      "integration_paytech_moneroo_payment_method_routing",
-      "integration_paytech_moneroo_paytech",
-      "orange_money_adaptation_doc",
-      "orange_money_adaptation_webpayment_guide",
-      "orange_money_next_steps_doc",
-      "orange_money_next_steps_ngrok_webhook",
-      "orange_money_next_steps_oauth_access_token",
-      "orange_money_next_steps_ussd_simulator",
-      "orange_money_setup_doc",
-      "orange_money_setup_notif_token",
-      "orange_money_setup_transaction_statuses",
-      "orange_money_setup_webpayment_api",
-      "paytech_official_integration_api_base",
+      "paytech_official_integration",
+      "paytech_official_integration_1_initiation_de_paiement_src_lib_paytech_ts",
+      "paytech_official_integration_1_url_de_base_api",
+      "paytech_official_integration_2_authentification",
+      "paytech_official_integration_2_v\u00e9rification_webhook_src_lib_paytech_ts",
+      "paytech_official_integration_3_endpoint_d_initiation",
+      "paytech_official_integration_3_route_d_initiation_src_app_api_payments_paytech_initiate_route_ts",
+      "paytech_official_integration_4_param\u00e8tres_de_requ\u00eate",
+      "paytech_official_integration_4_route_webhook_src_app_api_payments_paytech_webhook_route_ts",
+      "paytech_official_integration_5_format_de_r\u00e9ponse",
+      "paytech_official_integration_6_webhook_ipn",
+      "paytech_official_integration_7_variables_d_environnement",
+      "paytech_official_integration_changements_majeurs_par_rapport_\u00e0_l_ancienne_impl\u00e9mentation",
+      "paytech_official_integration_configuration_requise",
+      "paytech_official_integration_configuration_webhook_dans_paytech_dashboard",
       "paytech_official_integration_doc",
-      "paytech_official_integration_hmac_sha256",
-      "paytech_official_integration_request_payment",
-      "readme_doc",
-      "readme_nextjs",
-      "readme_vercel_deploy",
-      "solution_domaine_temporaire_doc",
-      "solution_domaine_temporaire_next_public_app_url",
-      "solution_domaine_temporaire_nxdomain"
+      "paytech_official_integration_d\u00e9pannage",
+      "paytech_official_integration_erreur_success_1",
+      "paytech_official_integration_exemples_d_utilisation",
+      "paytech_official_integration_fonctionnalit\u00e9s_impl\u00e9ment\u00e9es",
+      "paytech_official_integration_initiation_de_paiement",
+      "paytech_official_integration_mode_production",
+      "paytech_official_integration_mode_test_sandbox",
+      "paytech_official_integration_m\u00e9thode_1_hmac_sha256_recommand\u00e9e",
+      "paytech_official_integration_m\u00e9thode_2_sha256_classique",
+      "paytech_official_integration_r\u00e9f\u00e9rences",
+      "paytech_official_integration_signature_invalide",
+      "paytech_official_integration_sources_officielles",
+      "paytech_official_integration_s\u00e9curit\u00e9",
+      "paytech_official_integration_tests",
+      "paytech_official_integration_traitement_webhook",
+      "paytech_official_integration_variables_d_environnement",
+      "paytech_official_integration_v\u00e9rification_des_webhooks",
+      "paytech_official_integration_webhook_non_re\u00e7u"
     ],
     "5": [
-      "src_app_admin_access_page",
-      "src_app_admin_access_page_adminaccesspage",
-      "src_app_admin_courses_page",
-      "src_app_admin_courses_page_admincoursespage",
-      "src_app_admin_payments_page",
-      "src_app_admin_payments_page_adminpaymentspage",
-      "src_app_admin_students_page",
-      "src_app_admin_students_page_adminstudentspage",
-      "src_app_admin_students_page_courseoption",
-      "src_app_admin_students_page_paymentinstallment",
-      "src_app_admin_students_page_statuslabel",
-      "src_app_admin_students_page_studentdetailresponse",
-      "src_app_admin_students_page_studentpaymentfilteroption",
-      "src_app_admin_students_page_studentsortoption",
-      "src_app_admin_students_page_studentsummary",
-      "src_app_admin_telegram_page",
-      "src_app_admin_telegram_page_admintelegrampage",
-      "src_components_admin_admindashboard",
-      "src_components_admin_admindashboard_admindashboard",
-      "src_components_admin_admindashboard_adminsection",
-      "src_components_admin_admindashboard_course",
-      "src_components_admin_admindashboard_courseaccess",
-      "src_components_admin_admindashboard_coursevideo",
-      "src_components_admin_admindashboard_order",
-      "src_components_admin_admindashboard_section_meta",
-      "src_components_admin_admindashboard_telegramvipuser",
-      "src_components_admin_admindashboard_userprofile",
-      "src_components_admin_adminoverlays",
-      "src_components_admin_adminoverlays_adminfeedbackmodal",
-      "src_components_admin_adminoverlays_adminloadingoverlay",
-      "src_components_admin_adminoverlays_feedbacktype",
-      "src_components_admin_adminoverlays_spinner"
+      "configurer_smtp_supabase",
+      "configurer_smtp_supabase_configuration_dns_recommand\u00e9e",
+      "configurer_smtp_supabase_configurer_smtp_dans_supabase_guide_pas_\u00e0_pas",
+      "configurer_smtp_supabase_dmarc_domain_based_message_authentication",
+      "configurer_smtp_supabase_d\u00e9pannage",
+      "configurer_smtp_supabase_erreur_authentication_failed",
+      "configurer_smtp_supabase_erreur_connection_timeout",
+      "configurer_smtp_supabase_erreur_invalid_sender",
+      "configurer_smtp_supabase_les_emails_arrivent_mais_dans_les_spams",
+      "configurer_smtp_supabase_option_1_resend_recommand\u00e9_gratuit_et_facile",
+      "configurer_smtp_supabase_option_2_sendgrid_alternative",
+      "configurer_smtp_supabase_option_3_mailgun_alternative",
+      "configurer_smtp_supabase_probl\u00e8me",
+      "configurer_smtp_supabase_ressources",
+      "configurer_smtp_supabase_solution_configurer_un_service_smtp_professionnel",
+      "configurer_smtp_supabase_spf_sender_policy_framework",
+      "configurer_smtp_supabase_support",
+      "configurer_smtp_supabase_test_rapide",
+      "configurer_smtp_supabase_v\u00e9rification_de_la_configuration",
+      "configurer_smtp_supabase_v\u00e9rifier_dans_supabase",
+      "configurer_smtp_supabase_v\u00e9rifier_les_logs",
+      "configurer_smtp_supabase_\u00e9tape_1_cr\u00e9er_un_compte_mailgun",
+      "configurer_smtp_supabase_\u00e9tape_1_cr\u00e9er_un_compte_resend",
+      "configurer_smtp_supabase_\u00e9tape_2_cr\u00e9er_une_api_key",
+      "configurer_smtp_supabase_\u00e9tape_2_obtenir_les_identifiants_smtp",
+      "configurer_smtp_supabase_\u00e9tape_2_obtenir_votre_api_key",
+      "configurer_smtp_supabase_\u00e9tape_3_ajouter_votre_domaine_optionnel_mais_recommand\u00e9",
+      "configurer_smtp_supabase_\u00e9tape_3_configurer_supabase",
+      "configurer_smtp_supabase_\u00e9tape_4_configurer_supabase",
+      "configurer_smtp_supabase_\u00e9tape_5_tester"
     ],
     "6": [
-      "src_app_api_telegram_cron_route",
-      "src_app_api_telegram_cron_route_get",
-      "src_app_api_telegram_cron_route_isauthorized",
-      "src_app_api_telegram_cron_route_post",
-      "src_app_api_telegram_diagnose_route",
-      "src_app_api_telegram_diagnose_route_get",
-      "src_app_api_telegram_subscription_route",
-      "src_app_api_telegram_subscription_route_get",
-      "src_app_api_telegram_subscriptions_route",
-      "src_app_api_telegram_subscriptions_route_get",
-      "src_app_api_telegram_subscriptions_route_patch",
-      "src_app_api_telegram_subscriptions_route_post",
-      "src_lib_telegram_api_kickfromchannel",
-      "src_lib_telegram_resolveuser",
-      "src_lib_telegram_resolveuser_resolveduser",
-      "src_lib_telegram_resolveuser_resolveuserfromemailorid",
-      "src_lib_telegram_subscription",
-      "src_lib_telegram_subscription_addmonths",
-      "src_lib_telegram_subscription_ensureuserprofileexists",
-      "src_lib_telegram_subscription_expiresubscriptionnow",
-      "src_lib_telegram_subscription_findsubscriptionforaccount",
-      "src_lib_telegram_subscription_getsubscriptionbytelegramuserid",
-      "src_lib_telegram_subscription_getsubscriptionbyuserid",
-      "src_lib_telegram_subscription_grantorextendsubscription",
-      "src_lib_telegram_subscription_issubscriptionactive",
-      "src_lib_telegram_subscription_linktelegramaccount",
-      "src_lib_telegram_subscription_listchannelaccesssubscriptions",
-      "src_lib_telegram_subscription_migratesubscriptiontouser",
-      "src_lib_telegram_subscription_processexpiredsubscriptions",
-      "src_lib_telegram_subscription_revokesubscription",
-      "src_lib_telegram_subscription_telegramsubscription",
-      "src_lib_telegram_subscription_telegramsubscriptionwithprofile"
+      "configurer_service_role",
+      "configurer_service_role_alternative_modifier_les_politiques_rls",
+      "configurer_service_role_comment_obtenir_le_service_role_key",
+      "configurer_service_role_configuration",
+      "configurer_service_role_configurer_supabase_service_role_key",
+      "configurer_service_role_probl\u00e8me",
+      "configurer_service_role_solution_utiliser_le_service_role_key",
+      "configurer_service_role_s\u00e9curit\u00e9",
+      "configurer_service_role_v\u00e9rification",
+      "configurer_vercel_env",
+      "depannage_dns_domaine",
+      "orange_money_setup",
+      "orange_money_setup_1_cr\u00e9er_une_application",
+      "orange_money_setup_2_ajouter_l_api_orange_money_webpaydev",
+      "orange_money_setup_3_obtenir_l_access_token",
+      "orange_money_setup_configuration_des_urls",
+      "orange_money_setup_configuration_orange_money_webpayment_api",
+      "orange_money_setup_documentation_suppl\u00e9mentaire",
+      "orange_money_setup_format_des_donn\u00e9es",
+      "orange_money_setup_initiation_de_paiement",
+      "orange_money_setup_notes_importantes",
+      "orange_money_setup_obtention_des_identifiants",
+      "orange_money_setup_statuts_de_transaction",
+      "orange_money_setup_test_avec_le_sandbox",
+      "orange_money_setup_urls_de_retour",
+      "orange_money_setup_variables_d_environnement_requises",
+      "orange_money_setup_webhook_notif_url",
+      "orange_money_setup_webhook_notification"
     ],
     "7": [
-      "src_app_api_telegram_link_token_route",
-      "src_app_api_telegram_link_token_route_post",
-      "src_app_api_telegram_set_webhook_route",
-      "src_app_api_telegram_set_webhook_route_post",
-      "src_app_api_telegram_webhook_info_route",
-      "src_app_api_telegram_webhook_info_route_get",
-      "src_app_api_telegram_webhook_route",
-      "src_app_api_telegram_webhook_route_get",
-      "src_app_api_telegram_webhook_route_post",
-      "src_lib_telegram_api",
-      "src_lib_telegram_api_calltelegramapi",
-      "src_lib_telegram_api_createpersonalinvitelink",
-      "src_lib_telegram_api_sendtelegrammessage",
-      "src_lib_telegram_api_telegramapiresponse",
-      "src_lib_telegram_api_unbanfromchannel",
-      "src_lib_telegram_config",
-      "src_lib_telegram_config_getbotusername",
-      "src_lib_telegram_config_gettelegramconfig",
-      "src_lib_telegram_config_gettelegramconfigmissing",
-      "src_lib_telegram_config_gettelegramwebhookbaseurl",
-      "src_lib_telegram_config_telegramconfig",
-      "src_lib_telegram_linktoken",
-      "src_lib_telegram_linktoken_createlinktokenresult",
-      "src_lib_telegram_linktoken_createtelegramlinktoken",
-      "src_lib_telegram_linktoken_generatetoken",
-      "src_lib_telegram_linktoken_handlestartwithtoken",
-      "src_lib_telegram_subscription_preparetelegramaccess",
-      "src_lib_telegram_webhookhandler",
-      "src_lib_telegram_webhookhandler_parsestarttoken",
-      "src_lib_telegram_webhookhandler_processtelegramupdate",
-      "src_lib_telegram_webhookhandler_telegramupdate"
+      "integration_paytech_moneroo",
+      "integration_paytech_moneroo_acc\u00e8s_automatique_au_cours",
+      "integration_paytech_moneroo_application_de_la_migration_sql",
+      "integration_paytech_moneroo_configuration",
+      "integration_paytech_moneroo_configuration_des_webhooks",
+      "integration_paytech_moneroo_documentation",
+      "integration_paytech_moneroo_d\u00e9pannage",
+      "integration_paytech_moneroo_erreur_configuration_manquante",
+      "integration_paytech_moneroo_erreur_payment_method_invalide",
+      "integration_paytech_moneroo_fichiers_cr\u00e9\u00e9s",
+      "integration_paytech_moneroo_fichiers_modifi\u00e9s",
+      "integration_paytech_moneroo_flux_de_paiement",
+      "integration_paytech_moneroo_fonctionnalit\u00e9s",
+      "integration_paytech_moneroo_gestion_des_\u00e9checs",
+      "integration_paytech_moneroo_int\u00e9gration_paytech_et_moneroo",
+      "integration_paytech_moneroo_librairies",
+      "integration_paytech_moneroo_migrations_sql",
+      "integration_paytech_moneroo_moneroo",
+      "integration_paytech_moneroo_notes_importantes",
+      "integration_paytech_moneroo_paytech",
+      "integration_paytech_moneroo_pour_les_utilisateurs",
+      "integration_paytech_moneroo_pour_moneroo",
+      "integration_paytech_moneroo_pour_paytech",
+      "integration_paytech_moneroo_routes_api",
+      "integration_paytech_moneroo_utilisation",
+      "integration_paytech_moneroo_variables_d_environnement_requises",
+      "integration_paytech_moneroo_webhook_ne_fonctionne_pas",
+      "integration_paytech_moneroo_webhooks"
     ],
     "8": [
+      "depannage_dns_domaine_1_ajouter_le_domaine",
+      "depannage_dns_domaine_2_configurer_les_dns",
+      "depannage_dns_domaine_3_attendre_la_propagation",
+      "depannage_dns_domaine_4_v\u00e9rifier_le_certificat_ssl",
+      "depannage_dns_domaine_causes_possibles",
+      "depannage_dns_domaine_configuration_compl\u00e8te_du_domaine_sur_vercel",
+      "depannage_dns_domaine_d\u00e9pannage_erreur_dns_pour_vbsniperacademie_com",
+      "depannage_dns_domaine_erreur_domain_not_found_dans_vercel",
+      "depannage_dns_domaine_erreur_rencontr\u00e9e",
+      "depannage_dns_domaine_le_domaine_est_configur\u00e9_mais_ne_fonctionne_pas",
+      "depannage_dns_domaine_le_domaine_fonctionne_mais_pas_le_www",
+      "depannage_dns_domaine_option_a_utiliser_l_url_vercel",
+      "depannage_dns_domaine_option_b_utiliser_un_sous_domaine",
+      "depannage_dns_domaine_probl\u00e8mes_courants",
+      "depannage_dns_domaine_ressources",
+      "depannage_dns_domaine_solution_1_v\u00e9rifier_que_le_domaine_est_configur\u00e9_dans_vercel",
+      "depannage_dns_domaine_solution_2_configurer_les_enregistrements_dns",
+      "depannage_dns_domaine_solution_3_utiliser_l_url_vercel_temporairement",
+      "depannage_dns_domaine_solution_4_pour_le_d\u00e9veloppement_local",
+      "depannage_dns_domaine_solutions",
+      "depannage_dns_domaine_solutions_temporaires",
+      "depannage_dns_domaine_support",
+      "depannage_dns_domaine_v\u00e9rification_apr\u00e8s_configuration",
+      "depannage_dns_domaine_v\u00e9rification_\u00e9tape_par_\u00e9tape",
+      "depannage_dns_domaine_\u00e9tape_1_v\u00e9rifier_que_le_domaine_existe",
+      "depannage_dns_domaine_\u00e9tape_2_v\u00e9rifier_les_enregistrements_dns",
+      "depannage_dns_domaine_\u00e9tape_3_v\u00e9rifier_dans_vercel"
+    ],
+    "9": [
+      "orange_money_next_steps",
+      "orange_money_next_steps_1_1_cr\u00e9er_une_application_sur_orange_developer",
+      "orange_money_next_steps_1_2_ajouter_l_api_orange_money_webpaydev",
+      "orange_money_next_steps_1_3_obtenir_l_access_token",
+      "orange_money_next_steps_1_obtenir_les_identifiants_orange_money",
+      "orange_money_next_steps_2_configurer_les_variables_d_environnement",
+      "orange_money_next_steps_3_1_tester_l_initiation_de_paiement",
+      "orange_money_next_steps_3_2_utiliser_le_simulateur_ussd_pour_tester_le_paiement",
+      "orange_money_next_steps_3_3_v\u00e9rifier_le_webhook",
+      "orange_money_next_steps_3_tester_l_int\u00e9gration_en_sandbox",
+      "orange_money_next_steps_4_configurer_le_webhook_en_production",
+      "orange_money_next_steps_5_tester_le_flux_complet",
+      "orange_money_next_steps_6_1_si_le_webhook_ne_fonctionne_pas",
+      "orange_money_next_steps_6_2_si_le_paiement_\u00e9choue",
+      "orange_money_next_steps_6_3_si_l_access_token_expire",
+      "orange_money_next_steps_6_g\u00e9rer_les_cas_d_erreur",
+      "orange_money_next_steps_7_passer_en_production",
+      "orange_money_next_steps_8_monitoring_et_logs",
+      "orange_money_next_steps_ce_qui_a_\u00e9t\u00e9_fait",
+      "orange_money_next_steps_checklist_de_v\u00e9rification",
+      "orange_money_next_steps_logs_importants_\u00e0_v\u00e9rifier",
+      "orange_money_next_steps_points_\u00e0_surveiller",
+      "orange_money_next_steps_prochaines_\u00e9tapes_int\u00e9gration_orange_money",
+      "orange_money_next_steps_r\u00e9sum\u00e9_des_actions_imm\u00e9diates",
+      "orange_money_next_steps_sc\u00e9nario_de_test",
+      "orange_money_next_steps_support",
+      "orange_money_next_steps_\u00e9tapes_suivantes"
+    ],
+    "10": [
+      "reactiver_confirmation_email_comportement_apr\u00e8s_activation",
+      "reactiver_confirmation_email_connexion_sign_in",
+      "reactiver_confirmation_email_d\u00e9pannage",
+      "reactiver_confirmation_email_gestion_des_messages",
+      "reactiver_confirmation_email_gestion_des_utilisateurs_existants",
+      "reactiver_confirmation_email_inscription_sign_up",
+      "reactiver_confirmation_email_la_redirection_apr\u00e8s_confirmation_ne_fonctionne_pas",
+      "reactiver_confirmation_email_les_emails_de_confirmation_ne_sont_pas_envoy\u00e9s",
+      "reactiver_confirmation_email_les_utilisateurs_existants_ne_peuvent_plus_se_connecter",
+      "reactiver_confirmation_email_les_utilisateurs_ne_re\u00e7oivent_pas_les_emails",
+      "reactiver_confirmation_email_modifier_le_code_frontend_si_n\u00e9cessaire",
+      "reactiver_confirmation_email_personnalisation_du_template_d_email",
+      "reactiver_confirmation_email_probl\u00e8me",
+      "reactiver_confirmation_email_probl\u00e8me_utilisateurs_d\u00e9j\u00e0_inscrits_sans_confirmation",
+      "reactiver_confirmation_email_ressources",
+      "reactiver_confirmation_email_r\u00e9activer_la_confirmation_d_email_dans_supabase",
+      "reactiver_confirmation_email_solution_r\u00e9activer_dans_supabase_dashboard",
+      "reactiver_confirmation_email_src_app_auth_page_tsx",
+      "reactiver_confirmation_email_template_de_confirmation_d_inscription",
+      "reactiver_confirmation_email_tester_la_confirmation_d_email",
+      "reactiver_confirmation_email_v\u00e9rification",
+      "reactiver_confirmation_email_v\u00e9rifier_dans_supabase",
+      "reactiver_confirmation_email_\u00e9tape_1_acc\u00e9der_aux_param\u00e8tres_d_authentification",
+      "reactiver_confirmation_email_\u00e9tape_2_5_configurer_les_urls_de_redirection_important",
+      "reactiver_confirmation_email_\u00e9tape_2_activer_la_confirmation_d_email",
+      "reactiver_confirmation_email_\u00e9tape_3_configurer_le_comportement",
+      "reactiver_confirmation_email_\u00e9tape_4_v\u00e9rifier_les_templates_d_email"
+    ],
+    "11": [
       "package",
       "package_dependencies",
       "package_dependencies_grammy",
@@ -347,7 +474,250 @@
       "package_scripts_start",
       "package_version"
     ],
-    "9": [
+    "12": [
+      "corriger_erreur_confirmation_email_1_v\u00e9rifier_l_url_dans_l_email",
+      "corriger_erreur_confirmation_email_2_tester_la_confirmation",
+      "corriger_erreur_confirmation_email_3_v\u00e9rifier_les_logs_supabase",
+      "corriger_erreur_confirmation_email_configuration_compl\u00e8te_recommand\u00e9e",
+      "corriger_erreur_confirmation_email_corriger_l_erreur_requested_path_is_invalid_lors_de_la_confirmation_d_email",
+      "corriger_erreur_confirmation_email_d\u00e9pannage",
+      "corriger_erreur_confirmation_email_d\u00e9veloppement_local",
+      "corriger_erreur_confirmation_email_format_des_urls",
+      "corriger_erreur_confirmation_email_l_erreur_persiste_apr\u00e8s_configuration",
+      "corriger_erreur_confirmation_email_l_url_change_selon_l_environnement",
+      "corriger_erreur_confirmation_email_le_lien_dans_l_email_pointe_vers_localhost",
+      "corriger_erreur_confirmation_email_pour_la_production_votre_domaine",
+      "corriger_erreur_confirmation_email_pour_le_d\u00e9veloppement_local_si_vous_testez_en_local",
+      "corriger_erreur_confirmation_email_probl\u00e8me",
+      "corriger_erreur_confirmation_email_production_d\u00e9veloppement",
+      "corriger_erreur_confirmation_email_production_uniquement",
+      "corriger_erreur_confirmation_email_ressources",
+      "corriger_erreur_confirmation_email_si_vous_utilisez_ngrok_ou_un_autre_tunnel",
+      "corriger_erreur_confirmation_email_solution_ajouter_l_url_de_redirection_dans_supabase",
+      "corriger_erreur_confirmation_email_v\u00e9rification",
+      "corriger_erreur_confirmation_email_\u00e9tape_1_aller_dans_les_param\u00e8tres_d_authentification",
+      "corriger_erreur_confirmation_email_\u00e9tape_2_ajouter_l_url_de_callback_pour_la_confirmation_d_email",
+      "corriger_erreur_confirmation_email_\u00e9tape_3_v\u00e9rifier_la_site_url",
+      "corriger_erreur_confirmation_email_\u00e9tape_4_sauvegarder",
+      "corriger_erreur_confirmation_email_\u00e9tapes_de_r\u00e9solution_rapide"
+    ],
+    "13": [
+      "configurer_vercel_env_1_les_redirections_ne_fonctionnent_pas",
+      "configurer_vercel_env_1_v\u00e9rifier_que_la_variable_est_bien_d\u00e9finie",
+      "configurer_vercel_env_2_orange_money_rejette_les_urls",
+      "configurer_vercel_env_2_tester_les_fonctionnalit\u00e9s",
+      "configurer_vercel_env_3_la_variable_n_est_pas_accessible_c\u00f4t\u00e9_client",
+      "configurer_vercel_env_bonnes_pratiques",
+      "configurer_vercel_env_comment_ajouter_les_variables",
+      "configurer_vercel_env_configuration_compl\u00e8te_des_variables_d_environnement_sur_vercel",
+      "configurer_vercel_env_configuration_sur_vercel",
+      "configurer_vercel_env_configurer_les_variables_d_environnement_sur_vercel",
+      "configurer_vercel_env_development_local",
+      "configurer_vercel_env_diff\u00e9rences_entre_environnements",
+      "configurer_vercel_env_exemple_de_configuration_compl\u00e8te",
+      "configurer_vercel_env_option_1_utiliser_votre_domaine_personnalis\u00e9_recommand\u00e9",
+      "configurer_vercel_env_option_2_utiliser_l_url_vercel_automatique_non_recommand\u00e9_pour_la_production",
+      "configurer_vercel_env_preview_pull_requests",
+      "configurer_vercel_env_probl\u00e8mes_courants",
+      "configurer_vercel_env_production",
+      "configurer_vercel_env_question_next_public_app_url_est_elle_n\u00e9cessaire",
+      "configurer_vercel_env_ressources",
+      "configurer_vercel_env_utilisations_de_next_public_app_url",
+      "configurer_vercel_env_valeur_recommand\u00e9e_pour_la_production",
+      "configurer_vercel_env_variables_n\u00e9cessaires_pour_la_production",
+      "configurer_vercel_env_v\u00e9rification_apr\u00e8s_d\u00e9ploiement"
+    ],
+    "14": [
+      "corriger_probleme_email_spam",
+      "corriger_probleme_email_spam_1_v\u00e9rifier_la_configuration_actuelle_supabase",
+      "corriger_probleme_email_spam_2_configurer_resend_recommand\u00e9",
+      "corriger_probleme_email_spam_3_tester_l_envoi",
+      "corriger_probleme_email_spam_am\u00e9lioration_continue",
+      "corriger_probleme_email_spam_causes_possibles",
+      "corriger_probleme_email_spam_corriger_le_probl\u00e8me_d_emails_marqu\u00e9s_comme_spam",
+      "corriger_probleme_email_spam_dkim_domainkeys_identified_mail",
+      "corriger_probleme_email_spam_dmarc_domain_based_message_authentication",
+      "corriger_probleme_email_spam_option_a_resend_recommand\u00e9_pour_next_js",
+      "corriger_probleme_email_spam_option_b_sendgrid",
+      "corriger_probleme_email_spam_option_c_mailgun",
+      "corriger_probleme_email_spam_outils_de_v\u00e9rification",
+      "corriger_probleme_email_spam_probl\u00e8me_identifi\u00e9",
+      "corriger_probleme_email_spam_ressources",
+      "corriger_probleme_email_spam_solution_1_configurer_un_service_d_email_transactionnel_recommand\u00e9",
+      "corriger_probleme_email_spam_solution_2_am\u00e9liorer_les_enregistrements_dns",
+      "corriger_probleme_email_spam_solution_3_personnaliser_les_templates_d_email_supabase",
+      "corriger_probleme_email_spam_solution_4_utiliser_un_sous_domaine_pour_les_emails_transactionnels",
+      "corriger_probleme_email_spam_solutions_recommand\u00e9es",
+      "corriger_probleme_email_spam_spf_sender_policy_framework",
+      "corriger_probleme_email_spam_support",
+      "corriger_probleme_email_spam_v\u00e9rification_de_la_d\u00e9livrabilit\u00e9",
+      "corriger_probleme_email_spam_\u00e9tapes_imm\u00e9diates_\u00e0_suivre"
+    ],
+    "15": [
+      "configurer_urls_redirection_supabase_configuration_recommand\u00e9e_pour_la_production",
+      "configurer_urls_redirection_supabase_configurer_les_urls_de_redirection_dans_supabase",
+      "configurer_urls_redirection_supabase_d\u00e9pannage",
+      "configurer_urls_redirection_supabase_d\u00e9veloppement_local",
+      "configurer_urls_redirection_supabase_erreur_persiste_apr\u00e8s_configuration",
+      "configurer_urls_redirection_supabase_format_des_urls",
+      "configurer_urls_redirection_supabase_l_url_change_selon_l_environnement",
+      "configurer_urls_redirection_supabase_pour_la_production_votre_domaine",
+      "configurer_urls_redirection_supabase_pour_le_d\u00e9veloppement_local_si_vous_testez_en_local",
+      "configurer_urls_redirection_supabase_probl\u00e8me",
+      "configurer_urls_redirection_supabase_production_d\u00e9veloppement",
+      "configurer_urls_redirection_supabase_production_uniquement",
+      "configurer_urls_redirection_supabase_ressources",
+      "configurer_urls_redirection_supabase_si_vous_utilisez_ngrok_ou_un_autre_tunnel",
+      "configurer_urls_redirection_supabase_solution_ajouter_l_url_de_redirection_dans_supabase",
+      "configurer_urls_redirection_supabase_tester_la_r\u00e9initialisation",
+      "configurer_urls_redirection_supabase_urls_\u00e0_configurer_selon_votre_environnement",
+      "configurer_urls_redirection_supabase_v\u00e9rification",
+      "configurer_urls_redirection_supabase_v\u00e9rifier_les_logs",
+      "configurer_urls_redirection_supabase_\u00e9tape_1_aller_dans_les_param\u00e8tres_d_authentification",
+      "configurer_urls_redirection_supabase_\u00e9tape_2_ajouter_les_urls_de_redirection",
+      "configurer_urls_redirection_supabase_\u00e9tape_3_ajouter_les_site_urls_autoris\u00e9es",
+      "configurer_urls_redirection_supabase_\u00e9tape_4_sauvegarder"
+    ],
+    "16": [
+      "src_app_admin_students_page",
+      "src_app_admin_students_page_adminstudentspage",
+      "src_app_admin_students_page_courseoption",
+      "src_app_admin_students_page_paymentinstallment",
+      "src_app_admin_students_page_statuslabel",
+      "src_app_admin_students_page_studentdetailresponse",
+      "src_app_admin_students_page_studentpaymentfilteroption",
+      "src_app_admin_students_page_studentsortoption",
+      "src_app_admin_students_page_studentsummary",
+      "src_app_auth_reset_password_page",
+      "src_app_auth_reset_password_page_resetpasswordform",
+      "src_app_auth_reset_password_page_resetpasswordpage",
+      "src_app_course_courseid_video_videoid_page",
+      "src_app_course_courseid_video_videoid_page_course",
+      "src_app_course_courseid_video_videoid_page_coursevideo",
+      "src_app_course_courseid_video_videoid_page_videopage",
+      "src_components_admin_adminoverlays",
+      "src_components_admin_adminoverlays_adminfeedbackmodal",
+      "src_components_admin_adminoverlays_adminloadingoverlay",
+      "src_components_admin_adminoverlays_feedbacktype",
+      "src_components_admin_adminoverlays_spinner",
+      "src_lib_supabaseclient",
+      "src_lib_supabaseclient_supabase"
+    ],
+    "17": [
+      "comment_obtenir_codes_paiement",
+      "comment_obtenir_codes_paiement_1_pay_token_token_de_paiement",
+      "comment_obtenir_codes_paiement_2_notif_token_token_de_notification",
+      "comment_obtenir_codes_paiement_3_txnid_id_de_transaction",
+      "comment_obtenir_codes_paiement_comment_obtenir_les_codes_de_paiement_orange_money",
+      "comment_obtenir_codes_paiement_d\u00e9pannage",
+      "comment_obtenir_codes_paiement_endpoint",
+      "comment_obtenir_codes_paiement_erreur_403_acc\u00e8s_non_autoris\u00e9",
+      "comment_obtenir_codes_paiement_exemple_de_requ\u00eate",
+      "comment_obtenir_codes_paiement_exemple_de_r\u00e9ponse",
+      "comment_obtenir_codes_paiement_flux_complet",
+      "comment_obtenir_codes_paiement_le_txnid_est_null",
+      "comment_obtenir_codes_paiement_les_codes_sont_null",
+      "comment_obtenir_codes_paiement_m\u00e9thode_1_via_l_api_rest_recommand\u00e9",
+      "comment_obtenir_codes_paiement_m\u00e9thode_2_directement_depuis_la_base_de_donn\u00e9es",
+      "comment_obtenir_codes_paiement_m\u00e9thode_3_via_le_frontend_javascript_typescript",
+      "comment_obtenir_codes_paiement_m\u00e9thodes_pour_obtenir_les_codes",
+      "comment_obtenir_codes_paiement_notes_importantes",
+      "comment_obtenir_codes_paiement_types_de_codes_de_paiement",
+      "comment_obtenir_codes_paiement_utilisation_des_codes",
+      "comment_obtenir_codes_paiement_v\u00e9rifier_l_authenticit\u00e9_d_un_webhook_avec_notif_token",
+      "comment_obtenir_codes_paiement_v\u00e9rifier_le_statut_d_un_paiement_avec_pay_token"
+    ],
+    "18": [
+      "confirmation_paiement_orange_money",
+      "confirmation_paiement_orange_money_1_initiation_du_paiement_par_le_marchand",
+      "confirmation_paiement_orange_money_2_redirection_vers_orange_money",
+      "confirmation_paiement_orange_money_3_confirmation_du_paiement_par_le_client",
+      "confirmation_paiement_orange_money_code_actuel",
+      "confirmation_paiement_orange_money_confirmation_du_paiement_orange_money_num\u00e9ro_de_t\u00e9l\u00e9phone",
+      "confirmation_paiement_orange_money_exemple_concret",
+      "confirmation_paiement_orange_money_faq",
+      "confirmation_paiement_orange_money_flux_de_paiement_d\u00e9taill\u00e9",
+      "confirmation_paiement_orange_money_identifiants_du_client",
+      "confirmation_paiement_orange_money_identifiants_du_marchand_vous",
+      "confirmation_paiement_orange_money_identifiants_du_marchand_vs_client",
+      "confirmation_paiement_orange_money_option_a_avec_num\u00e9ro_de_t\u00e9l\u00e9phone_et_pin",
+      "confirmation_paiement_orange_money_option_b_avec_code_otp",
+      "confirmation_paiement_orange_money_pourquoi_le_client_entre_son_num\u00e9ro",
+      "confirmation_paiement_orange_money_processus",
+      "confirmation_paiement_orange_money_r\u00e9ponse_rapide",
+      "confirmation_paiement_orange_money_r\u00e9sum\u00e9",
+      "confirmation_paiement_orange_money_r\u00f4les_dans_le_processus",
+      "confirmation_paiement_orange_money_sc\u00e9nario",
+      "confirmation_paiement_orange_money_test_en_sandbox"
+    ],
+    "19": [
+      "envoyer_emails_promotionnels",
+      "envoyer_emails_promotionnels_1_cr\u00e9er_un_compte_resend",
+      "envoyer_emails_promotionnels_2_obtenir_votre_api_key",
+      "envoyer_emails_promotionnels_3_configurer_les_variables_d_environnement",
+      "envoyer_emails_promotionnels_4_v\u00e9rifier_votre_domaine_production",
+      "envoyer_emails_promotionnels_configuration",
+      "envoyer_emails_promotionnels_d\u00e9pannage",
+      "envoyer_emails_promotionnels_emails_non_re\u00e7us",
+      "envoyer_emails_promotionnels_erreur_lors_de_la_r\u00e9cup\u00e9ration_des_utilisateurs",
+      "envoyer_emails_promotionnels_erreur_non_autoris\u00e9",
+      "envoyer_emails_promotionnels_erreur_resend_api_key_non_configur\u00e9e",
+      "envoyer_emails_promotionnels_guide_envoyer_des_emails_promotionnels_via_resend",
+      "envoyer_emails_promotionnels_limitations_resend",
+      "envoyer_emails_promotionnels_option_1_via_l_interface_resend_recommand\u00e9_pour_les_campagnes",
+      "envoyer_emails_promotionnels_option_2_via_l_interface_admin_automatique",
+      "envoyer_emails_promotionnels_personnalisation",
+      "envoyer_emails_promotionnels_pr\u00e9requis",
+      "envoyer_emails_promotionnels_s\u00e9curit\u00e9",
+      "envoyer_emails_promotionnels_template_d_email",
+      "envoyer_emails_promotionnels_utilisation",
+      "envoyer_emails_promotionnels_via_l_api_directement"
+    ],
+    "20": [
+      "automatiser_ajout_contacts_resend",
+      "automatiser_ajout_contacts_resend_1_cr\u00e9er_une_audience_dans_resend_optionnel_mais_recommand\u00e9",
+      "automatiser_ajout_contacts_resend_2_configurer_les_variables_d_environnement",
+      "automatiser_ajout_contacts_resend_3_v\u00e9rifier_que_tout_fonctionne",
+      "automatiser_ajout_contacts_resend_add_contact_api",
+      "automatiser_ajout_contacts_resend_api_route",
+      "automatiser_ajout_contacts_resend_automatiser_l_ajout_des_contacts_\u00e0_resend",
+      "automatiser_ajout_contacts_resend_avantages",
+      "automatiser_ajout_contacts_resend_configuration",
+      "automatiser_ajout_contacts_resend_d\u00e9pannage",
+      "automatiser_ajout_contacts_resend_erreur_contact_already_exists",
+      "automatiser_ajout_contacts_resend_erreur_resend_api_key_non_configur\u00e9e",
+      "automatiser_ajout_contacts_resend_flux_d_inscription",
+      "automatiser_ajout_contacts_resend_fonctionnement",
+      "automatiser_ajout_contacts_resend_fonctionnement_technique",
+      "automatiser_ajout_contacts_resend_gestion_des_erreurs",
+      "automatiser_ajout_contacts_resend_le_contact_n_appara\u00eet_pas_dans_resend",
+      "automatiser_ajout_contacts_resend_limitations",
+      "automatiser_ajout_contacts_resend_migration_des_utilisateurs_existants",
+      "automatiser_ajout_contacts_resend_utilisation_manuelle"
+    ],
+    "21": [
+      "depannage_undefined_orange_money",
+      "depannage_undefined_orange_money_1_variable_d_environnement_orange_money_env_non_d\u00e9finie_ou_incorrecte",
+      "depannage_undefined_orange_money_2_prix_du_cours_invalide_ou_manquant",
+      "depannage_undefined_orange_money_3_format_des_donn\u00e9es_incorrect_dans_la_requ\u00eate_api",
+      "depannage_undefined_orange_money_4_r\u00e9ponse_d_orange_money_incorrecte",
+      "depannage_undefined_orange_money_cas_1_orange_money_env_est_undefined",
+      "depannage_undefined_orange_money_cas_2_le_prix_du_cours_est_null_ou_undefined",
+      "depannage_undefined_orange_money_cas_3_la_devise_est_undefined",
+      "depannage_undefined_orange_money_cas_4_orange_money_retourne_une_erreur",
+      "depannage_undefined_orange_money_causes_possibles",
+      "depannage_undefined_orange_money_contact",
+      "depannage_undefined_orange_money_d\u00e9pannage_frais_undefined_undefined_sur_la_page_orange_money",
+      "depannage_undefined_orange_money_probl\u00e8me",
+      "depannage_undefined_orange_money_solutions_selon_le_cas",
+      "depannage_undefined_orange_money_v\u00e9rification_rapide",
+      "depannage_undefined_orange_money_\u00e9tape_1_v\u00e9rifier_les_variables_d_environnement",
+      "depannage_undefined_orange_money_\u00e9tape_2_v\u00e9rifier_les_logs_du_serveur",
+      "depannage_undefined_orange_money_\u00e9tape_3_v\u00e9rifier_la_base_de_donn\u00e9es",
+      "depannage_undefined_orange_money_\u00e9tape_4_tester_avec_des_valeurs_fixes",
+      "depannage_undefined_orange_money_\u00e9tapes_de_diagnostic"
+    ],
+    "22": [
       "tsconfig",
       "tsconfig_compileroptions",
       "tsconfig_compileroptions_allowjs",
@@ -369,30 +739,157 @@
       "tsconfig_include",
       "tsconfig_paths"
     ],
-    "10": [
-      "email_templates_readme_doc",
-      "email_templates_readme_reset_password",
-      "email_templates_reset_password_simple_html",
-      "email_templates_reset_password_simple_vb_sniper",
-      "email_templates_reset_password_subject_line",
-      "email_templates_reset_password_subject_txt",
-      "envoyer_emails_promotionnels_doc",
-      "envoyer_emails_promotionnels_email_templates",
-      "envoyer_emails_promotionnels_resend",
-      "envoyer_emails_promotionnels_send_promo_api",
-      "reactiver_confirmation_email_auth_callback",
-      "reactiver_confirmation_email_doc",
-      "reactiver_confirmation_email_supabase_confirm",
-      "template_confirmation_email_confirm_signup",
-      "template_confirmation_email_confirmation_url",
-      "template_confirmation_email_doc"
+    "23": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_1_nouvelle_page_d_accueil_principale",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_2_d\u00e9placer_la_page_de_vente_actuelle",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_3_cr\u00e9er_un_composant_r\u00e9utilisable_pour_les_services",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_4_mettre_\u00e0_jour_les_m\u00e9tadonn\u00e9es",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_5_navigation_optionnel",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_architecture",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_contenu_\u00e0_fournir",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_design_et_style",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_fichiers_\u00e0_cr\u00e9er_modifier",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_informations_entreprise_\u00e0_d\u00e9finir",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_informations_fondateur_\u00e0_d\u00e9finir",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_liste_des_services",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_points_d_attention",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_restructuration_du_site_vb_sniper_acad\u00e9mie",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_structure_des_donn\u00e9es",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_vue_d_ensemble",
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_\u00e9tapes_d_impl\u00e9mentation"
     ],
-    "11": [
+    "24": [
+      "src_app_admin_access_page",
+      "src_app_admin_access_page_adminaccesspage",
+      "src_app_admin_courses_page",
+      "src_app_admin_courses_page_admincoursespage",
+      "src_app_admin_payments_page",
+      "src_app_admin_payments_page_adminpaymentspage",
+      "src_app_admin_telegram_page",
+      "src_app_admin_telegram_page_admintelegrampage",
+      "src_components_admin_admindashboard",
+      "src_components_admin_admindashboard_admindashboard",
+      "src_components_admin_admindashboard_adminsection",
+      "src_components_admin_admindashboard_course",
+      "src_components_admin_admindashboard_courseaccess",
+      "src_components_admin_admindashboard_coursevideo",
+      "src_components_admin_admindashboard_order",
+      "src_components_admin_admindashboard_section_meta",
+      "src_components_admin_admindashboard_telegramvipuser",
+      "src_components_admin_admindashboard_userprofile"
+    ],
+    "25": [
+      "comment_obtenir_otp_requestor",
+      "comment_obtenir_otp_requestor_comment_obtenir_le_code_otp_requestor",
+      "comment_obtenir_otp_requestor_comment_obtenir_le_code_otp_requestor_orange_money",
+      "comment_obtenir_otp_requestor_dans_le_code_si_n\u00e9cessaire",
+      "comment_obtenir_otp_requestor_dans_les_variables_d_environnement",
+      "comment_obtenir_otp_requestor_diff\u00e9rence_entre_otp_requestor_et_autres_identifiants",
+      "comment_obtenir_otp_requestor_exemple_de_configuration_compl\u00e8te",
+      "comment_obtenir_otp_requestor_faq",
+      "comment_obtenir_otp_requestor_format_du_code_otp_requestor",
+      "comment_obtenir_otp_requestor_m\u00e9thode_1_depuis_le_portail_orange_developer",
+      "comment_obtenir_otp_requestor_m\u00e9thode_2_depuis_les_emails_orange_money",
+      "comment_obtenir_otp_requestor_m\u00e9thode_3_depuis_le_dashboard_orange_money_si_disponible",
+      "comment_obtenir_otp_requestor_notes_importantes",
+      "comment_obtenir_otp_requestor_qu_est_ce_que_l_otp_requestor",
+      "comment_obtenir_otp_requestor_support",
+      "comment_obtenir_otp_requestor_utilisation_du_code_otp_requestor",
+      "comment_obtenir_otp_requestor_v\u00e9rification"
+    ],
+    "26": [
+      "ajouter_colonne_payment_reference",
+      "ajouter_colonne_payment_reference_ajouter_la_colonne_payment_reference_\u00e0_la_table_orders",
+      "ajouter_colonne_payment_reference_d\u00e9pannage",
+      "ajouter_colonne_payment_reference_erreur_permission_denied",
+      "ajouter_colonne_payment_reference_la_colonne_existe_d\u00e9j\u00e0",
+      "ajouter_colonne_payment_reference_m\u00e9thode_1_via_l_\u00e9diteur_sql_de_supabase_recommand\u00e9",
+      "ajouter_colonne_payment_reference_m\u00e9thode_2_via_la_ligne_de_commande_supabase_cli",
+      "ajouter_colonne_payment_reference_m\u00e9thode_3_via_l_interface_table_editor",
+      "ajouter_colonne_payment_reference_notes_importantes",
+      "ajouter_colonne_payment_reference_probl\u00e8me",
+      "ajouter_colonne_payment_reference_solution_ex\u00e9cuter_la_migration_sql",
+      "ajouter_colonne_payment_reference_utilisation_de_la_colonne",
+      "ajouter_colonne_payment_reference_v\u00e9rification",
+      "ajouter_colonne_payment_reference_v\u00e9rifier_si_la_colonne_existe"
+    ],
+    "27": [
+      "ajouter_fonction_acces_automatique",
+      "ajouter_fonction_acces_automatique_ajouter_la_fonction_d_acc\u00e8s_automatique_pour_orange_money",
+      "ajouter_fonction_acces_automatique_code_modifi\u00e9",
+      "ajouter_fonction_acces_automatique_fonctionnement",
+      "ajouter_fonction_acces_automatique_notes_importantes",
+      "ajouter_fonction_acces_automatique_option_1_via_l_interface_supabase_recommand\u00e9",
+      "ajouter_fonction_acces_automatique_option_2_via_la_ligne_de_commande",
+      "ajouter_fonction_acces_automatique_pour_les_paiements_en_esp\u00e8ces",
+      "ajouter_fonction_acces_automatique_pour_les_paiements_orange_money",
+      "ajouter_fonction_acces_automatique_probl\u00e8me",
+      "ajouter_fonction_acces_automatique_solution",
+      "ajouter_fonction_acces_automatique_v\u00e9rification",
+      "ajouter_fonction_acces_automatique_webhook_src_app_api_payments_webhook_route_ts",
+      "ajouter_fonction_acces_automatique_\u00e9tapes_pour_appliquer_la_migration"
+    ],
+    "28": [
+      "gestion_echecs_paiement",
+      "gestion_echecs_paiement_1_ajout_du_statut_failed_pour_les_commandes",
+      "gestion_echecs_paiement_2_mise_\u00e0_jour_automatique_des_anciennes_commandes",
+      "gestion_echecs_paiement_3_mise_\u00e0_jour_du_webhook_pour_les_\u00e9checs",
+      "gestion_echecs_paiement_4_v\u00e9rification_de_l_acc\u00e8s_pay\u00e9_et_changement_de_bouton",
+      "gestion_echecs_paiement_5_protection_contre_les_doubles_paiements",
+      "gestion_echecs_paiement_flux_utilisateur",
+      "gestion_echecs_paiement_gestion_des_\u00e9checs_de_paiement_et_changement_de_bouton",
+      "gestion_echecs_paiement_migration_\u00e0_appliquer",
+      "gestion_echecs_paiement_modifications_apport\u00e9es",
+      "gestion_echecs_paiement_sc\u00e9nario_1_paiement_\u00e9chou\u00e9_puis_retentative",
+      "gestion_echecs_paiement_sc\u00e9nario_2_utilisateur_ayant_d\u00e9j\u00e0_pay\u00e9",
+      "gestion_echecs_paiement_tests_\u00e0_effectuer"
+    ],
+    "29": [
+      "solution_domaine_temporaire",
+      "solution_domaine_temporaire_configuration_pour_le_d\u00e9veloppement_local",
+      "solution_domaine_temporaire_doc",
+      "solution_domaine_temporaire_important",
+      "solution_domaine_temporaire_probl\u00e8me",
+      "solution_domaine_temporaire_quand_configurer_le_domaine_personnalis\u00e9",
+      "solution_domaine_temporaire_solution_imm\u00e9diate_utiliser_l_url_vercel",
+      "solution_domaine_temporaire_v\u00e9rification",
+      "solution_domaine_temporaire_\u00e9tape_1_trouver_votre_url_vercel",
+      "solution_domaine_temporaire_\u00e9tape_2_configurer_next_public_app_url",
+      "solution_domaine_temporaire_\u00e9tape_3_red\u00e9ployer",
+      "solution_domaine_temporaire_\u00e9tape_4_tester"
+    ],
+    "30": [
+      "src_app_api_payments_orange_money_initiate_route",
+      "src_app_api_payments_orange_money_initiate_route_getuserid",
+      "src_app_api_payments_orange_money_initiate_route_post",
+      "src_lib_orangemoney",
+      "src_lib_orangemoney_checkpaymentstatus",
+      "src_lib_orangemoney_initiatepayment",
+      "src_lib_orangemoney_orangemoneyinitiaterequest",
+      "src_lib_orangemoney_orangemoneyinitiateresponse",
+      "src_lib_orangemoney_orangemoneytransactionstatusrequest",
+      "src_lib_orangemoney_orangemoneytransactionstatusresponse",
+      "src_lib_orangemoney_orangemoneywebhookpayload",
+      "src_lib_orangemoney_verifywebhooktoken"
+    ],
+    "31": [
+      "orange_money_adaptation",
+      "orange_money_adaptation_1_configuration_de_base",
+      "orange_money_adaptation_2_endpoint_d_initiation_de_paiement",
+      "orange_money_adaptation_3_authentification",
+      "orange_money_adaptation_4_webhook",
+      "orange_money_adaptation_5_v\u00e9rification_de_statut_si_disponible",
+      "orange_money_adaptation_6_codes_de_statut",
+      "orange_money_adaptation_adaptation_orange_money_api_selon_la_documentation",
+      "orange_money_adaptation_comment_fournir_les_informations",
+      "orange_money_adaptation_fichiers_\u00e0_adapter",
+      "orange_money_adaptation_informations_n\u00e9cessaires_du_document_newguide_d_utilisation_api_webpayment_docx"
+    ],
+    "32": [
       "src_app_api_payments_paytech_initiate_route",
       "src_app_api_payments_paytech_initiate_route_getuserid",
       "src_app_api_payments_paytech_initiate_route_post",
-      "src_app_api_payments_paytech_webhook_route",
-      "src_app_api_payments_paytech_webhook_route_post",
       "src_lib_paytech",
       "src_lib_paytech_decodecustomfield",
       "src_lib_paytech_initiatepayment",
@@ -402,21 +899,33 @@
       "src_lib_paytech_rationale_10",
       "src_lib_paytech_verifywebhooksignature"
     ],
-    "12": [
-      "automatiser_ajout_contacts_resend",
-      "automatiser_ajout_contacts_resend_add_contact_api",
-      "automatiser_ajout_contacts_resend_audience_id",
-      "automatiser_ajout_contacts_resend_resend",
-      "configurer_smtp_supabase",
-      "configurer_smtp_supabase_custom_smtp",
-      "configurer_smtp_supabase_mailgun",
-      "configurer_smtp_supabase_resend_smtp",
-      "configurer_smtp_supabase_sendgrid",
-      "configurer_smtp_supabase_spf_dkim_dmarc",
-      "corriger_probleme_email_spam",
-      "corriger_probleme_email_spam_deliverability"
+    "33": [
+      "src_app_client_page",
+      "src_app_client_page_clientspace",
+      "src_app_client_page_course",
+      "src_app_client_page_courseaccess",
+      "src_app_client_page_coursevideo",
+      "src_app_client_page_order",
+      "src_app_client_page_orderstatusclass",
+      "src_app_client_page_orderstatuslabel",
+      "src_app_client_page_payment_method_labels",
+      "src_app_client_page_paymentmethodlabel",
+      "src_app_client_page_telegramicon"
     ],
-    "13": [
+    "34": [
+      "src_app_services_strategie_nasongon_page",
+      "src_app_services_strategie_nasongon_page_countdown",
+      "src_app_services_strategie_nasongon_page_findnasongoncourse",
+      "src_app_services_strategie_nasongon_page_formatprice",
+      "src_app_services_strategie_nasongon_page_home",
+      "src_app_services_strategie_nasongon_page_otherproducts",
+      "src_app_services_strategie_nasongon_page_product",
+      "src_app_services_strategie_nasongon_page_stat",
+      "src_app_services_strategie_nasongon_page_store",
+      "src_app_services_strategie_nasongon_page_testimonials",
+      "src_app_services_strategie_nasongon_page_usecountdown"
+    ],
+    "35": [
       "src_app_admin_layout",
       "src_app_admin_layout_adminlayout",
       "src_app_admin_layout_metadata",
@@ -428,7 +937,7 @@
       "src_components_admin_adminshell_navitem",
       "src_components_admin_adminshell_sidebarcard"
     ],
-    "14": [
+    "36": [
       "src_app_page",
       "src_app_page_founderinfo",
       "src_app_page_home",
@@ -440,7 +949,27 @@
       "src_components_servicecard_service",
       "src_components_servicecard_servicecard"
     ],
-    "15": [
+    "37": [
+      "email_templates_readme",
+      "email_templates_readme_configuration_dans_supabase",
+      "email_templates_readme_fichiers",
+      "email_templates_readme_instructions",
+      "email_templates_readme_notes",
+      "email_templates_readme_personnalisation",
+      "email_templates_readme_templates_d_email_supabase",
+      "email_templates_readme_variables_disponibles_dans_supabase"
+    ],
+    "38": [
+      "src_lib_moneroo",
+      "src_lib_moneroo_initiatepayment",
+      "src_lib_moneroo_monerooinitiaterequest",
+      "src_lib_moneroo_monerooinitiateresponse",
+      "src_lib_moneroo_monerooverifyresponse",
+      "src_lib_moneroo_moneroowebhookpayload",
+      "src_lib_moneroo_verifypayment",
+      "src_lib_moneroo_verifywebhooktoken"
+    ],
+    "39": [
       "src_app_api_email_get_template_route",
       "src_app_api_email_get_template_route_get",
       "src_app_api_email_send_promo_route",
@@ -449,7 +978,15 @@
       "src_lib_emailtemplates",
       "src_lib_emailtemplates_getpromoendingemailtemplate"
     ],
-    "16": [
+    "40": [
+      "email_templates_readme_reset_password",
+      "email_templates_reset_password_simple_html",
+      "email_templates_reset_password_simple_vb_sniper",
+      "email_templates_reset_password_subject_line",
+      "email_templates_reset_password_subject_txt",
+      "template_confirmation_email_confirmation_url"
+    ],
+    "41": [
       "src_app_api_resend_add_contact_route",
       "src_app_api_resend_add_contact_route_post",
       "src_lib_resendcontacts",
@@ -457,96 +994,458 @@
       "src_lib_resendcontacts_addcontacttoresendparams",
       "src_lib_resendcontacts_resend"
     ],
-    "17": [
+    "42": [
+      "readme",
+      "readme_deploy_on_vercel",
+      "readme_getting_started",
+      "readme_learn_more"
+    ],
+    "43": [
+      "src_app_auth_page",
+      "src_app_auth_page_authform",
+      "src_app_auth_page_authpage",
+      "src_app_auth_page_mode"
+    ],
+    "44": [
       "src_app_layout",
       "src_app_layout_metadata",
       "src_app_layout_poppins",
       "src_app_layout_rootlayout"
     ],
-    "18": [
+    "45": [
       "github_workflows_telegram_cron",
       "github_workflows_telegram_cron_api_telegram_cron",
       "github_workflows_telegram_cron_telegram_cron_secret"
     ],
-    "19": [
+    "46": [
       "src_app_payment_cancel_page",
       "src_app_payment_cancel_page_paymentcancelcontent",
       "src_app_payment_cancel_page_paymentcancelpage"
     ],
-    "20": [
+    "47": [
+      "src_app_payment_success_page",
+      "src_app_payment_success_page_paymentsuccesscontent",
+      "src_app_payment_success_page_paymentsuccesspage"
+    ],
+    "48": [
       "src_app_services_strategie_nasongon_layout",
       "src_app_services_strategie_nasongon_layout_metadata",
       "src_app_services_strategie_nasongon_layout_strategienasongonlayout"
     ],
-    "21": [
+    "49": [
+      "claude",
+      "claude_graphify"
+    ],
+    "50": [
       "eslint_config",
       "eslint_config_eslintconfig"
     ],
-    "22": [
+    "51": [
       "next_config",
       "next_config_nextconfig"
     ],
-    "23": [
+    "52": [
       "postcss_config",
       "postcss_config_config"
     ],
-    "24": [
+    "53": [
       "src_app_admin_page",
       "src_app_admin_page_adminpage"
     ],
-    "25": [
+    "54": [
       "src_app_api_users_export_emails_route",
       "src_app_api_users_export_emails_route_get"
     ],
-    "26": [
+    "55": [
       "src_app_auth_callback_route",
       "src_app_auth_callback_route_get"
     ],
-    "27": [
+    "56": [
       "src_app_robots_txt_route",
       "src_app_robots_txt_route_get"
     ],
-    "28": [
+    "57": [
       "src_app_sitemap",
       "src_app_sitemap_sitemap"
+    ],
+    "58": [
+      "ajouter_colonne_payment_reference_notif_token"
+    ],
+    "59": [
+      "ajouter_colonne_payment_reference_orders_table"
+    ],
+    "60": [
+      "ajouter_colonne_payment_reference_pay_token"
+    ],
+    "61": [
+      "ajouter_colonne_payment_reference_payment_reference"
+    ],
+    "62": [
+      "ajouter_colonne_payment_reference_txnid"
+    ],
+    "63": [
+      "ajouter_fonction_acces_automatique_grant_course_access"
+    ],
+    "64": [
+      "ajouter_fonction_acces_automatique_grant_course_access_automatic"
+    ],
+    "65": [
+      "ajouter_fonction_acces_automatique_orange_money_webhook"
+    ],
+    "66": [
+      "automatiser_ajout_contacts_resend_audience_id"
+    ],
+    "67": [
+      "automatiser_ajout_contacts_resend_resend"
+    ],
+    "68": [
+      "comment_obtenir_codes_paiement_check_payment_status"
+    ],
+    "69": [
+      "comment_obtenir_codes_paiement_orange_money_initiate"
+    ],
+    "70": [
+      "comment_obtenir_codes_paiement_payment_codes_api"
+    ],
+    "71": [
+      "comment_obtenir_otp_requestor_access_token"
+    ],
+    "72": [
+      "comment_obtenir_otp_requestor_merchant_key"
+    ],
+    "73": [
+      "comment_obtenir_otp_requestor_orange_developer"
+    ],
+    "74": [
+      "comment_obtenir_otp_requestor_otp_requestor"
+    ],
+    "75": [
+      "configurer_service_role_rls"
+    ],
+    "76": [
+      "configurer_service_role_service_role_key"
+    ],
+    "77": [
+      "configurer_smtp_supabase_custom_smtp"
+    ],
+    "78": [
+      "configurer_smtp_supabase_mailgun"
+    ],
+    "79": [
+      "configurer_smtp_supabase_resend_smtp"
+    ],
+    "80": [
+      "configurer_smtp_supabase_sendgrid"
+    ],
+    "81": [
+      "configurer_smtp_supabase_spf_dkim_dmarc"
+    ],
+    "82": [
+      "configurer_urls_redirection_supabase_auth_callback"
+    ],
+    "83": [
+      "configurer_urls_redirection_supabase_auth_reset_password"
+    ],
+    "84": [
+      "configurer_urls_redirection_supabase_redirect_urls"
+    ],
+    "85": [
+      "configurer_vercel_env_next_public_app_url"
+    ],
+    "86": [
+      "configurer_vercel_env_orange_money_env_vars"
+    ],
+    "87": [
+      "confirmation_paiement_orange_money_client_phone_confirmation"
+    ],
+    "88": [
+      "confirmation_paiement_orange_money_merchant_credentials"
+    ],
+    "89": [
+      "corriger_erreur_confirmation_email_requested_path_invalid"
+    ],
+    "90": [
+      "corriger_probleme_email_spam_deliverability"
+    ],
+    "91": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_geoffroy_boko"
+    ],
+    "92": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_preserve_orange_money"
+    ],
+    "93": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_service_card"
+    ],
+    "94": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_strategie_nasongon"
+    ],
+    "95": [
+      "cursor_plans_int_gration_orange_money_6ca8dea5_plan_vb_sniper_academie"
+    ],
+    "96": [
+      "depannage_dns_domaine_nxdomain"
+    ],
+    "97": [
+      "depannage_dns_domaine_vbsniperacademie"
+    ],
+    "98": [
+      "depannage_dns_domaine_vercel_domains"
+    ],
+    "99": [
+      "depannage_email_non_verifie_auth_callback_exchange"
+    ],
+    "100": [
+      "depannage_email_non_verifie_email_confirmed_at"
+    ],
+    "101": [
+      "depannage_undefined_orange_money_currency_ouv_xof"
+    ],
+    "102": [
+      "depannage_undefined_orange_money_doc"
+    ],
+    "103": [
+      "depannage_undefined_orange_money_frais_undefined"
+    ],
+    "104": [
+      "email_templates_readme_doc"
+    ],
+    "105": [
+      "envoyer_emails_promotionnels_doc"
+    ],
+    "106": [
+      "envoyer_emails_promotionnels_email_templates"
+    ],
+    "107": [
+      "envoyer_emails_promotionnels_resend"
+    ],
+    "108": [
+      "envoyer_emails_promotionnels_send_promo_api"
+    ],
+    "109": [
+      "gestion_echecs_paiement_doc"
+    ],
+    "110": [
+      "gestion_echecs_paiement_double_payment_protection"
+    ],
+    "111": [
+      "gestion_echecs_paiement_has_paid_access"
+    ],
+    "112": [
+      "gestion_echecs_paiement_orders_failed_status"
+    ],
+    "113": [
+      "integration_paytech_moneroo_grant_course_access"
+    ],
+    "114": [
+      "integration_paytech_moneroo_payment_method_routing"
+    ],
+    "115": [
+      "orange_money_adaptation_doc"
+    ],
+    "116": [
+      "orange_money_adaptation_webpayment_guide"
+    ],
+    "117": [
+      "orange_money_next_steps_doc"
+    ],
+    "118": [
+      "orange_money_next_steps_ngrok_webhook"
+    ],
+    "119": [
+      "orange_money_next_steps_oauth_access_token"
+    ],
+    "120": [
+      "orange_money_next_steps_ussd_simulator"
+    ],
+    "121": [
+      "orange_money_setup_notif_token"
+    ],
+    "122": [
+      "orange_money_setup_transaction_statuses"
+    ],
+    "123": [
+      "orange_money_setup_webpayment_api"
+    ],
+    "124": [
+      "paytech_official_integration_api_base"
+    ],
+    "125": [
+      "paytech_official_integration_hmac_sha256"
+    ],
+    "126": [
+      "paytech_official_integration_request_payment"
+    ],
+    "127": [
+      "reactiver_confirmation_email_auth_callback"
+    ],
+    "128": [
+      "reactiver_confirmation_email_doc"
+    ],
+    "129": [
+      "reactiver_confirmation_email_supabase_confirm"
+    ],
+    "130": [
+      "readme_doc"
+    ],
+    "131": [
+      "readme_nextjs"
+    ],
+    "132": [
+      "readme_vercel_deploy"
+    ],
+    "133": [
+      "solution_domaine_temporaire_next_public_app_url"
+    ],
+    "134": [
+      "solution_domaine_temporaire_nxdomain"
+    ],
+    "135": [
+      "template_confirmation_email_confirm_signup"
     ]
   },
   "cohesion": {
-    "0": 0.07077922077922078,
-    "1": 0.05087881591119334,
-    "2": 0.13225371120107962,
-    "3": 0.0748663101604278,
-    "4": 0.08870967741935484,
-    "5": 0.08064516129032258,
-    "6": 0.1693548387096774,
-    "7": 0.17634408602150536,
-    "8": 0.07692307692307693,
-    "9": 0.1,
-    "10": 0.16666666666666666,
-    "11": 0.2564102564102564,
-    "12": 0.19696969696969696,
-    "13": 0.24444444444444444,
-    "14": 0.2222222222222222,
-    "15": 0.47619047619047616,
-    "16": 0.4666666666666667,
-    "17": 0.5,
-    "18": 1.0,
-    "19": 0.6666666666666666,
-    "20": 0.6666666666666666,
-    "21": 1.0,
-    "22": 1.0,
-    "23": 1.0,
-    "24": 1.0,
-    "25": 1.0,
-    "26": 1.0,
-    "27": 1.0,
-    "28": 1.0
+    "0": 0.06293965198074787,
+    "1": 0.09623015873015874,
+    "2": 0.043478260869565216,
+    "3": 0.12944523470839261,
+    "4": 0.058823529411764705,
+    "5": 0.07126436781609195,
+    "6": 0.07142857142857142,
+    "7": 0.07142857142857142,
+    "8": 0.07407407407407407,
+    "9": 0.07407407407407407,
+    "10": 0.07407407407407407,
+    "11": 0.07692307692307693,
+    "12": 0.08,
+    "13": 0.08333333333333333,
+    "14": 0.08333333333333333,
+    "15": 0.08695652173913043,
+    "16": 0.11067193675889328,
+    "17": 0.09090909090909091,
+    "18": 0.09523809523809523,
+    "19": 0.09523809523809523,
+    "20": 0.1,
+    "21": 0.1,
+    "22": 0.1,
+    "23": 0.1111111111111111,
+    "24": 0.13725490196078433,
+    "25": 0.11764705882352941,
+    "26": 0.14285714285714285,
+    "27": 0.14285714285714285,
+    "28": 0.15384615384615385,
+    "29": 0.16666666666666666,
+    "30": 0.21212121212121213,
+    "31": 0.18181818181818182,
+    "32": 0.23636363636363636,
+    "33": 0.23636363636363636,
+    "34": 0.23636363636363636,
+    "35": 0.24444444444444444,
+    "36": 0.2222222222222222,
+    "37": 0.25,
+    "38": 0.25,
+    "39": 0.47619047619047616,
+    "40": 0.3333333333333333,
+    "41": 0.4666666666666667,
+    "42": 0.5,
+    "43": 0.5,
+    "44": 0.5,
+    "45": 1.0,
+    "46": 0.6666666666666666,
+    "47": 0.6666666666666666,
+    "48": 0.6666666666666666,
+    "49": 1.0,
+    "50": 1.0,
+    "51": 1.0,
+    "52": 1.0,
+    "53": 1.0,
+    "54": 1.0,
+    "55": 1.0,
+    "56": 1.0,
+    "57": 1.0,
+    "58": 1.0,
+    "59": 1.0,
+    "60": 1.0,
+    "61": 1.0,
+    "62": 1.0,
+    "63": 1.0,
+    "64": 1.0,
+    "65": 1.0,
+    "66": 1.0,
+    "67": 1.0,
+    "68": 1.0,
+    "69": 1.0,
+    "70": 1.0,
+    "71": 1.0,
+    "72": 1.0,
+    "73": 1.0,
+    "74": 1.0,
+    "75": 1.0,
+    "76": 1.0,
+    "77": 1.0,
+    "78": 1.0,
+    "79": 1.0,
+    "80": 1.0,
+    "81": 1.0,
+    "82": 1.0,
+    "83": 1.0,
+    "84": 1.0,
+    "85": 1.0,
+    "86": 1.0,
+    "87": 1.0,
+    "88": 1.0,
+    "89": 1.0,
+    "90": 1.0,
+    "91": 1.0,
+    "92": 1.0,
+    "93": 1.0,
+    "94": 1.0,
+    "95": 1.0,
+    "96": 1.0,
+    "97": 1.0,
+    "98": 1.0,
+    "99": 1.0,
+    "100": 1.0,
+    "101": 1.0,
+    "102": 1.0,
+    "103": 1.0,
+    "104": 1.0,
+    "105": 1.0,
+    "106": 1.0,
+    "107": 1.0,
+    "108": 1.0,
+    "109": 1.0,
+    "110": 1.0,
+    "111": 1.0,
+    "112": 1.0,
+    "113": 1.0,
+    "114": 1.0,
+    "115": 1.0,
+    "116": 1.0,
+    "117": 1.0,
+    "118": 1.0,
+    "119": 1.0,
+    "120": 1.0,
+    "121": 1.0,
+    "122": 1.0,
+    "123": 1.0,
+    "124": 1.0,
+    "125": 1.0,
+    "126": 1.0,
+    "127": 1.0,
+    "128": 1.0,
+    "129": 1.0,
+    "130": 1.0,
+    "131": 1.0,
+    "132": 1.0,
+    "133": 1.0,
+    "134": 1.0,
+    "135": 1.0
   },
   "gods": [
     {
       "id": "src_lib_supabaseserver_createsupabasefromrequest",
       "label": "createSupabaseFromRequest()",
-      "degree": 35
+      "degree": 40
     },
     {
       "id": "src_lib_requireadmin_requireadmin",
@@ -574,81 +1473,81 @@
       "degree": 12
     },
     {
-      "id": "src_lib_studentsecurity_isuuid",
-      "label": "isUuid()",
-      "degree": 9
+      "id": "configurer_vercel_env_configurer_les_variables_d_environnement_sur_vercel",
+      "label": "Configurer les variables d'environnement sur Vercel",
+      "degree": 12
     },
     {
-      "id": "src_lib_supabaseclient_supabase",
-      "label": "supabase",
-      "degree": 9
+      "id": "template_confirmation_email_template_de_confirmation_d_email_am\u00e9lior\u00e9",
+      "label": "Template de confirmation d'email am\u00e9lior\u00e9",
+      "degree": 12
     },
     {
-      "id": "src_lib_telegram_linktoken_handlestartwithtoken",
-      "label": "handleStartWithToken()",
-      "degree": 9
+      "id": "src_lib_payments_notifypaymentsuccess_notifyadminorderpaid",
+      "label": "notifyAdminOrderPaid()",
+      "degree": 12
     },
     {
-      "id": "src_lib_telegram_resolveuser_resolveuserfromemailorid",
-      "label": "resolveUserFromEmailOrId()",
-      "degree": 9
+      "id": "comment_obtenir_otp_requestor_comment_obtenir_le_code_otp_requestor_orange_money",
+      "label": "Comment obtenir le code OTP Requestor Orange Money",
+      "degree": 11
     }
   ],
   "surprises": [
     {
-      "source": "Corriger erreur confirmation email",
-      "target": "Configurer URLs redirection Supabase",
+      "source": "VB Sniper Academie password reset email",
+      "target": "{{ .ConfirmationURL }}",
       "source_files": [
-        "CORRIGER_ERREUR_CONFIRMATION_EMAIL.md",
-        "CONFIGURER_URLS_REDIRECTION_SUPABASE.md"
+        "email-templates/reset-password-simple.html",
+        "TEMPLATE_CONFIRMATION_EMAIL.md"
       ],
-      "confidence": "INFERRED",
-      "relation": "semantically_similar_to",
-      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link; peripheral node `Configurer URLs redirection Supabase` unexpectedly reaches hub `Corriger erreur confirmation email`"
+      "confidence": "EXTRACTED",
+      "relation": "shares_data_with",
+      "why": "connects across different repos/directories"
     },
     {
-      "source": "VB Sniper Acad\u00e9mie",
-      "target": "vbsniperacademie.com",
+      "source": "AdminStudentsPage()",
+      "target": "sanitizePhoneInput()",
       "source_files": [
-        ".cursor/plans/int-gration-orange-money-6ca8dea5.plan.md",
-        "DEPANNAGE_DNS_DOMAINE.md"
+        "src/app/admin/students/page.tsx",
+        "src/lib/studentSecurity.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "semantically_similar_to",
-      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "bridges separate communities"
     },
     {
-      "source": "Resend SMTP for Supabase",
-      "target": "Resend",
+      "source": "GET()",
+      "target": "createSupabaseFromRequest()",
       "source_files": [
-        "CONFIGURER_SMTP_SUPABASE.md",
-        "AUTOMATISER_AJOUT_CONTACTS_RESEND.md"
+        "src/app/api/courses/[id]/videos/route.ts",
+        "src/lib/supabaseServer.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "semantically_similar_to",
-      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `GET()` unexpectedly reaches hub `createSupabaseFromRequest()`"
     },
     {
-      "source": "Corriger probl\u00e8me email spam",
-      "target": "Configurer SMTP Supabase",
+      "source": "GET()",
+      "target": "getPromoEndingEmailTemplate()",
       "source_files": [
-        "CORRIGER_PROBLEME_EMAIL_SPAM.md",
-        "CONFIGURER_SMTP_SUPABASE.md"
+        "src/app/api/email/get-template/route.ts",
+        "src/lib/emailTemplates.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "semantically_similar_to",
-      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `GET()` unexpectedly reaches hub `getPromoEndingEmailTemplate()`"
     },
     {
-      "source": "Frais undefined undefined (Orange Money)",
-      "target": "Orange Money WebPayment API",
+      "source": "POST()",
+      "target": "getPromoEndingEmailTemplate()",
       "source_files": [
-        "DEPANNAGE_UNDEFINED_ORANGE_MONEY.md",
-        "ORANGE_MONEY_SETUP.md"
+        "src/app/api/email/send-promo/route.ts",
+        "src/lib/emailTemplates.ts"
       ],
-      "confidence": "INFERRED",
-      "relation": "semantically_similar_to",
-      "why": "inferred connection - not explicitly stated in source; connects across different repos/directories; semantically similar concepts with no structural link"
+      "confidence": "EXTRACTED",
+      "relation": "calls",
+      "why": "peripheral node `POST()` unexpectedly reaches hub `getPromoEndingEmailTemplate()`"
     }
   ],
   "tokens": {

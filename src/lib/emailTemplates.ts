@@ -133,3 +133,137 @@ ${siteUrl}
   };
 }
 
+export function getPaymentSuccessEmailTemplate(data: {
+  productLabel: string;
+  amountLabel: string;
+  paymentMethod: string;
+  referenceId: string;
+  dateLabel: string;
+  detail?: string | null;
+  userEmail?: string | null;
+  userName?: string | null;
+  userId?: string | null;
+  monerooPaymentId?: string | null;
+  siteUrl?: string;
+}) {
+  const {
+    productLabel,
+    amountLabel,
+    paymentMethod,
+    referenceId,
+    dateLabel,
+    detail,
+    userEmail,
+    userName,
+    userId,
+    monerooPaymentId,
+    siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://vbsniperacademie.com",
+  } = data;
+
+  const rows: Array<[string, string]> = [
+    ["Produit", productLabel],
+    ["Montant", amountLabel],
+    ["Méthode", paymentMethod],
+    ["Référence", referenceId],
+    ["Date", dateLabel],
+  ];
+  if (detail) rows.push(["Détail", detail]);
+  if (userEmail) rows.push(["Client (email)", userEmail]);
+  if (userName) rows.push(["Client (nom)", userName]);
+  if (userId) rows.push(["User ID", userId]);
+  if (monerooPaymentId) rows.push(["Moneroo ID", monerooPaymentId]);
+
+  const htmlRows = rows
+    .map(
+      ([label, value]) => `
+              <tr>
+                <td style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #666666; font-size: 14px; width: 140px; vertical-align: top;">${label}</td>
+                <td style="padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #1a1a1a; font-size: 14px; font-weight: 600; vertical-align: top;">${value}</td>
+              </tr>`
+    )
+    .join("");
+
+  return {
+    subject: `💰 Paiement réussi — ${productLabel} — ${amountLabel}`,
+    html: `
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paiement réussi</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+  <table role="presentation" style="width: 100%; border-collapse: collapse; background-color: #f5f5f5;">
+    <tr>
+      <td align="center" style="padding: 40px 20px;">
+        <table role="presentation" style="max-width: 600px; width: 100%; border-collapse: collapse; background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+          <tr>
+            <td style="padding: 30px 30px 20px; text-align: center; background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); border-radius: 8px 8px 0 0;">
+              <h1 style="margin: 0; color: #d4af37; font-size: 28px; font-weight: bold;">VB Sniper Académie</h1>
+              <p style="margin: 8px 0 0; color: #ffffff; font-size: 14px; opacity: 0.85;">Notification de paiement</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 40px 30px;">
+              <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 16px 20px; margin: 0 0 24px; border-radius: 4px;">
+                <p style="margin: 0; color: #065f46; font-size: 16px; font-weight: bold;">
+                  ✓ Paiement confirmé
+                </p>
+                <p style="margin: 6px 0 0; color: #047857; font-size: 14px;">
+                  Un nouveau paiement a été validé sur la plateforme.
+                </p>
+              </div>
+
+              <h2 style="margin: 0 0 8px; color: #1a1a1a; font-size: 22px; font-weight: bold;">
+                ${productLabel}
+              </h2>
+              <p style="margin: 0 0 24px; color: #d4af37; font-size: 28px; font-weight: bold;">
+                ${amountLabel}
+              </p>
+
+              <table role="presentation" style="width: 100%; border-collapse: collapse; border: 1px solid #eeeeee; border-radius: 6px; overflow: hidden;">
+                ${htmlRows}
+              </table>
+
+              <div style="margin: 28px 0 0; text-align: center;">
+                <a href="${siteUrl}/admin/payments" style="display: inline-block; background-color: #d4af37; color: #1a1a1a; text-decoration: none; padding: 14px 28px; border-radius: 6px; font-weight: bold; font-size: 15px;">
+                  Voir les paiements
+                </a>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding: 24px 30px; background-color: #fafafa; border-radius: 0 0 8px 8px; text-align: center; border-top: 1px solid #eeeeee;">
+              <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.5;">
+                Email automatique — VB Sniper Académie<br>
+                ${siteUrl}
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>
+    `.trim(),
+    text: `
+Paiement réussi — VB Sniper Académie
+
+Produit: ${productLabel}
+Montant: ${amountLabel}
+Méthode: ${paymentMethod}
+Référence: ${referenceId}
+Date: ${dateLabel}
+${detail ? `Détail: ${detail}` : ""}
+${userEmail ? `Client (email): ${userEmail}` : ""}
+${userName ? `Client (nom): ${userName}` : ""}
+${userId ? `User ID: ${userId}` : ""}
+${monerooPaymentId ? `Moneroo ID: ${monerooPaymentId}` : ""}
+
+Voir les paiements: ${siteUrl}/admin/payments
+    `.trim(),
+  };
+}
+

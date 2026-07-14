@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createSupabaseFromRequest, getAuthUserId } from "@/lib/supabaseServer";
-import { notifyAdminPaymentSuccess } from "@/lib/payments/notifyPaymentSuccess";
+import {
+  getPaymentNotifyEmails,
+  notifyAdminPaymentSuccess,
+} from "@/lib/payments/notifyPaymentSuccess";
 
 /**
  * POST /api/payments/test-notify
@@ -45,7 +48,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     ok: true,
     message: "Email de test envoyé (vérifie Resend + boîte mail)",
-    to: process.env.PAYMENT_NOTIFY_EMAIL || "modiboongoiba76@gmail.com",
+    to: getPaymentNotifyEmails(),
     from:
       process.env.RESEND_FROM_EMAIL ||
       "VB Sniper Académie <support@vbsniperacademie.com>",

@@ -1,15 +1,24 @@
-# Templates d'email Supabase
+# Templates d'email
+
+## Fichiers
+
+### Supabase Auth
+
+- `reset-password.html` - Template HTML pour le corps de l'email
+- `reset-password-subject.txt` - Sujet de l'email
+
+### Paiements (Resend)
+
+- `payment-success.html` - Aperçu HTML de la notif admin paiement
+- Source runtime : `src/lib/emailTemplates.ts` → `getPaymentSuccessEmailTemplate()`
+- Destinataires : `modiboongoiba76@gmail.com` + `ms.marakadev@gmail.com`
+  (surcharge via `PAYMENT_NOTIFY_EMAIL` séparés par virgule)
 
 ## Configuration dans Supabase
 
 1. Allez dans **Supabase Dashboard > Authentication > Email Templates**
 2. Sélectionnez **Reset Password**
-3. Copiez le contenu des fichiers ci-dessous
-
-## Fichiers
-
-- `reset-password.html` - Template HTML pour le corps de l'email
-- `reset-password-subject.txt` - Sujet de l'email
+3. Copiez le contenu des fichiers reset-password ci-dessous
 
 ## Variables disponibles dans Supabase
 
