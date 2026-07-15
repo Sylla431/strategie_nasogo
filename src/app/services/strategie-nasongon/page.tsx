@@ -418,10 +418,12 @@ export default function Home() {
     }
 
     // Mapping des moyens de paiement vers leurs codes
+    // "Orange Money" → Moneroo (passerelle Orange Money déjà branchée dans Moneroo)
     const paymentMethodMap: Record<string, string> = {
       "Mobile Money (Orange money)": "orange_money",
       "PayTech": "paytech",
-      "Moneroo": "moneroo",
+      "Orange Money": "moneroo",
+      Moneroo: "moneroo", // alias legacy
     };
 
     // Si c'est un paiement en ligne (Orange Money, PayTech, Moneroo)
@@ -839,9 +841,9 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
               </div>
               <div className="flex flex-wrap gap-2 sm:gap-3">
                 {[
-                  { label: "Mobile Money (Orange money)", enabled: false },
-                  { label: "PayTech", enabled: false },
-                  { label: "Moneroo", enabled: true },
+                  // { label: "Mobile Money (Orange money)", enabled: false },
+                  // { label: "PayTech", enabled: false },
+                  { label: "Orange Money", enabled: true },
                   // "Carte bancaire (Visa / MasterCard)", // Pas encore intégrée
                 ].map((method) => (
                   <button
@@ -923,7 +925,11 @@ Nasongon n&apos;est pas une promesse, c&apos;est une méthode. Une approche réa
               )}
               
               {/* Messages de chargement */}
-              {submitted && paymentInfo === "Mobile Money (Orange money)" && !error && (
+              {submitted &&
+                (paymentInfo === "Mobile Money (Orange money)" ||
+                  paymentInfo === "Orange Money" ||
+                  paymentInfo === "Moneroo") &&
+                !error && (
                 <div className="rounded-2xl bg-blue-50 p-3 sm:p-4 text-sm text-blue-700 border border-blue-200">
                   Redirection vers Orange Money en cours...
                 </div>
