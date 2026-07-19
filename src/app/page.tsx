@@ -108,6 +108,7 @@ const services = [
     externalUrl: "/vip/checkout",
     price: 30000,
     available: true,
+    confirmBeforeCheckout: true,
   },
 ];
 
