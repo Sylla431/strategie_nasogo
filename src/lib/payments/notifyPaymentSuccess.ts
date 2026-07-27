@@ -43,15 +43,15 @@ function formatAmount(amount?: number | null, currency = "XOF") {
 
 /**
  * Notifie les admins par email à chaque paiement réussi.
- * Ne bloque jamais le flux paiement (erreurs loguées seulement).
+ * Retourne true si l'envoi Resend a réussi.
  */
 export async function notifyAdminPaymentSuccess(
   input: PaymentSuccessNotifyInput
-): Promise<void> {
+): Promise<boolean> {
   try {
     if (!process.env.RESEND_API_KEY) {
       console.warn("notifyAdminPaymentSuccess: RESEND_API_KEY manquante");
-      return;
+      return false;
     }
 
     const resend = new Resend(process.env.RESEND_API_KEY);
@@ -62,11 +62,13 @@ export async function notifyAdminPaymentSuccess(
 
     if (toEmails.length === 0) {
       console.warn("notifyAdminPaymentSuccess: aucun destinataire");
-      return;
+      return false;
     }
 
     const productLabel =
-      input.product === "telegram_vip" ? "VIP Telegram" : "Cours";
+      input.product === "telegram_vip"
+        ? "Canal VIP Telegram Signaux"
+        : "Cours";
     const amountLabel = formatAmount(input.amount, input.currency);
     const when = new Date().toLocaleString("fr-FR", { timeZone: "Africa/Bamako" });
 
@@ -100,12 +102,14 @@ export async function notifyAdminPaymentSuccess(
 
     if (error) {
       console.error("notifyAdminPaymentSuccess Resend error:", error);
-      return;
+      return false;
     }
 
     console.log("✅ Email admin paiement envoyé à", toEmails.join(", "), "id=", data?.id);
+    return true;
   } catch (err) {
     console.error("notifyAdminPaymentSuccess exception:", err);
+    return false;
   }
 }
 

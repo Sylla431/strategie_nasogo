@@ -139,6 +139,12 @@ async function confirmVipPayment(params: {
   if (!payment || !monerooPaymentId) return null;
 
   if (payment.status === "paid") {
+    await fulfillVipPayment({
+      serviceClient,
+      payment,
+      monerooPaymentId,
+      confirmedVia: "return_url_retry",
+    });
     return NextResponse.json({
       status: "paid",
       product: "telegram_vip",

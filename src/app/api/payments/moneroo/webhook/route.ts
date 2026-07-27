@@ -138,6 +138,12 @@ async function handleVipWebhook(
   }
 
   if (payment.status === "paid" && payload.event === "payment.success") {
+    await fulfillVipPayment({
+      serviceClient: supabase,
+      payment,
+      monerooPaymentId: payload.data.id,
+      confirmedVia: "webhook_retry",
+    });
     return NextResponse.json({ message: "VIP déjà traité" }, { status: 200 });
   }
 

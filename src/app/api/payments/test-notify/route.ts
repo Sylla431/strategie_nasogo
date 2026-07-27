@@ -34,20 +34,27 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  const body = await req.json().catch(() => ({}));
+  const product = body?.product === "telegram_vip" ? "telegram_vip" : "course";
+
   await notifyAdminPaymentSuccess({
-    product: "course",
+    product,
     paymentMethod: "test",
-    amount: 1000,
+    amount: product === "telegram_vip" ? 30000 : 1000,
     referenceId: `test_${Date.now()}`,
     userId,
     userEmail: profile.email ?? null,
     userName: profile.full_name ?? null,
-    detail: "Email de test — notification paiement",
+    detail:
+      product === "telegram_vip"
+        ? "Email de test — paiement canal VIP Telegram"
+        : "Email de test — notification paiement",
   });
 
   return NextResponse.json({
     ok: true,
     message: "Email de test envoyé (vérifie Resend + boîte mail)",
+    product,
     to: getPaymentNotifyEmails(),
     from:
       process.env.RESEND_FROM_EMAIL ||

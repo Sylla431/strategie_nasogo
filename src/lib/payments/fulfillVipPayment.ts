@@ -12,8 +12,94 @@ export type VipPaymentRow = {
   payment_reference: string | null;
 };
 
+function parsePaymentRef(raw: string | null): Record<string, unknown> {
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return {};
+  }
+}
+
+async function resolveVipCustomer(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  serviceClient: SupabaseClient<any>,
+  userId: string
+): Promise<{ userEmail: string | null; userName: string | null }> {
+  let userEmail: string | null = null;
+  let userName: string | null = null;
+  try {
+    const { data: profile } = await serviceClient
+      .from("users_profile")
+      .select("email, full_name")
+      .eq("id", userId)
+      .maybeSingle();
+    userEmail = profile?.email ?? null;
+    userName = profile?.full_name ?? null;
+  } catch {
+    /* ignore */
+  }
+  if (!userEmail) {
+    try {
+      const { data: authUser } = await serviceClient.auth.admin.getUserById(userId);
+      userEmail = authUser.user?.email ?? null;
+    } catch {
+      /* ignore */
+    }
+  }
+  return { userEmail, userName };
+}
+
+/**
+ * Envoie l'email admin VIP si pas encore envoyé, et marque admin_email_sent.
+ */
+export async function notifyVipPaymentEmailIfNeeded(params: {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  serviceClient: SupabaseClient<any>;
+  payment: VipPaymentRow;
+  monerooPaymentId?: string | null;
+}): Promise<void> {
+  const { serviceClient, payment, monerooPaymentId } = params;
+  const paymentData = parsePaymentRef(payment.payment_reference);
+
+  if (paymentData.admin_email_sent === true) {
+    return;
+  }
+
+  const { userEmail, userName } = await resolveVipCustomer(serviceClient, payment.user_id);
+  const monerooId =
+    monerooPaymentId ||
+    (typeof paymentData.payment_id === "string" ? paymentData.payment_id : null) ||
+    (typeof paymentData.moneroo_id === "string" ? paymentData.moneroo_id : null);
+
+  const sent = await notifyAdminPaymentSuccess({
+    product: "telegram_vip",
+    paymentMethod: "moneroo",
+    amount: payment.amount,
+    referenceId: payment.id,
+    userId: payment.user_id,
+    userEmail,
+    userName,
+    detail:
+      payment.kind === "adhesion"
+        ? "Adhésion canal VIP Telegram (1er mois inclus)"
+        : "Renouvellement canal VIP Telegram — 1 mois",
+    monerooPaymentId: monerooId,
+  });
+
+  if (!sent) return;
+
+  paymentData.admin_email_sent = true;
+  paymentData.admin_email_sent_at = new Date().toISOString();
+  await serviceClient
+    .from("telegram_vip_payments")
+    .update({ payment_reference: JSON.stringify(paymentData) })
+    .eq("id", payment.id);
+}
+
 /**
  * Marque un paiement VIP comme payé et active/prolonge l'abonnement Telegram.
+ * Envoie aussi l'email admin de notification.
  */
 export async function fulfillVipPayment(params: {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -25,17 +111,15 @@ export async function fulfillVipPayment(params: {
   const { serviceClient, payment, monerooPaymentId, confirmedVia } = params;
 
   if (payment.status === "paid") {
+    await notifyVipPaymentEmailIfNeeded({
+      serviceClient,
+      payment,
+      monerooPaymentId,
+    });
     return { ok: true };
   }
 
-  let paymentData: Record<string, unknown> = {};
-  if (payment.payment_reference) {
-    try {
-      paymentData = JSON.parse(payment.payment_reference);
-    } catch {
-      paymentData = {};
-    }
-  }
+  const paymentData = parsePaymentRef(payment.payment_reference);
   paymentData.moneroo_id = monerooPaymentId;
   paymentData.payment_id = monerooPaymentId;
   paymentData.completed_at = new Date().toISOString();
@@ -65,36 +149,13 @@ export async function fulfillVipPayment(params: {
 
   console.log("✅ VIP Telegram activé/prolongé pour", payment.user_id, `(${payment.kind})`);
 
-  let userEmail: string | null = null;
-  let userName: string | null = null;
-  try {
-    const { data: profile } = await serviceClient
-      .from("users_profile")
-      .select("email, full_name")
-      .eq("id", payment.user_id)
-      .maybeSingle();
-    userEmail = profile?.email ?? null;
-    userName = profile?.full_name ?? null;
-  } catch {
-    /* ignore */
-  }
-  if (!userEmail) {
-    try {
-      const { data: authUser } = await serviceClient.auth.admin.getUserById(payment.user_id);
-      userEmail = authUser.user?.email ?? null;
-    } catch {
-      /* ignore */
-    }
-  }
-  await notifyAdminPaymentSuccess({
-    product: "telegram_vip",
-    paymentMethod: "moneroo",
-    amount: payment.amount,
-    referenceId: payment.id,
-    userId: payment.user_id,
-    userEmail,
-    userName,
-    detail: payment.kind === "adhesion" ? "Adhésion VIP (1er mois inclus)" : "Renouvellement VIP — 1 mois",
+  await notifyVipPaymentEmailIfNeeded({
+    serviceClient,
+    payment: {
+      ...payment,
+      status: "paid",
+      payment_reference: JSON.stringify(paymentData),
+    },
     monerooPaymentId,
   });
 
@@ -108,14 +169,7 @@ export async function failVipPayment(params: {
   monerooPaymentId: string;
 }) {
   const { serviceClient, payment, monerooPaymentId } = params;
-  let paymentData: Record<string, unknown> = {};
-  if (payment.payment_reference) {
-    try {
-      paymentData = JSON.parse(payment.payment_reference);
-    } catch {
-      paymentData = {};
-    }
-  }
+  const paymentData = parsePaymentRef(payment.payment_reference);
   paymentData.moneroo_id = monerooPaymentId;
   paymentData.failed_at = new Date().toISOString();
 
