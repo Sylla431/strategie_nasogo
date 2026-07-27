@@ -2,8 +2,9 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ServiceCard from "@/components/ServiceCard";
+import { supabase } from "@/lib/supabaseClient";
 
 const store = {
   name: "VB Sniper Académie",
@@ -131,6 +132,49 @@ const testimonials = [
 
 export default function Home() {
   const [selectedTestimonial, setSelectedTestimonial] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadSession = async () => {
+      const { data } = await supabase.auth.getSession();
+      const token = data.session?.access_token ?? null;
+      const uid = data.session?.user?.id ?? null;
+      setSessionToken(token);
+
+      if (token && uid) {
+        const { data: profile } = await supabase
+          .from("users_profile")
+          .select("role")
+          .eq("id", uid)
+          .maybeSingle();
+        const roleVal =
+          profile?.role && typeof profile.role === "string"
+            ? profile.role.trim().toLowerCase()
+            : null;
+        setUserRole(roleVal === "admin" ? "admin" : roleVal || "client");
+      } else {
+        setUserRole(null);
+      }
+    };
+
+    void loadSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "SIGNED_OUT" || !session) {
+        setSessionToken(null);
+        setUserRole(null);
+      } else if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        void loadSession();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
 
   return (
     <div className="bg-transparent text-neutral-900">
@@ -180,15 +224,44 @@ export default function Home() {
           </div>
         </div>
         
-        {/* Contact en haut à droite */}
-        <div className="absolute top-6 right-6 z-20 text-right">
-          <p className="text-sm text-white font-medium mb-1">Contactez-moi</p>
-          <a 
-            href={store.support.email.replace("mailto:", "")}
-            className="text-base text-brand font-semibold hover:text-[#f4d03f] transition-colors"
-          >
-            {store.support.email.replace("mailto:", "")}
-          </a>
+        {/* Contact + auth en haut à droite */}
+        <div className="absolute top-6 right-6 z-20 text-right space-y-3">
+          <div>
+            <p className="text-sm text-white font-medium mb-1">Contactez-moi</p>
+            <a
+              href={store.support.email.replace("mailto:", "")}
+              className="text-base text-brand font-semibold hover:text-[#f4d03f] transition-colors"
+            >
+              {store.support.email.replace("mailto:", "")}
+            </a>
+          </div>
+          <div className="flex flex-wrap items-center justify-end gap-2">
+            {sessionToken ? (
+              <>
+                <Link
+                  href="/client"
+                  className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#d4af37] hover:text-black transition-colors"
+                >
+                  Espace client
+                </Link>
+                {userRole === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-[#d4af37] px-3 py-1.5 text-xs sm:text-sm font-semibold text-black hover:bg-[#f4d03f] transition-colors"
+                  >
+                    Admin
+                  </Link>
+                )}
+              </>
+            ) : (
+              <Link
+                href="/auth"
+                className="inline-flex items-center rounded-full border border-white/30 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:border-[#d4af37] hover:text-[#d4af37] transition-colors"
+              >
+                Connexion
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Contenu centré en bas de la page */}
@@ -542,12 +615,25 @@ La rentabilité n’est pas une question de chance, mais de processus.          
                 <Link href="#services" className="block text-neutral-400 hover:text-white">
                   Services
                 </Link>
-                <Link href="/auth" className="block text-neutral-400 hover:text-white">
-                  Connexion
-                </Link>
-                  </div>
-                </div>
+                {sessionToken ? (
+                  <>
+                    <Link href="/client" className="block text-neutral-400 hover:text-white">
+                      Espace client
+                    </Link>
+                    {userRole === "admin" && (
+                      <Link href="/admin" className="block text-neutral-400 hover:text-white">
+                        Admin
+                      </Link>
+                    )}
+                  </>
+                ) : (
+                  <Link href="/auth" className="block text-neutral-400 hover:text-white">
+                    Connexion
+                  </Link>
+                )}
               </div>
+            </div>
+          </div>
           
           <div className="mt-8 pt-8 border-t border-neutral-800 text-center text-sm text-neutral-400">
             <p>&copy; {new Date().getFullYear()} {store.name}. Tous droits réservés.</p>
