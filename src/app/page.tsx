@@ -240,14 +240,14 @@ export default function Home() {
               <>
                 <Link
                   href="/client"
-                  className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:bg-[#d4af37] hover:text-black transition-colors"
+                  className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold !text-white hover:bg-[#d4af37] hover:!text-black transition-colors"
                 >
                   Espace client
                 </Link>
                 {userRole === "admin" && (
                   <Link
                     href="/admin"
-                    className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-[#d4af37] px-3 py-1.5 text-xs sm:text-sm font-semibold text-black hover:bg-[#f4d03f] transition-colors"
+                    className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-[#d4af37] px-3 py-1.5 text-xs sm:text-sm font-semibold !text-black hover:bg-[#f4d03f] transition-colors"
                   >
                     Admin
                   </Link>
@@ -256,7 +256,7 @@ export default function Home() {
             ) : (
               <Link
                 href="/auth"
-                className="inline-flex items-center rounded-full border border-white/30 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold text-white hover:border-[#d4af37] hover:text-[#d4af37] transition-colors"
+                className="inline-flex items-center rounded-full border border-white/30 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold !text-white hover:border-[#d4af37] hover:!text-[#d4af37] transition-colors"
               >
                 Connexion
               </Link>
