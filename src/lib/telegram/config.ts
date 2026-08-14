@@ -53,7 +53,7 @@ export function getTelegramConfig(): TelegramConfig | null {
       process.env.TELEGRAM_CRON_SECRET?.trim() ??
       process.env.CRON_SECRET?.trim() ??
       "",
-    linkTokenTtlMinutes: Number(process.env.TELEGRAM_LINK_TOKEN_TTL_MINUTES ?? "15") || 15,
+    linkTokenTtlMinutes: Number(process.env.TELEGRAM_LINK_TOKEN_TTL_MINUTES ?? "1440") || 1440,
     inviteLinkExpireMinutes: Number(process.env.TELEGRAM_INVITE_LINK_TTL_MINUTES ?? "60") || 60,
   };
 }

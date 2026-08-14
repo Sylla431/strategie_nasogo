@@ -207,6 +207,12 @@ export async function grantOrExtendSubscription(
         .eq("user_id", userId);
     }
 
+    // Si l'utilisateur était banni suite à une expiration, le débannir
+    // pour qu'il puisse être rajouté au canal (via bot ou manuellement).
+    if (existing.telegram_user_id) {
+      await unbanFromChannel(existing.telegram_user_id);
+    }
+
     return { subscription: data as TelegramSubscription };
   }
 

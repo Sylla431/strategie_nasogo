@@ -92,21 +92,35 @@ export async function notifyAdminPaymentSuccess(
       referenceId: input.referenceId,
     });
 
-    const { data, error } = await resend.emails.send({
-      from: fromEmail,
-      to: toEmails,
-      subject: template.subject,
-      html: template.html,
-      text: template.text,
-    });
+    const maxAttempts = 3;
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      const { data, error } = await resend.emails.send({
+        from: fromEmail,
+        to: toEmails,
+        subject: template.subject,
+        html: template.html,
+        text: template.text,
+      });
 
-    if (error) {
-      console.error("notifyAdminPaymentSuccess Resend error:", error);
-      return false;
+      if (!error) {
+        console.log("✅ Email admin paiement envoyé à", toEmails.join(", "), "id=", data?.id);
+        return true;
+      }
+
+      console.error(
+        `notifyAdminPaymentSuccess Resend error (tentative ${attempt}/${maxAttempts}):`,
+        error
+      );
+
+      // Erreur de validation (from/to malformé, etc.) : réessayer ne changera rien.
+      if (error.name === "validation_error") break;
+
+      if (attempt < maxAttempts) {
+        await new Promise((resolve) => setTimeout(resolve, attempt * 1000));
+      }
     }
 
-    console.log("✅ Email admin paiement envoyé à", toEmails.join(", "), "id=", data?.id);
-    return true;
+    return false;
   } catch (err) {
     console.error("notifyAdminPaymentSuccess exception:", err);
     return false;
