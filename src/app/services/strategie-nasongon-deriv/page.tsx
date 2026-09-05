@@ -22,9 +22,9 @@ const store = {
 
 const product = {
   id: "prd_nasongon_deriv",
-  name: "Stratégie Nasongon sur Deriv",
+  name: "Indices Synthétiques",
   cover: "/images/INDICES SYNTHÉTIQUES.jpg",
-  description: "Stratégie Nasongon sur Deriv",
+  description: "Indices Synthétiques",
   price: 75000,
   type: "Programme de formation",
   customCtaText: "Rejoindre le programme",
@@ -361,7 +361,7 @@ export default function StrategieNasongonDerivPage() {
                 {isCheckingAccess
                   ? "Vérification en cours..."
                   : hasPaidAccess
-                    ? "✅ Accès déjà obtenu"
+                    ? "Accès déjà obtenu"
                     : submitted
                       ? "Traitement en cours..."
                       : product.customCtaText}
@@ -369,7 +369,7 @@ export default function StrategieNasongonDerivPage() {
 
               {hasPaidAccess && (
                 <div className="rounded-2xl bg-green-50 p-3 sm:p-4 text-sm text-green-700 border border-green-200">
-                  🎉 Vous avez déjà accès à ce cours ! <Link href="/client" className="underline font-semibold">Accéder à mes cours</Link>
+                   Vous avez déjà accès à ce cours ! <Link href="/client" className="underline font-semibold">Accéder à mes cours</Link>
                 </div>
               )}
 
