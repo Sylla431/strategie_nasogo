@@ -7,6 +7,7 @@ import type { FormEvent } from "react";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabaseClient";
 import ScrollReveal from "@/components/ScrollReveal";
+import SiteHeader from "@/components/SiteHeader";
 
 const store = {
   name: "VB Sniper Academie",
@@ -229,41 +230,7 @@ export default function StrategieNasongonDerivPage() {
 
   return (
     <div className="bg-transparent text-neutral-900">
-      <header className="sticky top-0 z-30 bg-white/85 backdrop-blur-lg p-4 border-b border-[#e1e3eb]">
-        <div className="layout-shell flex flex-wrap items-center justify-between gap-3 sm:gap-4 py-4">
-          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-            <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-full border border-[#d4af37]/60 bg-black shadow-md">
-              <Image
-                src={store.logoUrl}
-                alt={store.name}
-                fill
-                sizes="64px"
-                className="object-contain"
-              />
-            </div>
-            <div className="min-w-0">
-              <p className="text-lg font-semibold tracking-tight">{store.name}</p>
-              <p className="hidden sm:block text-sm text-neutral-800">
-                {store.description}
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3 flex-nowrap">
-            <Link
-              href={store.support.whatsapp}
-              target="_blank"
-              className="pill-neutral text-xs sm:text-sm whitespace-nowrap"
-            >
-              Besoin d&apos;aide ?
-            </Link>
-            {!sessionToken && (
-              <Link href="/auth" className="button-primary cta-pulse text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
-                Connexion
-              </Link>
-            )}
-          </div>
-        </div>
-      </header>
+      <SiteHeader />
 
       <main className="layout-shell py-10 md:py-14 space-y-10">
         <section className="grid gap-8 lg:grid-cols-[1.4fr_1fr] items-start pt-5">

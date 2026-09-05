@@ -245,8 +245,8 @@
     "semantic_hash": "67b4e5cc92d0867abd6c66b7defa9c93"
   },
   "src/app/page.tsx": {
-    "mtime": 1788624888.7776647,
-    "ast_hash": "c3819334133a05604b8645cbc72a9266",
+    "mtime": 1788633708.8896782,
+    "ast_hash": "15f813e7fe1f493619e01434740b6199",
     "semantic_hash": ""
   },
   "src/app/payment/cancel/page.tsx": {
@@ -270,8 +270,8 @@
     "semantic_hash": "c4dc82e3989991c5dd68b69b8de40042"
   },
   "src/app/services/strategie-nasongon/page.tsx": {
-    "mtime": 1784112157.371574,
-    "ast_hash": "2f98e3677e2eca23c8a32a87a4525684",
+    "mtime": 1788633649.1515398,
+    "ast_hash": "c0bab80ff31e091de7a5ede9645a0706",
     "semantic_hash": ""
   },
   "src/app/sitemap.ts": {
@@ -925,8 +925,8 @@
     "semantic_hash": ""
   },
   "src/app/services/strategie-nasongon-deriv/page.tsx": {
-    "mtime": 1788624895.7438583,
-    "ast_hash": "145edbdaf25ab6472b0ccf70251d86d7",
+    "mtime": 1788633513.3121376,
+    "ast_hash": "6fc5640b0e9b90f7cf7f8583628adb58",
     "semantic_hash": ""
   },
   "email-templates/payment-success.html": {
@@ -2032,6 +2032,11 @@
   "src/app/api/courses/[id]/videos/[videoId]/route.ts": {
     "mtime": 1788626927.577696,
     "ast_hash": "d67692e438d4770aa9a09c565b5ce574",
+    "semantic_hash": ""
+  },
+  "src/components/SiteHeader.tsx": {
+    "mtime": 1788634053.3222537,
+    "ast_hash": "68eb65131b4cc489440658cf7e39b1c6",
     "semantic_hash": ""
   }
 }

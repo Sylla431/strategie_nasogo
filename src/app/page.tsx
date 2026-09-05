@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import ServicesCarousel from "@/components/ServicesCarousel";
 import ScrollReveal from "@/components/ScrollReveal";
+import SiteHeader from "@/components/SiteHeader";
 import { supabase } from "@/lib/supabaseClient";
 
 const store = {
@@ -225,58 +226,7 @@ export default function Home() {
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_transparent_30%,_rgba(0,0,0,0.7)_80%)]" />
         </div>
 
-        {/* Logo en haut à gauche */}
-        <div className="absolute top-6 left-6 z-20">
-          <div className="relative h-12 w-12 overflow-hidden rounded-full border border-[#d4af37]/60 bg-black/50 backdrop-blur-sm shadow-md">
-            <Image
-              src={store.logoUrl}
-              alt={store.name}
-              fill
-              sizes="48px"
-              className="object-contain"
-            />
-          </div>
-        </div>
-        
-        {/* Contact + auth en haut à droite */}
-        <div className="absolute top-6 right-6 z-20 text-right space-y-3">
-          <div>
-            <p className="text-sm text-white font-medium mb-1">Contactez-moi</p>
-            <a
-              href={store.support.email.replace("mailto:", "")}
-              className="text-base text-brand font-semibold hover:text-[#f4d03f] transition-colors"
-            >
-              {store.support.email.replace("mailto:", "")}
-            </a>
-          </div>
-          <div className="flex flex-wrap items-center justify-end gap-2">
-            {sessionToken ? (
-              <>
-                <Link
-                  href="/client"
-                  className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold !text-white hover:bg-[#d4af37] hover:!text-black transition-colors"
-                >
-                  Espace client
-                </Link>
-                {userRole === "admin" && (
-                  <Link
-                    href="/admin"
-                    className="inline-flex items-center rounded-full border border-[#d4af37]/50 bg-[#d4af37] px-3 py-1.5 text-xs sm:text-sm font-semibold !text-black hover:bg-[#f4d03f] transition-colors"
-                  >
-                    Admin
-                  </Link>
-                )}
-              </>
-            ) : (
-              <Link
-                href="/auth"
-                className="inline-flex items-center rounded-full border border-white/30 bg-black/50 backdrop-blur-sm px-3 py-1.5 text-xs sm:text-sm font-semibold !text-white hover:border-[#d4af37] hover:!text-[#d4af37] transition-colors"
-              >
-                Connexion
-              </Link>
-            )}
-          </div>
-        </div>
+        <SiteHeader variant="hero" />
 
         {/* Contenu centré en bas de la page */}
         <div className="relative z-10 w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center py-20">
