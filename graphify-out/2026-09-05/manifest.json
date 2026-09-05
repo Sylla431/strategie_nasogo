@@ -285,9 +285,9 @@
     "semantic_hash": ""
   },
   "src/components/admin/AdminDashboard.tsx": {
-    "mtime": 1783680171.417887,
-    "ast_hash": "869462389819cf4e542089db872a7930",
-    "semantic_hash": "869462389819cf4e542089db872a7930"
+    "mtime": 1788625705.655485,
+    "ast_hash": "b8401622f7131dac132afb4f7e5434fa",
+    "semantic_hash": ""
   },
   "src/components/admin/AdminOverlays.tsx": {
     "mtime": 1780931092.4353228,
@@ -2027,6 +2027,11 @@
   "public/images/INDICES SYNTHE\u0301TIQUES.jpg": {
     "mtime": 1788624756.2754307,
     "ast_hash": "370b6f8e2f00b9adc9b52ed2fd4d2000",
+    "semantic_hash": ""
+  },
+  "src/app/api/courses/[id]/videos/[videoId]/route.ts": {
+    "mtime": 1788625630.6967921,
+    "ast_hash": "f0cc7abc69429570b021cb28fff2a9d3",
     "semantic_hash": ""
   }
 }

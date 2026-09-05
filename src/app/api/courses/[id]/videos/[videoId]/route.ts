@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createSupabaseFromRequest } from "@/lib/supabaseServer";
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 async function getRole(supabase: ReturnType<typeof createSupabaseFromRequest>["supabase"]) {
   const { data: authData } = await supabase.auth.getUser();
@@ -17,6 +18,7 @@ export async function PATCH(
   const { supabase } = createSupabaseFromRequest(req);
   const role = await getRole(supabase);
   if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
   const { title, video_url, position } = await req.json();
   const update: { title?: string; video_url?: string; position?: number } = {};
@@ -28,14 +30,15 @@ export async function PATCH(
     return NextResponse.json({ error: "Aucun champ à mettre à jour" }, { status: 400 });
   }
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("course_videos")
     .update(update)
     .eq("id", videoId)
     .eq("course_id", id)
     .select("*")
-    .single();
+    .maybeSingle();
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!data) return NextResponse.json({ error: "Vidéo introuvable" }, { status: 404 });
   return NextResponse.json(data);
 }
 
@@ -47,12 +50,17 @@ export async function DELETE(
   const { supabase } = createSupabaseFromRequest(req);
   const role = await getRole(supabase);
   if (role !== "admin") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!supabaseAdmin) return NextResponse.json({ error: "Client admin Supabase non initialisé" }, { status: 500 });
 
-  const { error } = await supabase
+  const { data, error } = await supabaseAdmin
     .from("course_videos")
     .delete()
     .eq("id", videoId)
-    .eq("course_id", id);
+    .eq("course_id", id)
+    .select("id");
   if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+  if (!data || data.length === 0) {
+    return NextResponse.json({ error: "Vidéo introuvable" }, { status: 404 });
+  }
   return NextResponse.json({ success: true });
 }

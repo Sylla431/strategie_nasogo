@@ -2030,8 +2030,8 @@
     "semantic_hash": ""
   },
   "src/app/api/courses/[id]/videos/[videoId]/route.ts": {
-    "mtime": 1788625630.6967921,
-    "ast_hash": "f0cc7abc69429570b021cb28fff2a9d3",
+    "mtime": 1788626927.577696,
+    "ast_hash": "d67692e438d4770aa9a09c565b5ce574",
     "semantic_hash": ""
   }
 }

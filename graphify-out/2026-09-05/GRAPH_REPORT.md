@@ -1,11 +1,11 @@
-# Graph Report - strategie_nasogo  (2026-09-01)
+# Graph Report - strategie_nasogo  (2026-09-05)
 
 ## Corpus Check
-- 346 files · ~974,818 words
+- 347 files · ~1,031,568 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 5217 nodes · 6581 edges · 456 communities (302 shown, 154 thin omitted)
+- 5221 nodes · 6590 edges · 447 communities (293 shown, 154 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 422 edges (avg confidence: 0.75)
 - Token cost: 0 input · 0 output
 
@@ -373,7 +373,6 @@
 - muted
 - primary-foreground
 - ring
-- secondary-foreground
 - .__init__
 - format_output
 - test_sync_brand_to_tokens.py
@@ -444,23 +443,15 @@
 - ring
 - secondary-foreground
 - _suggest_identities
-- TestLandingAndStackContract
 - $type
 - radius
 - lg
 - Solutions
-- Dépannage
-- padding-y
-- Problèmes courants
-- Différences entre environnements
 - md
-- Vérification étape par étape
-- Obtention des identifiants
 - 16
 - 1
 - 3
 - 8
-- destructive
 - muted
 - ring
 - 8
@@ -469,38 +460,38 @@
 1. `DesignSystemGenerator` - 61 edges
 2. `TailwindConfigGenerator` - 59 edges
 3. `TailwindConfigGenerator` - 55 edges
-4. `search()` - 40 edges
+4. `createSupabaseFromRequest()` - 43 edges
 5. `search()` - 40 edges
-6. `createSupabaseFromRequest()` - 40 edges
+6. `search()` - 40 edges
 7. `TestTailwindConfigGenerator` - 35 edges
 8. `TestTailwindConfigGenerator` - 35 edges
 9. `ShadcnInstaller` - 34 edges
 10. `ShadcnInstaller` - 32 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `TestBm25CoreBehavior` --uses--> `BM25`  [INFERRED]
+  .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
+- `TestDiagnosticsContracts` --uses--> `BM25`  [INFERRED]
+  .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
 - `TestDomainDetection` --uses--> `BM25`  [INFERRED]
   .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
 - `TestPersistence` --uses--> `BM25`  [INFERRED]
   .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
 - `TestReasoningMatch` --uses--> `BM25`  [INFERRED]
   .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
-- `TestSearchDomains` --uses--> `BM25`  [INFERRED]
-  .cursor/skills/ui-ux-pro-max/scripts/tests/test_core.py → .claude/skills/design/scripts/cip/core.py
-- `TestShadcnInstaller` --uses--> `ShadcnInstaller`  [INFERRED]
-  .cursor/skills/ui-styling/scripts/tests/test_shadcn_add.py → .claude/skills/ui-styling/scripts/shadcn_add.py
 
 ## Import Cycles
 - None detected.
 
-## Communities (456 total, 154 thin omitted)
+## Communities (447 total, 154 thin omitted)
 
 ### Community 0 - "Course Access APIs"
 Cohesion: 0.20
 Nodes (14): GET(), getUserIdAndRole(), POST(), POST(), POST(), initiatePayment(), Course, initiateMonerooForOrder() (+6 more)
 
 ### Community 1 - "Orders Payment Access SQL"
-Cohesion: 0.19
-Nodes (15): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+7 more)
+Cohesion: 0.16
+Nodes (18): DELETE(), GET(), getProfileRole(), POST(), GET(), getProfileRole(), GET(), getRole() (+10 more)
 
 ### Community 2 - "Students Admin APIs"
 Cohesion: 0.12
@@ -519,24 +510,24 @@ Cohesion: 0.06
 Nodes (31): Configuration DNS recommandée, Configurer SMTP dans Supabase - Guide pas à pas, DMARC (Domain-based Message Authentication), Dépannage, Erreur : "Authentication failed", Erreur : "Connection timeout", Erreur : "Invalid sender", Les emails arrivent mais dans les spams (+23 more)
 
 ### Community 6 - "Telegram Bot APIs"
-Cohesion: 0.17
-Nodes (12): Configuration des URLs, Configuration Orange Money WebPayment API, Documentation supplémentaire, Format des données, Initiation de paiement, Notes importantes, Statuts de transaction, Test avec le Sandbox (+4 more)
+Cohesion: 0.12
+Nodes (16): 1. Créer une application, 2. Ajouter l'API Orange Money WebPayDev, 3. Obtenir l'Access Token, Configuration des URLs, Configuration Orange Money WebPayment API, Documentation supplémentaire, Format des données, Initiation de paiement (+8 more)
 
 ### Community 7 - "Orange Money Payment APIs"
 Cohesion: 0.07
 Nodes (27): Accès automatique au cours, Application de la migration SQL, 🔧 Configuration, Configuration des webhooks, 📚 Documentation, 🔍 Dépannage, Erreur "Configuration manquante", Erreur "payment_method invalide" (+19 more)
 
 ### Community 8 - "NPM Dependencies"
-Cohesion: 0.15
-Nodes (13): Causes possibles, Dépannage : Erreur DNS pour vbsniperacademie.com, Erreur "Domain not found" dans Vercel, Erreur rencontrée, Le domaine est configuré mais ne fonctionne pas, Le domaine fonctionne mais pas le www, Option A : Utiliser l'URL Vercel, Option B : Utiliser un sous-domaine (+5 more)
+Cohesion: 0.09
+Nodes (22): 1. Ajouter le domaine, 2. Configurer les DNS, 3. Attendre la propagation, 4. Vérifier le certificat SSL, Causes possibles, Configuration complète du domaine sur Vercel, Dépannage : Erreur DNS pour vbsniperacademie.com, Erreur "Domain not found" dans Vercel (+14 more)
 
 ### Community 9 - "TypeScript Config"
 Cohesion: 0.07
 Nodes (26): 1.1 Créer une application sur Orange Developer, 1.2 Ajouter l'API Orange Money WebPayDev, 1.3 Obtenir l'Access Token, 1. Obtenir les identifiants Orange Money, 2. Configurer les variables d'environnement, 3.1 Tester l'initiation de paiement, 3.2 Utiliser le simulateur USSD pour tester le paiement, 3.3 Vérifier le webhook (+18 more)
 
 ### Community 10 - "Email Templates Resend"
-Cohesion: 0.09
-Nodes (22): Comportement après activation, Connexion (Sign In), Gestion des messages, Gestion des utilisateurs existants, Inscription (Sign Up), Modifier le code frontend (si nécessaire), Personnalisation du template d'email, Problème (+14 more)
+Cohesion: 0.07
+Nodes (27): Comportement après activation, Connexion (Sign In), Dépannage, Gestion des messages, Gestion des utilisateurs existants, Inscription (Sign Up), La redirection après confirmation ne fonctionne pas, Les emails de confirmation ne sont pas envoyés (+19 more)
 
 ### Community 11 - "PayTech Moneroo Code"
 Cohesion: 0.08
@@ -547,16 +538,12 @@ Cohesion: 0.12
 Nodes (17): 1. Vérifier l'URL dans l'email, 2. Tester la confirmation, 3. Vérifier les logs Supabase, Configuration complète recommandée, Corriger l'erreur "requested path is invalid" lors de la confirmation d'email, Dépannage, Développement local, Format des URLs (+9 more)
 
 ### Community 13 - "Admin Shell Layout"
-Cohesion: 0.12
-Nodes (16): 1. Vérifier que la variable est bien définie, 2. Tester les fonctionnalités, Bonnes pratiques, Comment ajouter les variables, Configuration complète des variables d'environnement sur Vercel, Configuration sur Vercel, Configurer les variables d'environnement sur Vercel, Exemple de configuration complète (+8 more)
+Cohesion: 0.08
+Nodes (24): 1. Les redirections ne fonctionnent pas, 1. Vérifier que la variable est bien définie, 2. Orange Money rejette les URLs, 2. Tester les fonctionnalités, 3. La variable n'est pas accessible côté client, Bonnes pratiques, Comment ajouter les variables, Configuration complète des variables d'environnement sur Vercel (+16 more)
 
 ### Community 14 - "Marketing Home Page"
 Cohesion: 0.08
 Nodes (23): 1. Vérifier la configuration actuelle Supabase, 2. Configurer Resend (Recommandé), 3. Tester l'envoi, Amélioration continue, Causes possibles, Corriger le problème d'emails marqués comme spam, DKIM (DomainKeys Identified Mail), DMARC (Domain-based Message Authentication) (+15 more)
-
-### Community 15 - "Promo Email API"
-Cohesion: 0.13
-Nodes (15): Configuration recommandée pour la production, Configurer les URLs de redirection dans Supabase, Dépannage, Développement local, Erreur persiste après configuration, Format des URLs, L'URL change selon l'environnement, Problème (+7 more)
 
 ### Community 16 - "Resend Contacts Helper"
 Cohesion: 0.18
@@ -615,7 +602,7 @@ Cohesion: 0.17
 Nodes (11): Configuration pour le développement local, Important, Problème, Quand configurer le domaine personnalisé, Solution immédiate : Utiliser l'URL Vercel, Solution temporaire : Utiliser l'URL Vercel, Vérification, Étape 1 : Trouver votre URL Vercel (+3 more)
 
 ### Community 30 - "Réactiver la confirmation d'email dans Supabase"
-Cohesion: 0.17
+Cohesion: 0.25
 Nodes (8): Alternative : Modifier les politiques RLS, Comment obtenir le Service Role Key, Configuration, Configurer SUPABASE_SERVICE_ROLE_KEY, Problème, Solution : Utiliser le Service Role Key, Sécurité, Vérification
 
 ### Community 31 - "Corriger l'erreur "requested path is invalid" lors de la confirmation d'email"
@@ -755,8 +742,8 @@ Cohesion: 0.06
 Nodes (34): Accessibility, Available Domains, Available Stacks, Common Rules for Professional UI, Common Sticking Points, Example Workflow, How to Use This Skill, Icons & Visual Elements (+26 more)
 
 ### Community 159 - "search_stack"
-Cohesion: 0.10
-Nodes (8): _project_row(), Search stack-specific guidelines, search_stack(), _valid_max_results(), _rows(), TestNativeDesktopStackFreshness, _rows(), TestWebStackFreshness
+Cohesion: 0.09
+Nodes (10): _exact_stack_identifier(), _project_row(), Resolve a standalone API identifier even when its BM25 IDF is low., Search stack-specific guidelines, search_stack(), _valid_max_results(), _rows(), TestNativeDesktopStackFreshness (+2 more)
 
 ### Community 160 - "spacing"
 Cohesion: 0.09
@@ -803,8 +790,8 @@ Cohesion: 0.06
 Nodes (30): Accessibility, Base System, Best Practices, Clean & Modern, Common Font Pairings, Contrast Requirements, CSS Implementation, Editorial (+22 more)
 
 ### Community 171 - "read_rows"
-Cohesion: 0.24
-Nodes (4): split_values(), style_identities(), TestGeneratedCatalogContract, TestStyleIdentityContract
+Cohesion: 0.21
+Nodes (4): split_values(), style_identities(), TestLandingAndStackContract, TestStyleIdentityContract
 
 ### Community 172 - "Typography Specifications"
 Cohesion: 0.06
@@ -815,8 +802,8 @@ Cohesion: 0.11
 Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
 
 ### Community 174 - "getTelegramConfig"
-Cohesion: 0.11
-Nodes (19): Ajouter un logo, Bonnes pratiques, Comment l'utiliser dans Supabase, Compatibilité, Dépannage, Guide d'utilisation, Le lien de confirmation ne fonctionne pas, Le template ne s'affiche pas correctement (+11 more)
+Cohesion: 0.05
+Nodes (42): Configuration recommandée pour la production, Configurer les URLs de redirection dans Supabase, Dépannage, Développement local, Erreur persiste après configuration, Format des URLs, L'URL change selon l'environnement, Pour la production (votre domaine) : (+34 more)
 
 ### Community 175 - "Logo Usage Rules"
 Cohesion: 0.07
@@ -867,8 +854,8 @@ Cohesion: 0.14
 Nodes (24): get_context(), is_allowed_exception(), is_allowed_rgba(), is_inside_block(), load_css_variables(), main(), print_result(), print_summary() (+16 more)
 
 ### Community 187 - "search"
-Cohesion: 0.10
-Nodes (9): _exact_stack_identifier(), Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, Resolve a standalone API identifier even when its BM25 IDF is low., search(), _style_search_destination(), TestSearchDomains, read_rows() (+1 more)
+Cohesion: 0.11
+Nodes (7): Resolve a deprecated in-domain alias, or expose a cross-domain redirect., Main search function with auto-domain detection, search(), _style_search_destination(), TestSearchDomains, read_rows(), TestStyleTaxonomy
 
 ### Community 188 - "search"
 Cohesion: 0.11
@@ -883,8 +870,8 @@ Cohesion: 0.08
 Nodes (25): Common Pitfalls, Core Prompt Structure, Detailed Brief, Eco/Sustainable, Effective Keywords by Style, Fashion Brand, Healthcare, Industry-Specific Prompts (+17 more)
 
 ### Community 191 - "BM25"
-Cohesion: 0.15
-Nodes (5): BM25, BM25 ranking algorithm for text search, TestBm25CoreBehavior, TestDiagnosticsContracts, TestTokenizer
+Cohesion: 0.10
+Nodes (10): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query, BM25, BM25 ranking algorithm for text search, TestBm25CoreBehavior (+2 more)
 
 ### Community 192 - "Asset Approval Checklist"
 Cohesion: 0.08
@@ -968,7 +955,7 @@ Nodes (22): $type, $value, $type, $value, $type, $value, $type, $value (+14 more
 
 ### Community 212 - "radius"
 Cohesion: 0.18
-Nodes (15): $type, $value, sm, $type, $value, primitive, radius, shadow (+7 more)
+Nodes (15): sm, $type, $value, $type, $value, primitive, radius, shadow (+7 more)
 
 ### Community 213 - "DesignSystemGenerator"
 Cohesion: 0.10
@@ -1024,7 +1011,7 @@ Nodes (18): 1. Wordmark (Logotype), 2. Lettermark (Monogram), 3. Pictorial Mark 
 
 ### Community 226 - "color"
 Cohesion: 0.11
-Nodes (19): $type, $value, background, foreground, muted-foreground, primary, primary-hover, secondary (+11 more)
+Nodes (19): $type, $value, background, destructive, foreground, muted-foreground, primary-hover, secondary (+11 more)
 
 ### Community 227 - "DesignSystemGenerator"
 Cohesion: 0.16
@@ -1079,8 +1066,8 @@ Cohesion: 0.13
 Nodes (3): TestFixtureValidation, TestMetricMath, TestThresholdGate
 
 ### Community 240 - "BM25"
-Cohesion: 0.10
-Nodes (10): BM25, BM25 ranking algorithm for text search, Lowercase, split, remove punctuation, filter short words, Build BM25 index from documents, Score all documents against query, BM25, BM25 ranking algorithm for text search, TestBm25CoreBehavior (+2 more)
+Cohesion: 0.15
+Nodes (5): BM25, BM25 ranking algorithm for text search, TestBm25CoreBehavior, TestDiagnosticsContracts, TestTokenizer
 
 ### Community 241 - "TestThresholdGate"
 Cohesion: 0.13
@@ -1155,8 +1142,8 @@ Cohesion: 0.23
 Nodes (3): detect_domain(), Auto-detect the most relevant domain from query.      Matches are weighted by ke, TestDomainDetection
 
 ### Community 261 - ".generate"
-Cohesion: 0.14
-Nodes (8): Execute searches across multiple domains., Find matching reasoning rule for a category., Apply reasoning rules to search results., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation.          variance/motion/density, Bucket a 1-10 dial value into its tier config. Returns None if value is None., _resolve_dial()
+Cohesion: 0.18
+Nodes (6): Execute searches across multiple domains., Select best matching result based on priority keywords., Extract results list from search result dict., Generate complete design system recommendation.          variance/motion/density, Bucket a 1-10 dial value into its tier config. Returns None if value is None., _resolve_dial()
 
 ### Community 262 - "CIP Design Reference"
 Cohesion: 0.13
@@ -1207,8 +1194,8 @@ Cohesion: 0.14
 Nodes (13): Card Styles, Component Variants, CSS Structures, Feature Grid (3 columns), Layout Decision Flow, Layout Patterns, Layout Selection by Use Case, Metric Styles (+5 more)
 
 ### Community 274 - "parse_decision_rules"
-Cohesion: 0.31
-Nodes (6): apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), Return deterministic mutations and an audit trail; never execute data., Parse the canonical condition -> action-array representation., _validate_action()
+Cohesion: 0.21
+Nodes (8): Find matching reasoning rule for a category., Apply reasoning rules to search results., apply_decision_rules(), _object_without_duplicates(), parse_decision_rules(), Return deterministic mutations and an audit trail; never execute data., Parse the canonical condition -> action-array representation., _validate_action()
 
 ### Community 275 - "Banner Design - Multi-Format Creative Banner System"
 Cohesion: 0.14
@@ -1527,8 +1514,8 @@ Cohesion: 0.67
 Nodes (4): xl, xl, $type, $value
 
 ### Community 356 - "16"
-Cohesion: 0.40
-Nodes (5): 1. Ajouter le domaine, 2. Configurer les DNS, 3. Attendre la propagation, 4. Vérifier le certificat SSL, Configuration complète du domaine sur Vercel
+Cohesion: 0.67
+Nodes (4): $type, $value, default, default
 
 ### Community 357 - "1"
 Cohesion: 0.67
@@ -1536,23 +1523,23 @@ Nodes (4): padding-y, padding-y, $type, $value
 
 ### Community 358 - "3"
 Cohesion: 0.67
-Nodes (4): $type, $value, none, none
+Nodes (3): primary, $type, $value
 
 ### Community 359 - "8"
-Cohesion: 0.29
-Nodes (8): padding-x, input, $type, $value, focus-ring, padding-x, $type, $value
+Cohesion: 0.20
+Nodes (12): padding-x, padding-y, input, $type, $value, focus-ring, padding-x, padding-y (+4 more)
 
 ### Community 360 - "destructive"
 Cohesion: 0.67
-Nodes (3): $type, $value, 1
+Nodes (3): $type, $value, 12
 
 ### Community 361 - "destructive-foreground"
 Cohesion: 0.67
 Nodes (3): destructive-foreground, $type, $value
 
 ### Community 362 - "muted"
-Cohesion: 0.25
-Nodes (8): Pour la production (votre domaine) :, Pour le développement local (si vous testez en local) :, Si vous utilisez ngrok ou un autre tunnel :, Solution : Ajouter l'URL de redirection dans Supabase, Étape 1 : Aller dans les paramètres d'authentification, Étape 2 : Ajouter les URLs de redirection, Étape 3 : Ajouter les Site URLs autorisées, Étape 4 : Sauvegarder
+Cohesion: 0.67
+Nodes (3): $type, $value, 2
 
 ### Community 363 - "primary-foreground"
 Cohesion: 0.67
@@ -1560,11 +1547,7 @@ Nodes (3): primary-foreground, $type, $value
 
 ### Community 364 - "ring"
 Cohesion: 0.67
-Nodes (3): $type, $value, 16
-
-### Community 365 - "secondary-foreground"
-Cohesion: 0.67
-Nodes (3): $type, $value, 3
+Nodes (3): $type, $value, 4
 
 ### Community 370 - "Solution : Ajouter l'URL de redirection dans Supabase"
 Cohesion: 0.25
@@ -1614,33 +1597,9 @@ Nodes (5): lg, $type, $value, lg, lg
 Cohesion: 0.40
 Nodes (5): Solution 1 : Vérifier que le domaine est configuré dans Vercel, Solution 2 : Configurer les enregistrements DNS, Solution 3 : Utiliser l'URL Vercel temporairement, Solution 4 : Pour le développement local, Solutions
 
-### Community 441 - "Dépannage"
-Cohesion: 0.40
-Nodes (5): Dépannage, La redirection après confirmation ne fonctionne pas, Les emails de confirmation ne sont pas envoyés, Les utilisateurs existants ne peuvent plus se connecter, Les utilisateurs ne reçoivent pas les emails
-
-### Community 442 - "padding-y"
-Cohesion: 0.67
-Nodes (4): padding-y, padding-y, $type, $value
-
-### Community 443 - "Problèmes courants"
-Cohesion: 0.50
-Nodes (4): 1. Les redirections ne fonctionnent pas, 2. Orange Money rejette les URLs, 3. La variable n'est pas accessible côté client, Problèmes courants
-
-### Community 444 - "Différences entre environnements"
-Cohesion: 0.50
-Nodes (4): Development (local), Différences entre environnements, Preview (Pull Requests), Production
-
 ### Community 445 - "md"
 Cohesion: 0.67
 Nodes (4): $type, $value, md, md
-
-### Community 446 - "Vérification étape par étape"
-Cohesion: 0.50
-Nodes (4): Vérification étape par étape, Étape 1 : Vérifier que le domaine existe, Étape 2 : Vérifier les enregistrements DNS, Étape 3 : Vérifier dans Vercel
-
-### Community 447 - "Obtention des identifiants"
-Cohesion: 0.50
-Nodes (4): 1. Créer une application, 2. Ajouter l'API Orange Money WebPayDev, 3. Obtenir l'Access Token, Obtention des identifiants
 
 ### Community 448 - "16"
 Cohesion: 0.67
@@ -1657,10 +1616,6 @@ Nodes (3): $type, $value, 3
 ### Community 451 - "8"
 Cohesion: 0.67
 Nodes (3): $type, $value, 8
-
-### Community 452 - "destructive"
-Cohesion: 0.67
-Nodes (3): destructive, $type, $value
 
 ### Community 453 - "muted"
 Cohesion: 0.67
@@ -1682,11 +1637,11 @@ Nodes (3): $type, $value, 8
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `DesignSystemGenerator` connect `DesignSystemGenerator` to `detect_domain`, `.generate`, `detect_domain`, `design_system.py`, `_resolve_color_mode`, `_resolve_color_mode`, `design_system.py`, `read_rows`, `TestLandingAndStackContract`, `read_rows`, `search`, `search`, `BM25`, `Solution : Ajouter l'URL de redirection dans Supabase`, `_select_palette_for_mode`, `_filter_anti_patterns_for_mode`, `radius`, `DesignSystemGenerator`, `BM25`?**
+- **Why does `DesignSystemGenerator` connect `DesignSystemGenerator` to `detect_domain`, `.generate`, `detect_domain`, `Promo Email API`, `parse_decision_rules`, `design_system.py`, `_resolve_color_mode`, `_resolve_color_mode`, `design_system.py`, `read_rows`, `read_rows`, `search`, `search`, `BM25`, `Solution : Ajouter l'URL de redirection dans Supabase`, `_select_palette_for_mode`, `_filter_anti_patterns_for_mode`, `radius`, `DesignSystemGenerator`, `BM25`?**
   _High betweenness centrality (0.017) - this node is a cross-community bridge._
 - **Why does `search()` connect `search` to `_normalize`, `search_stack`, `design_system.py`, `core.py`, `detect_domain`, `Problèmes courants`, `BM25`, `_suggest_identities`, `_select_palette_for_mode`, `TestTextLayoutDataContracts`?**
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
-- **Why does `TestSearchDomains` connect `search` to `BM25`, `search_stack`, `DesignSystemGenerator`?**
+- **Why does `TestSearchDomains` connect `search` to `BM25`, `search_stack`, `DesignSystemGenerator`, `BM25`?**
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Are the 46 inferred relationships involving `DesignSystemGenerator` (e.g. with `TestBm25CoreBehavior` and `TestDiagnosticsContracts`) actually correct?**
   _`DesignSystemGenerator` has 46 INFERRED edges - model-reasoned connections that need verification._
