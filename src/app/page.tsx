@@ -264,12 +264,10 @@ export default function Home() {
                 </svg>
               </Link>
               <Link
-                href={store.support.whatsapp}
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/client"
                 className="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all backdrop-blur-sm"
               >
-                <span className="text-brand">Me contacter</span>
+                <span className="text-brand">Espace client</span>
               </Link>
             </div>
           </div>
