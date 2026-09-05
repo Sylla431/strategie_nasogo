@@ -3,7 +3,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import ServiceCard from "@/components/ServiceCard";
+import ServicesCarousel from "@/components/ServicesCarousel";
+import ScrollReveal from "@/components/ScrollReveal";
 import { supabase } from "@/lib/supabaseClient";
 
 const store = {
@@ -99,6 +100,16 @@ const services = [
     available: true,
     externalUrl: `${store.support.whatsapp}`,
   },
+  {
+    id: "strategie-nasongon-deriv",
+    name: "Stratégie Nasongon Deriv",
+    slug: "strategie-nasongon-deriv",
+    description: "Stratégie Nasongon sur Deriv",
+    cover: "/images/INDICES SYNTHÉTIQUES.jpg",
+    price: 75000,
+    featured: false,
+    available: true,
+  },
   // VIP telegram signaux
   {
     id:"vip-telegram-signaux",
@@ -112,6 +123,9 @@ const services = [
     confirmBeforeCheckout: true,
   },
 ];
+
+const newService = services.find((s) => s.id === "strategie-nasongon-deriv");
+const otherServices = services.filter((s) => s.id !== "strategie-nasongon-deriv");
 
 const testimonials = [
   "IMG-20251213-WA0002.jpg",
@@ -421,20 +435,56 @@ export default function Home() {
       {/* Section Services */}
       <section id="services" className="py-16 md:py-24 bg-white">
         <div className="layout-shell">
-          <div className="text-center mb-12">
+          <ScrollReveal className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-semibold text-neutral-900 mb-4">
               Nos Services
             </h2>
             <p className="text-lg text-neutral-600 max-w-2xl mx-auto">
               Services disponibles et à venir
             </p>
-          </div>
+          </ScrollReveal>
 
-          <div className="grid md:grid-cols-2 gap-6 lg:gap-8">
-            {services.map((service) => (
-              <ServiceCard key={service.id} service={service} />
-            ))}
-          </div>
+          {newService && (
+            <ScrollReveal className="mb-10">
+              <div className="card overflow-hidden border-2 border-brand/40 shadow-[0_20px_60px_rgba(212,175,55,0.18)] md:grid md:grid-cols-[1.1fr_1fr] md:items-stretch">
+                <div className="relative h-56 md:h-full min-h-[240px] w-full">
+                  <Image
+                    src={newService.cover}
+                    alt={newService.name}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  <span className="absolute left-4 top-4 badge-soft text-brand text-xs sm:text-sm">
+                    ✨ Nouvelle formation
+                  </span>
+                </div>
+                <div className="flex flex-col justify-center gap-4 p-6 md:p-10">
+                  <h3 className="text-2xl md:text-3xl font-semibold text-neutral-900">
+                    {newService.name}
+                  </h3>
+                  <p className="text-neutral-600 leading-relaxed">
+                    {newService.description}
+                  </p>
+                  {newService.price !== undefined && (
+                    <p className="text-2xl font-semibold text-brand">
+                      {newService.price.toLocaleString("fr-FR")} F CFA
+                    </p>
+                  )}
+                  <Link
+                    href={`/services/${newService.slug}`}
+                    className="button-primary cta-pulse inline-flex w-full items-center justify-center sm:w-fit sm:px-8"
+                  >
+                    Découvrir la formation
+                  </Link>
+                </div>
+              </div>
+            </ScrollReveal>
+          )}
+
+          <ScrollReveal delayMs={100}>
+            <ServicesCarousel services={otherServices} />
+          </ScrollReveal>
           </div>
         </section>
 
