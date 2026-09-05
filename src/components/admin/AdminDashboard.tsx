@@ -115,6 +115,14 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
   const [selectedVideo, setSelectedVideo] = useState<{ title: string; video_url: string } | null>(null);
   const [selectedCourseForVideos, setSelectedCourseForVideos] = useState<string>("");
   const [newVideo, setNewVideo] = useState({ title: "", video_url: "", position: 0 });
+  const [editingVideo, setEditingVideo] = useState<{
+    id: string;
+    courseId: string;
+    title: string;
+    video_url: string;
+    position: number;
+  } | null>(null);
+  const [videoActionLoading, setVideoActionLoading] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -784,13 +792,16 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
     }
   };
 
-  const getAllVideosForCourse = (course: Course): Array<{ title: string; video_url: string; position: number; source: string }> => {
-    const videos: Array<{ title: string; video_url: string; position: number; source: string }> = [];
-    
-    // Vidéos depuis course_videos (table)
+  const getAllVideosForCourse = (
+    course: Course
+  ): Array<{ id: string | null; title: string; video_url: string; position: number; source: string }> => {
+    const videos: Array<{ id: string | null; title: string; video_url: string; position: number; source: string }> = [];
+
+    // Vidéos depuis course_videos (table) — seules celles-ci sont modifiables/supprimables
     if (course.course_videos && course.course_videos.length > 0) {
       course.course_videos.forEach((v) => {
         videos.push({
+          id: v.id,
           title: v.title,
           video_url: v.video_url,
           position: v.position,
@@ -798,11 +809,12 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
         });
       });
     }
-    
-    // Vidéos depuis video_url (JSONB)
+
+    // Vidéos depuis video_url (JSONB) — format hérité, non modifiable ici
     if (course.video_url && Array.isArray(course.video_url)) {
       course.video_url.forEach((v) => {
         videos.push({
+          id: null,
           title: v.title || "Sans titre",
           video_url: v.video_url,
           position: v.position ?? 999,
@@ -810,9 +822,77 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
         });
       });
     }
-    
+
     // Trier par position
     return videos.sort((a, b) => a.position - b.position);
+  };
+
+  const startEditVideo = (courseId: string, video: { id: string | null; title: string; video_url: string; position: number }) => {
+    if (!video.id) return;
+    setError(null);
+    setMessage(null);
+    setEditingVideo({ id: video.id, courseId, title: video.title, video_url: video.video_url, position: video.position });
+  };
+
+  const cancelEditVideo = () => setEditingVideo(null);
+
+  const saveEditVideo = async () => {
+    if (!token || !editingVideo) return;
+    if (!editingVideo.title || !editingVideo.video_url) {
+      setError("Titre et URL vidéo requis");
+      return;
+    }
+    setVideoActionLoading(editingVideo.id);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/courses/${editingVideo.courseId}/videos/${editingVideo.id}`, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: editingVideo.title,
+          video_url: editingVideo.video_url,
+          position: editingVideo.position,
+        }),
+      });
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({}));
+        setError(b.error || "Erreur lors de la modification de la vidéo");
+        return;
+      }
+      setMessage("Vidéo modifiée avec succès");
+      setEditingVideo(null);
+      await loadCourses(token);
+    } finally {
+      setVideoActionLoading(null);
+    }
+  };
+
+  const deleteVideo = async (courseId: string, videoId: string | null) => {
+    if (!token || !videoId) return;
+    if (!window.confirm("Supprimer définitivement cette vidéo ?")) return;
+    setVideoActionLoading(videoId);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch(`/api/courses/${courseId}/videos/${videoId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        const b = await res.json().catch(() => ({}));
+        setError(b.error || "Erreur lors de la suppression de la vidéo");
+        return;
+      }
+      setMessage("Vidéo supprimée avec succès");
+      if (editingVideo?.id === videoId) setEditingVideo(null);
+      await loadCourses(token);
+    } finally {
+      setVideoActionLoading(null);
+    }
   };
 
   const meta = SECTION_META[section];
@@ -951,23 +1031,92 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
                       const allVideos = course ? getAllVideosForCourse(course) : [];
                       return allVideos.length > 0 ? (
                         <div className="space-y-2">
-                          {allVideos.map((video, index) => (
-                            <div
-                              key={`${course?.id}-${index}-${video.source}`}
-                              className="flex items-center justify-between p-2 border rounded bg-neutral-50"
-                            >
-                              <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium">{video.title}</p>
-                                <p className="text-xs text-neutral-600 truncate">{video.video_url}</p>
+                          {allVideos.map((video, index) => {
+                            const isEditing = editingVideo?.id === video.id && video.id !== null;
+                            if (isEditing && editingVideo) {
+                              return (
+                                <div
+                                  key={`${course?.id}-${index}-${video.source}`}
+                                  className="space-y-2 p-3 border-2 border-brand/40 rounded bg-white"
+                                >
+                                  <input
+                                    className="form-control"
+                                    placeholder="Titre de la vidéo"
+                                    value={editingVideo.title}
+                                    onChange={(e) => setEditingVideo((v) => (v ? { ...v, title: e.target.value } : v))}
+                                  />
+                                  <input
+                                    className="form-control"
+                                    placeholder="URL vidéo (Vimeo/MP4)"
+                                    value={editingVideo.video_url}
+                                    onChange={(e) => setEditingVideo((v) => (v ? { ...v, video_url: e.target.value } : v))}
+                                  />
+                                  <div className="flex gap-2">
+                                    <input
+                                      className="form-control"
+                                      type="number"
+                                      placeholder="Position (ordre)"
+                                      value={editingVideo.position}
+                                      onChange={(e) =>
+                                        setEditingVideo((v) => (v ? { ...v, position: Number(e.target.value) } : v))
+                                      }
+                                    />
+                                    <button
+                                      type="button"
+                                      className="button-primary text-sm whitespace-nowrap"
+                                      onClick={saveEditVideo}
+                                      disabled={videoActionLoading === video.id}
+                                    >
+                                      {videoActionLoading === video.id ? "..." : "Enregistrer"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="button-secondary text-sm whitespace-nowrap"
+                                      onClick={cancelEditVideo}
+                                    >
+                                      Annuler
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div
+                                key={`${course?.id}-${index}-${video.source}`}
+                                className="flex items-center justify-between p-2 border rounded bg-neutral-50"
+                              >
+                                <div className="flex-1 min-w-0">
+                                  <p className="text-sm font-medium">{video.title}</p>
+                                  <p className="text-xs text-neutral-600 truncate">{video.video_url}</p>
+                                </div>
+                                <div className="flex items-center gap-2 ml-2">
+                                  <span className="text-xs text-neutral-500">Pos: {video.position}</span>
+                                  <span className="text-xs px-2 py-0.5 bg-neutral-100 rounded text-neutral-600">
+                                    {video.source === "table" ? "Table" : "JSONB"}
+                                  </span>
+                                  {video.source === "table" && video.id && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="button-secondary text-xs whitespace-nowrap"
+                                        onClick={() => course && startEditVideo(course.id, video)}
+                                      >
+                                        Modifier
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="text-xs whitespace-nowrap text-red-600 hover:text-red-700 px-2 py-1"
+                                        onClick={() => course && deleteVideo(course.id, video.id)}
+                                        disabled={videoActionLoading === video.id}
+                                      >
+                                        {videoActionLoading === video.id ? "..." : "Supprimer"}
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 ml-2">
-                                <span className="text-xs text-neutral-500">Pos: {video.position}</span>
-                                <span className="text-xs px-2 py-0.5 bg-neutral-100 rounded text-neutral-600">
-                                  {video.source === "table" ? "Table" : "JSONB"}
-                                </span>
-                              </div>
-                            </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       ) : (
                         <p className="text-sm text-neutral-600">Aucune vidéo pour ce cours.</p>
@@ -1054,27 +1203,98 @@ export function AdminDashboard({ section }: { section: AdminSection }) {
                         {allVideos.length === 0 ? (
                           <p className="text-sm text-neutral-600">Aucune vidéo.</p>
                         ) : (
-                          allVideos.map((video, idx) => (
-                            <div
-                              key={`${video.video_url}-${idx}`}
-                              className="flex items-center justify-between gap-3 p-3 bg-white rounded-lg border border-neutral-200"
-                            >
-                              <div className="min-w-0 flex-1">
-                                <p className="font-medium text-sm truncate">{video.title}</p>
-                                <p className="text-xs text-neutral-500 truncate">{video.video_url}</p>
-                                <p className="text-xs text-neutral-400 mt-1">
-                                  Position {video.position} • Source: {video.source}
-                                </p>
-                              </div>
-                              <button
-                                type="button"
-                                className="button-secondary text-xs whitespace-nowrap"
-                                onClick={() => setSelectedVideo({ title: video.title, video_url: video.video_url })}
+                          allVideos.map((video, idx) => {
+                            const isEditing = editingVideo?.id === video.id && video.id !== null;
+                            if (isEditing && editingVideo) {
+                              return (
+                                <div
+                                  key={`${video.video_url}-${idx}`}
+                                  className="space-y-2 p-3 bg-white rounded-lg border-2 border-brand/40"
+                                >
+                                  <input
+                                    className="form-control"
+                                    placeholder="Titre de la vidéo"
+                                    value={editingVideo.title}
+                                    onChange={(e) => setEditingVideo((v) => (v ? { ...v, title: e.target.value } : v))}
+                                  />
+                                  <input
+                                    className="form-control"
+                                    placeholder="URL vidéo (Vimeo/MP4)"
+                                    value={editingVideo.video_url}
+                                    onChange={(e) => setEditingVideo((v) => (v ? { ...v, video_url: e.target.value } : v))}
+                                  />
+                                  <div className="flex gap-2">
+                                    <input
+                                      className="form-control"
+                                      type="number"
+                                      placeholder="Position (ordre)"
+                                      value={editingVideo.position}
+                                      onChange={(e) =>
+                                        setEditingVideo((v) => (v ? { ...v, position: Number(e.target.value) } : v))
+                                      }
+                                    />
+                                    <button
+                                      type="button"
+                                      className="button-primary text-sm whitespace-nowrap"
+                                      onClick={saveEditVideo}
+                                      disabled={videoActionLoading === video.id}
+                                    >
+                                      {videoActionLoading === video.id ? "..." : "Enregistrer"}
+                                    </button>
+                                    <button
+                                      type="button"
+                                      className="button-secondary text-sm whitespace-nowrap"
+                                      onClick={cancelEditVideo}
+                                    >
+                                      Annuler
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            }
+                            return (
+                              <div
+                                key={`${video.video_url}-${idx}`}
+                                className="flex items-center justify-between gap-3 p-3 bg-white rounded-lg border border-neutral-200"
                               >
-                                Lire
-                              </button>
-                            </div>
-                          ))
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-medium text-sm truncate">{video.title}</p>
+                                  <p className="text-xs text-neutral-500 truncate">{video.video_url}</p>
+                                  <p className="text-xs text-neutral-400 mt-1">
+                                    Position {video.position} • Source: {video.source}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2 flex-shrink-0">
+                                  <button
+                                    type="button"
+                                    className="button-secondary text-xs whitespace-nowrap"
+                                    onClick={() => setSelectedVideo({ title: video.title, video_url: video.video_url })}
+                                  >
+                                    Lire
+                                  </button>
+                                  {video.source === "table" && video.id && (
+                                    <>
+                                      <button
+                                        type="button"
+                                        className="button-secondary text-xs whitespace-nowrap"
+                                        onClick={() => startEditVideo(course.id, video)}
+                                      >
+                                        Modifier
+                                      </button>
+                                      <button
+                                        type="button"
+                                        className="text-xs whitespace-nowrap text-red-600 hover:text-red-700 px-2 py-1"
+                                        onClick={() => deleteVideo(course.id, video.id)}
+                                        disabled={videoActionLoading === video.id}
+                                      >
+                                        {videoActionLoading === video.id ? "..." : "Supprimer"}
+                                      </button>
+                                    </>
+                                  )}
+                                </div>
+                              </div>
+                            );
+                          })
                         )}
                       </div>
                     )}
