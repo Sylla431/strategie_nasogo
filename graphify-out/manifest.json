@@ -245,8 +245,8 @@
     "semantic_hash": "67b4e5cc92d0867abd6c66b7defa9c93"
   },
   "src/app/page.tsx": {
-    "mtime": 1788635271.5969276,
-    "ast_hash": "b6160670a20f709dbbcbfc9587b15f5d",
+    "mtime": 1788636538.3315198,
+    "ast_hash": "e743466ffdaddb5d71978e843a4721f4",
     "semantic_hash": ""
   },
   "src/app/payment/cancel/page.tsx": {

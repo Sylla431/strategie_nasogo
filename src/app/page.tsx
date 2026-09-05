@@ -264,7 +264,7 @@ export default function Home() {
                 </svg>
               </Link>
               <Link
-                href="/client"
+                href={sessionToken ? "/client" : "/auth"}
                 className="inline-flex items-center gap-2 border-2 border-white/30 text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white/10 hover:border-white/50 transition-all backdrop-blur-sm"
               >
                 <span className="text-brand">Espace client</span>
