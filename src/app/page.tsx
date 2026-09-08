@@ -107,7 +107,7 @@ const services = [
     slug: "strategie-nasongon-deriv",
     description: "Stratégie Nasongon sur Deriv",
     cover: "/images/INDICES SYNTHÉTIQUES.jpg",
-    price: 75000,
+    price: 74500,
     featured: false,
     available: true,
   },

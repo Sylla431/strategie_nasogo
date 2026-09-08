@@ -26,7 +26,7 @@ const product = {
   name: "Indices Synthétiques",
   cover: "/images/INDICES SYNTHÉTIQUES.jpg",
   description: "Indices Synthétiques",
-  price: 75000,
+  price: 74500,
   type: "Programme de formation",
   customCtaText: "Rejoindre le programme",
 };
