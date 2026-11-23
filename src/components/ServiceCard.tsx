@@ -17,6 +17,9 @@ type Service = {
   externalUrl?: string;
   /** Affiche une popup avant redirection (ex. checkout VIP) */
   confirmBeforeCheckout?: boolean;
+  /** Remplace le bouton « Découvrir » par des boutons de téléchargement */
+  downloads?: { label: string; href: string }[];
+  downloadHelpUrl?: string;
 };
 
 const formatPrice = (value: number) =>
@@ -60,6 +63,32 @@ export default function ServiceCard({ service }: { service: Service }) {
         >
           Bientôt disponible
         </button>
+      );
+    }
+
+    if (service.downloads?.length) {
+      return (
+        <div className="space-y-2">
+          {service.downloads.map((d, i) => (
+            <a
+              key={d.href}
+              href={d.href}
+              className={`block w-full text-center ${i === 0 ? "button-primary" : "button-secondary"}`}
+            >
+              {d.label}
+            </a>
+          ))}
+          {service.downloadHelpUrl && (
+            <a
+              href={service.downloadHelpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block pt-1 text-center text-xs text-neutral-500 underline hover:text-neutral-800"
+            >
+              Notice d&apos;installation
+            </a>
+          )}
+        </div>
       );
     }
 

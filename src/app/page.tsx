@@ -70,14 +70,19 @@ const services = [
   },
   {
     id: "journal-de-trading",
-    name: "Journal de Trading",
+    name: "Journal de Trading & Backtest",
     slug: "journal-de-trading",
-    description: "un outil d'auto-analyse qui sert à documenter vos trades, vos stratégies et vos émotions afin d'identifier vos erreurs et de mesurer objectivement vos performances pour devenir un trader rentable.",
+    description: "Une application pour ordinateur qui réunit votre journal de trading et le backtest : documentez vos trades, vos stratégies et vos émotions, rejouez le marché et testez vos stratégies pour mesurer objectivement vos performances.",
     cover: "/images/SERVICES 02.jpg",
     price: 10000,
     featured: false,
     available: true,
-    externalUrl: "https://journal.vbsniperacademie.com/",
+    downloads: [
+      { label: "Télécharger pour Windows", href: "/api/downloads/tradingsmart/windows" },
+      { label: "Mac puce Apple (M1, M2, M3…)", href: "/api/downloads/tradingsmart/mac-arm64" },
+      { label: "Mac Intel", href: "/api/downloads/tradingsmart/mac-x64" },
+    ],
+    downloadHelpUrl: "https://github.com/Sylla431/tradingsmart-releases#readme",
   },
   {
     id:"formation-en-presentiel",
